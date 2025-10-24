@@ -1,0 +1,13 @@
+<p>Estas en partida</p>
+
+{{#pregunta}}
+        <p>Pregunta_id: {{pregunta_id}}</p>
+        <p>Categoría: {{pregunta}}</p>
+        <p>Pregunta: {{categoria}}</p>
+        <div>Alternativas: </div>
+        {{#respuestas}}
+            <p> - {{texto}}</p>
+        {{/respuestas}}
+{{/pregunta}}
+
+<a href="/game/partida">Siguiente Pregunta</a>

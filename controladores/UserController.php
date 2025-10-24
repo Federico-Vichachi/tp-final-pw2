@@ -6,15 +6,15 @@ class UserController
     private $renderer;
     private $model;
 
-    public function __construct($pokemonModel,$renderer)
+    public function __construct($UserModel,$renderer)
     {
-        $this->model = $pokemonModel;
+        $this->model = $UserModel;
         $this->renderer = $renderer;
     }
 
     public function base()
     {
-        $this->registrar();
+        $this->lobby();
     }
 
     public function redirectToIndex()
@@ -39,5 +39,13 @@ class UserController
     {
         session_destroy();
         $this->redirectToIndex();
+    }
+
+    public function lobby()
+    {
+        $usuario = $this->model->getId();
+        $this->renderer->render("lobby",[
+            'usuario' => $usuario
+        ]);
     }
 }
