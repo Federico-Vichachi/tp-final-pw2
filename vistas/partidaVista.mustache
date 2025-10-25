@@ -1,13 +1,24 @@
-<p>Estas en partida</p>
+<p>Temporizador: <span id="tiempo">10</span></p>
 
-{{#pregunta}}
-        <p>Pregunta_id: {{pregunta_id}}</p>
-        <p>Categoría: {{pregunta}}</p>
-        <p>Pregunta: {{categoria}}</p>
-        <div>Alternativas: </div>
-        {{#respuestas}}
-            <p> - {{texto}}</p>
-        {{/respuestas}}
-{{/pregunta}}
+{{#partida}}
+    <p>Categoria: {{categoria.nombre}}</p>
+    <p>Pregunta: {{pregunta.pregunta}}</p>
+    <div>Alternativas: </div>
+    {{#respuestas}}
+        <p> - {{texto}} -> {{ es_correcta }}</p>
+    {{/respuestas}}
+{{/partida}}
+
+<script>
+    let tiempo = 10;
+    const temporizador = setInterval(() => {
+        tiempo--;
+        document.querySelector('#tiempo').textContent = tiempo;
+
+        if (tiempo <= 0) {
+            clearInterval(temporizador);
+        }
+    }, 1000);
+</script>
 
 <a href="/game/partida">Siguiente Pregunta</a>

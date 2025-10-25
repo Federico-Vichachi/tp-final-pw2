@@ -19,13 +19,9 @@ class GameController
 
     public function partida()
     {
-        $preguntas = $this->model->getPregunta("historia"); // Falta hacer random
-        $preguntaRandom = $preguntas[array_rand($preguntas)];
-        $idPreguntaRandom = $preguntaRandom['pregunta_id'];
-        $respuestas = $this->model->getRespuestas($idPreguntaRandom);
+        $partida = $this->model->getPartidaAleatoria();
         $this->renderer->render("partida", [
-            'pregunta' => $preguntaRandom,
-            'respuestas' => $respuestas
+            'partida' => $partida
         ]);
     }
 
