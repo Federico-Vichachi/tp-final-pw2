@@ -17,14 +17,6 @@ CREATE TABLE usuario (
                          fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO usuario (
-    nombre_completo, anio_nacimiento, sexo, pais, ciudad, email, password, username, foto_perfil, codigo_validacion, cuenta_activa, rol
-) VALUES (
-             'María López', 1998, 'Femenino', 'Argentina', 'Córdoba', 'maria@example.com',
-             '1234', 'Maria', 'uploads/perfiles/maria.jpg',
-             'abc123xyz', TRUE, 'editor'
-         );
-
 CREATE TABLE categorias (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             nombre VARCHAR(100) NOT NULL

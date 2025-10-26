@@ -1,1 +1,30 @@
-<p>registrar</p>
+<form method="POST" action="/user/registrar" enctype="multipart/form-data">
+    <h2>Registrar usuario</h2>
+
+    {{#error}}
+        <div style="color: red; margin-bottom: 10px;">
+            <strong>{{error}}</strong>
+            {{#errores}}
+                <div>{{.}}</div>
+            {{/errores}}
+        </div>
+    {{/error}}
+
+    <input type="text" name="nombre_completo" placeholder="Nombre completo" value="{{#datos}}{{nombre_completo}}{{/datos}}" required>
+    <input type="number" name="anio_nacimiento" placeholder="Año de nacimiento" value="{{#datos}}{{anio_nacimiento}}{{/datos}}" required>
+
+    <select name="sexo" required>
+        <option value="Femenino" {{#datos}}{{#sexo_femenino}}selected{{/sexo_femenino}}{{/datos}}>Femenino</option>
+        <option value="Masculino" {{#datos}}{{#sexo_masculino}}selected{{/sexo_masculino}}{{/datos}}>Masculino</option>
+        <option value="Prefiero no cargarlo" {{#datos}}{{^sexo_femenino}}{{^sexo_masculino}}selected{{/sexo_masculino}}{{/sexo_femenino}}{{/datos}}>Prefiero no cargarlo</option>
+    </select>
+
+    <input type="text" name="pais" placeholder="Pais" value="{{#datos}}{{pais}}{{/datos}}" required>
+    <input type="text" name="ciudad" placeholder="Ciudad" value="{{#datos}}{{ciudad}}{{/datos}}" required>
+    <input type="email" name="email" placeholder="Email" value="{{#datos}}{{email}}{{/datos}}" required>
+    <input type="text" name="username" placeholder="Usuario" value="{{#datos}}{{username}}{{/datos}}" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="file" name="file">
+
+    <button type="submit">Registrarse</button>
+</form>

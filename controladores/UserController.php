@@ -18,12 +18,24 @@ class UserController
 
     public function registrar() {
         $this->redirectAuthenticated();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->procesarRegistro();
+            exit;
+        }
+
         $this->renderer->render("registrar", []);
     }
 
     public function validar() {
         $this->redirectAuthenticated();
-        $this->renderer->render("validar", []);
+
+        $mensaje = $_SESSION['mensaje_exito'] ?? null;
+        unset($_SESSION['mensaje_exito']);
+
+        $this->renderer->render("validar", [
+            'mensaje' => $mensaje
+        ]);
     }
 
     public function ingresar() {
@@ -61,6 +73,36 @@ class UserController
         $this->redirectTo('lobby');
     }
 
+    private function procesarRegistro()
+    {
+        $datos = [
+            'nombre_completo' => $_POST['nombre_completo'] ?? '',
+            'anio_nacimiento' => $_POST['anio_nacimiento'] ?? '',
+            'sexo' => $_POST['sexo'] ?? 'Prefiero no cargarlo',
+            'pais' => $_POST['pais'] ?? '',
+            'ciudad' => $_POST['ciudad'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'username' => $_POST['username'] ?? '',
+            'password' => $_POST['password'] ?? ''
+        ];
+
+        $file = $_FILES['file'] ?? null;
+
+        $resultado = $this->model->registrarUsuario($datos, $file);
+
+        if (!$resultado['ok']) {
+            $this->renderer->render("registrar", [
+                'error' => "Error en el registro:",
+                'errores' => $resultado['errores'],
+                'datos' => $datos
+            ]);
+            exit;
+        }
+
+        $_SESSION['mensaje_exito'] = 'Registro exitoso. ¡Revisa tu correo para validar tu cuenta!';
+        $this->redirectTo('validar');
+    }
+
     private function isAuthenticated()
     {
         return isset($_SESSION["usuario"]);
@@ -87,7 +129,7 @@ class UserController
 
     private function redirectTo($method)
     {
-        header("Location: user/$method");
+        header("Location: $method");
         exit;
     }
 }

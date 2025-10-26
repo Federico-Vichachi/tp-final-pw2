@@ -15,9 +15,9 @@ class MyConexion
     {
         $result = $this->conexion->query($sql);
 
-        if ($result->num_rows > 0) {
+        if ($result && !is_bool($result) && $result->num_rows > 0) {
             return $result->fetch_all(MYSQLI_ASSOC);
         }
-        return [];
+        return $result;
     }
 }
