@@ -2,7 +2,6 @@
 
 class UserController
 {
-    private $conexion;
     private $renderer;
     private $model;
 
@@ -14,24 +13,26 @@ class UserController
 
     public function base()
     {
-        $this->lobby();
-    }
-
-    public function redirectToIndex()
-    {
-        header("Location: /");
-        exit;
+        $this->ingresar();
     }
 
     public function registrar() {
+        $this->redirectAuthenticated();
         $this->renderer->render("registrar", []);
     }
 
     public function validar() {
+        $this->redirectAuthenticated();
         $this->renderer->render("validar", []);
     }
 
     public function ingresar() {
+        $this->redirectAuthenticated();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->procesarLogin();
+        }
+
         $this->renderer->render("ingresar", []);
     }
 
@@ -43,9 +44,50 @@ class UserController
 
     public function lobby()
     {
-        $usuario = $this->model->getId();
-        $this->renderer->render("lobby",[
-            'usuario' => $usuario
-        ]);
+        $this->redirectNotAuthenticated();
+        $this->renderer->render("lobby",[]);
+    }
+
+    private function procesarLogin()
+    {
+        $usuario = $this->model->getUsuario($_POST['user'], $_POST['password']);
+        if (empty($usuario)) {
+            $this->renderer->render("ingresar", [
+                'error' => "Usuario o clave incorrecta"
+            ]);
+            exit;
+        }
+        $_SESSION['usuario'] = $usuario;
+        $this->redirectTo('lobby');
+    }
+
+    private function isAuthenticated()
+    {
+        return isset($_SESSION["usuario"]);
+    }
+
+    private function redirectNotAuthenticated()
+    {
+        if (!$this->isAuthenticated())
+            $this->redirectToIndex();
+    }
+
+    private function redirectAuthenticated()
+    {
+        if ($this->isAuthenticated()) {
+            $this->redirectTo('lobby');
+        }
+    }
+
+    private function redirectToIndex()
+    {
+        header("Location: /");
+        exit();
+    }
+
+    private function redirectTo($method)
+    {
+        header("Location: user/$method");
+        exit;
     }
 }

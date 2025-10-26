@@ -9,11 +9,10 @@ class UserModel
         $this->conexion = $conexion;
     }
 
-    public function getId()
+    public function getUsuario($user, $password)
     {
-        $sql = 'SELECT * FROM preguntados.usuario';
+        $sql = "SELECT * FROM usuario WHERE username = '$user' AND password = '$password'";
         $result = $this->conexion->query($sql);
-        return $result[0];
+        return $result;
     }
-
 }

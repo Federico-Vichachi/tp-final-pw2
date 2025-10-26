@@ -21,7 +21,7 @@ INSERT INTO usuario (
     nombre_completo, anio_nacimiento, sexo, pais, ciudad, email, password, username, foto_perfil, codigo_validacion, cuenta_activa, rol
 ) VALUES (
              'María López', 1998, 'Femenino', 'Argentina', 'Córdoba', 'maria@example.com',
-             '$2y$10$asfkjhsdfkjsdhflsdfkjhsdfjhsdflkj', 'marial98', 'uploads/perfiles/maria.jpg',
+             '1234', 'Maria', 'uploads/perfiles/maria.jpg',
              'abc123xyz', TRUE, 'editor'
          );
 

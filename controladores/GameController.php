@@ -2,7 +2,6 @@
 
 class GameController
 {
-    private $conexion;
     private $renderer;
     private $model;
 
