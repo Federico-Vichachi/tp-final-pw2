@@ -31,29 +31,59 @@ class GameModel
 
     public function getRespuestas($id_pregunta)
     {
-        $sql = "SELECT texto, es_correcta 
+        $sql = "SELECT id, texto 
             FROM respuestas 
             WHERE pregunta_id = '$id_pregunta'";
         $resultado = $this->conexion->query($sql);
         return $resultado;
     }
 
-    public function getPartidaAleatoria()
+    public function getPartidaAleatoria($preguntasVistas = [])
     {
-        $categorias = $this->getCategorias();
-        $categoriaRandom = $categorias[array_rand($categorias)];
+        $sql = "";
+        if(!empty($preguntasVistas)){
+            $idsExcluidos = implode(",", $preguntasVistas);
 
-        $preguntas = $this->getPreguntas($categoriaRandom["nombre"]);
-        $preguntaRandom = $preguntas[array_rand($preguntas)];
+            $sql = "SELECT p.id AS pregunta_id, p.
+                    texto AS pregunta, 
+                    c.nombre AS categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.id NOT IN ($idsExcluidos)
+            ORDER BY RAND()
+            LIMIT 1";
+        }else{
+            $sql = "SELECT p.id AS pregunta_id, 
+                    p.texto AS pregunta, 
+                    c.nombre AS categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id
+            ORDER BY RAND()
+            LIMIT 1";
+        }
 
+        $pregunta = $this->conexion->query($sql);
+
+        if(empty($pregunta)){
+            return [];
+        }
+
+        $preguntaRandom = $pregunta[0];
         $respuestas = $this->getRespuestas($preguntaRandom['pregunta_id']);
         shuffle($respuestas);
 
         return [
-            'categoria' => $categoriaRandom,
-            'pregunta' => $preguntaRandom,
-            'respuestas' => $respuestas
+            "pregunta" => $preguntaRandom,
+            "respuestas" => $respuestas
         ];
     }
 
+    public function verificarRespuesta($idRespuesta){
+        if ($idRespuesta ==null) return false;
+
+        $sql = "SELECT es_correcta FROM respuestas WHERE id = $idRespuesta";
+        $resultado = $this->conexion->query($sql);
+
+        return !empty($resultado) && $resultado[0]['es_correcta']==1;
+    }
 }

@@ -13,7 +13,7 @@ class UserController
 
     public function base()
     {
-        $this->ingresar();
+        $this->redirectToIngresar();
     }
 
     public function registrar() {
@@ -21,7 +21,6 @@ class UserController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarRegistro();
-            exit;
         }
 
         $this->renderer->render("registrar", []);
@@ -57,7 +56,9 @@ class UserController
     public function lobby()
     {
         $this->redirectNotAuthenticated();
-        $this->renderer->render("lobby",[]);
+        $this->renderer->render("lobby",[
+            'usuario' => $_SESSION['usuario']
+        ]);
     }
 
     private function procesarLogin()
@@ -67,7 +68,7 @@ class UserController
             $this->renderer->render("ingresar", [
                 'error' => "Usuario o clave incorrecta"
             ]);
-            exit;
+            exit();
         }
         $_SESSION['usuario'] = $usuario;
         $this->redirectTo('lobby');
@@ -96,7 +97,7 @@ class UserController
                 'errores' => $resultado['errores'],
                 'datos' => $datos
             ]);
-            exit;
+            exit();
         }
 
         $_SESSION['mensaje_exito'] = 'Registro exitoso. ¡Revisa tu correo para validar tu cuenta!';
@@ -127,9 +128,14 @@ class UserController
         exit();
     }
 
+    public function redirectToIngresar(){
+        header("Location: /user/ingresar");
+        exit();
+    }
+
     private function redirectTo($method)
     {
         header("Location: $method");
-        exit;
+        exit();
     }
 }
