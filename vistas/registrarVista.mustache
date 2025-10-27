@@ -1,30 +1,74 @@
-<form method="POST" action="/user/registrar" enctype="multipart/form-data">
-    <h2>Registrar usuario</h2>
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Registrar usuario</h2>
 
-    {{#error}}
-        <div style="color: red; margin-bottom: 10px;">
-            <strong>{{error}}</strong>
-            {{#errores}}
-                <div>{{.}}</div>
-            {{/errores}}
+                {{#error}}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>{{error}}</strong>
+                        {{#errores}}
+                            <div>{{.}}</div>
+                        {{/errores}}
+                    </div>
+                {{/error}}
+
+                <form method="POST" action="/user/registrar" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="nombre_completo" class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo" value="{{#datos}}{{nombre_completo}}{{/datos}}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="anio_nacimiento" class="form-label">Año de nacimiento</label>
+                        <input type="number" class="form-control" id="anio_nacimiento" name="anio_nacimiento" placeholder="Año de nacimiento" value="{{#datos}}{{anio_nacimiento}}{{/datos}}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sexo" class="form-label">Sexo</label>
+                        <select name="sexo" id="sexo" class="form-select" required>
+                            <option value="Femenino" {{#datos}}{{#sexo_femenino}}selected{{/sexo_femenino}}{{/datos}}>Femenino</option>
+                            <option value="Masculino" {{#datos}}{{#sexo_masculino}}selected{{/sexo_masculino}}{{/datos}}>Masculino</option>
+                            <option value="Prefiero no cargarlo" {{#datos}}{{^sexo_femenino}}{{^sexo_masculino}}selected{{/sexo_masculino}}{{/sexo_femenino}}{{/datos}}>Prefiero no cargarlo</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="pais" class="form-label">País</label>
+                            <input type="text" class="form-control" id="pais" name="pais" placeholder="País" value="{{#datos}}{{pais}}{{/datos}}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ciudad" class="form-label">Ciudad</label>
+                            <input type="text" class="form-control" id="ciudad" name="ciudad" placeholder="Ciudad" value="{{#datos}}{{ciudad}}{{/datos}}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{#datos}}{{email}}{{/datos}}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" value="{{#datos}}{{username}}{{/datos}}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Foto de perfil (opcional)</label>
+                        <input type="file" class="form-control" id="file" name="file" accept="image/*">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    {{/error}}
-
-    <input type="text" name="nombre_completo" placeholder="Nombre completo" value="{{#datos}}{{nombre_completo}}{{/datos}}" required>
-    <input type="number" name="anio_nacimiento" placeholder="Año de nacimiento" value="{{#datos}}{{anio_nacimiento}}{{/datos}}" required>
-
-    <select name="sexo" required>
-        <option value="Femenino" {{#datos}}{{#sexo_femenino}}selected{{/sexo_femenino}}{{/datos}}>Femenino</option>
-        <option value="Masculino" {{#datos}}{{#sexo_masculino}}selected{{/sexo_masculino}}{{/datos}}>Masculino</option>
-        <option value="Prefiero no cargarlo" {{#datos}}{{^sexo_femenino}}{{^sexo_masculino}}selected{{/sexo_masculino}}{{/sexo_femenino}}{{/datos}}>Prefiero no cargarlo</option>
-    </select>
-
-    <input type="text" name="pais" placeholder="Pais" value="{{#datos}}{{pais}}{{/datos}}" required>
-    <input type="text" name="ciudad" placeholder="Ciudad" value="{{#datos}}{{ciudad}}{{/datos}}" required>
-    <input type="email" name="email" placeholder="Email" value="{{#datos}}{{email}}{{/datos}}" required>
-    <input type="text" name="username" placeholder="Usuario" value="{{#datos}}{{username}}{{/datos}}" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <input type="file" name="file">
-
-    <button type="submit">Registrarse</button>
-</form>
+    </div>
+</div>

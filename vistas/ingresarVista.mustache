@@ -1,11 +1,31 @@
-<div class="w3-container w3-center w3-margin">
-    <form   method="POST"
-            action="/user/ingresar">
-        {{#error}}
-            <div class='w3-panel w3-red'>{{error}}</div>
-        {{/error}}
-        <p><input class="w3-input w3-border" type="text" name="user" placeholder="Usuario" required></p>
-        <p><input class="w3-input w3-border" type="password" name="password" placeholder="Password" required></p>
-        <p><input class="w3-button w3-blue" type="submit" value="Ingresar"></p>
-    </form>
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Iniciar sesión</h2>
+
+                {{#error}}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>{{error}}</strong>
+                    </div>
+                {{/error}}
+
+                <form method="POST" action="/user/ingresar">
+                    <div class="mb-3">
+                        <label for="user" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="user" name="user" placeholder="Usuario" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Ingresar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
