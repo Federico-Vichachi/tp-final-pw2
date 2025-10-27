@@ -16,7 +16,8 @@ class UserModel
         if (is_array($result) && count($result) > 0) {
             $usuario = $result[0];
 
-            if (password_verify($password, $usuario['password'])) {
+            if (password_verify($password, $usuario['password'])
+                && $usuario['cuenta_activa'] == 1) {
                 return $usuario;
             }
         }
