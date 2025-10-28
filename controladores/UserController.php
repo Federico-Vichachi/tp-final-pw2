@@ -47,18 +47,21 @@ class UserController
         $this->renderer->render("ingresar", []);
     }
 
-    public function salir()
-    {
-        session_destroy();
-        $this->redirectToIndex();
-    }
-
     public function lobby()
     {
         $this->redirectNotAuthenticated();
+        if (isset($_GET['action']) && $_GET['action'] === 'salir') {
+            $this->salir();
+        }
         $this->renderer->render("lobby",[
             'usuario' => $_SESSION['usuario']
         ]);
+    }
+
+    private function salir()
+    {
+        session_destroy();
+        $this->redirectToIndex();
     }
 
     private function procesarLogin()
@@ -128,7 +131,7 @@ class UserController
         exit();
     }
 
-    public function redirectToIngresar(){
+    private function redirectToIngresar(){
         header("Location: /user/ingresar");
         exit();
     }

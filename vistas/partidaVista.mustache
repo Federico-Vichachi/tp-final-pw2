@@ -7,7 +7,7 @@
         <p>Categoria: {{pregunta.categoria}}</p>
         <h2>Pregunta: {{pregunta.pregunta}}</h2>
 
-        <form method="POST" action="/game/procesarPartida">
+        <form method="POST" action="/game/jugarPartida?action=procesar">
             <div class="w3-padding">
 
                 {{#respuestas}}
@@ -29,7 +29,7 @@
 
             if (tiempo <= 0) {
                 clearInterval(temporizador);
-                window.location.href = "/game/procesarPartida";
+                document.querySelector('form').submit();
             }
         }, 1000);
     </script>

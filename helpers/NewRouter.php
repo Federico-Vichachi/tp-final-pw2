@@ -37,12 +37,12 @@ class NewRouter
 
     private function executeMethodFromController($controller, $methodName)
     {
-        call_user_func(
-            array(
-                $controller,
-                $this->getMethodName($controller, $methodName)
-            )
-        );
+        $method = $this->getMethodName($controller, $methodName);
+        $reflection = new ReflectionMethod($controller, $method);
+        if (!$reflection->isPublic()) {
+            $method = $this->defaultMethod;
+        }
+        call_user_func([$controller, $method]);
     }
 
     public function getControllerName($controllerName)
@@ -54,6 +54,12 @@ class NewRouter
 
     public function getMethodName($controller, $methodName)
     {
-        return method_exists($controller, $methodName) ? $methodName : $this->defaultMethod;
+        if (method_exists($controller, $methodName)) {
+            $reflection = new ReflectionMethod($controller, $methodName);
+            if ($reflection->isPublic()) {
+                return $methodName;
+            }
+        }
+        return $this->defaultMethod;
     }
 }
