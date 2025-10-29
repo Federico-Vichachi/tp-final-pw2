@@ -107,6 +107,27 @@ class UserController
         $this->redirectTo('validar');
     }
 
+    public function perfil()
+    {
+        $this->redirectNotAuthenticated();
+        $this->renderer->render("perfil", []);
+    }
+
+    private function aceptarInvitacion()
+    {//Manejar en el lobby desde invitaciones
+
+    }
+
+    private function rechazarInvitacion()
+    {//Manejar en el lobby desde invitaciones
+
+    }
+
+    private function desafiar()
+    {//Debe poder llamarse desde el perfil
+
+    }
+
     private function isAuthenticated()
     {
         return isset($_SESSION["usuario"]);

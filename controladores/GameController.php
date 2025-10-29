@@ -17,10 +17,11 @@ class GameController
     }
 
     public function jugarPartida(){
+        // Verificar si es una partida individual o un desafio
         $this->redirectNotAuthenticated();
 
-        if (isset($_GET['action']) && $_GET['action'] === 'nueva') {
-            $this->nuevaPartida();
+        if (isset($_GET['action']) && $_GET['action'] === 'partidaIndividual') {
+            $this->nuevaPartidaIndividual();
         }
 
         if (isset($_GET['action']) && $_GET['action'] === 'procesar') {
@@ -28,7 +29,7 @@ class GameController
         }
 
         if (!isset($_SESSION["partida_iniciada"]) || $_SESSION["partida_iniciada"] !== true) {
-            $this->redirectTo("jugarPartida?action=nueva");
+            $this->redirectTo("jugarPartida?action=partidaIndividual");
         }
 
         $preguntasVistas = $_SESSION["preguntas_vistas"] ?? [];
@@ -69,10 +70,32 @@ class GameController
         $this->renderer->render("resumenPartida", $data);
     }
 
-    private function nuevaPartida(){
+    public function ranking()
+    {
+        $this->redirectNotAuthenticated();
+        $this->renderer->render("ranking", []);
+    }
+
+    private function desafiar()
+    {
+        //Debe poder llamarse desde el ranking
+    }
+
+    private function nuevaPartidaIndividual(){
         $_SESSION["puntaje"] = 0;
         $_SESSION["preguntas_vistas"] = [];
         $_SESSION["partida_iniciada"] = true;
+        $_SESSION["partida_desafio"] = false;
+
+        $this->redirectTo("jugarPartida");
+    }
+
+    private function nuevaPartidaDesafio()
+    {
+        $_SESSION["puntaje"] = 0;
+        $_SESSION["preguntas_vistas"] = [];
+        $_SESSION["partida_iniciada"] = true;
+        $_SESSION["partida_desafio"] = true;
 
         $this->redirectTo("jugarPartida");
     }
