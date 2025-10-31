@@ -16,57 +16,32 @@ class GameController
         $this->redirectToIndex();
     }
 
-    public function jugarPartida(){
-        // Verificar si es una partida individual o un desafio
+    public function jugarPartida()
+    {
         $this->redirectNotAuthenticated();
 
-        if (isset($_GET['action']) && $_GET['action'] === 'partidaIndividual') {
-            $this->nuevaPartidaIndividual();
-        }
-
-        if (isset($_GET['action']) && $_GET['action'] === 'procesar') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarPartida();
         }
 
-        if (!isset($_SESSION["partida_iniciada"]) || $_SESSION["partida_iniciada"] !== true) {
-            $this->redirectTo("jugarPartida?action=partidaIndividual");
+        if (!$this->partidaEstaIniciada()) {
+            $this->iniciarNuevaPartida();
         }
 
-        $preguntasVistas = $_SESSION["preguntas_vistas"] ?? [];
-        $partida = $this->model->getPartidaAleatoria($preguntasVistas);
+        $partida = $this->obtenerPreguntaActual();
 
-        if(empty($partida)){
-            unset($_SESSION["partida_iniciada"]);
-            $this->redirectTo('resumenPartida');
-        }
-
-        $_SESSION["preguntas_vistas"][] = $partida["pregunta"]["pregunta_id"];
-
-        $data = [
-            "partida" => $partida,
-            "puntaje" => $_SESSION["puntaje"]
-        ];
-
-        $this->renderer->render("partida", $data);
+        $this->mostrarVistaPartida($partida);
     }
 
-    public function resumenPartida(){
+    public function resumenPartida()
+    {
         $this->redirectNotAuthenticated();
 
-        if (!isset($_SESSION["puntaje"])) {
-            $puntajeFinal = '0';
-            $mensaje = "No se registró un puntaje válido en la partida.";
-        } else {
-            $puntajeFinal = $_SESSION["puntaje"];
-            $mensaje = "Respuesta incorrecta";
-        }
+        list($puntajeFinal, $mensaje) = $this->calcularResultadoPartida();
 
-        unset($_SESSION["puntaje"], $_SESSION["preguntas_vistas"], $_SESSION["partida_iniciada"]);
-        $data = [
-            "puntajeFinal" => $puntajeFinal,
-            "mensaje" => $mensaje
-        ];
+        $data = $this->prepararDatosResumen($puntajeFinal, $mensaje);
 
+        $this->limpiarPartidaActual();
         $this->renderer->render("resumenPartida", $data);
     }
 
@@ -81,34 +56,158 @@ class GameController
         //Debe poder llamarse desde el ranking
     }
 
-    private function nuevaPartidaIndividual(){
+    private function calcularResultadoPartida()
+    {
+        if (!isset($_SESSION["puntaje"])) {
+            return ['0', "No se registró un puntaje válido en la partida."];
+        } else {
+            return [$_SESSION["puntaje"], "Respuesta incorrecta"];
+        }
+    }
+
+    private function prepararDatosResumen($puntajeFinal, $mensaje)
+    {
+        $preguntaActual = $_SESSION["pregunta_actual"] ?? [];
+
+        return [
+            "categoria" => $preguntaActual['pregunta']['categoria'] ?? 'Desconocida',
+            "pregunta" => $preguntaActual['pregunta']['pregunta'] ?? 'No disponible',
+            "respuestaCorrecta" => $preguntaActual['respuesta_correcta'] ?? 'No disponible',
+            "puntajeFinal" => $puntajeFinal,
+            "mensaje" => $mensaje
+        ];
+    }
+
+    private function limpiarPartidaActual()
+    {
+        $variablesPartida = [
+            "puntaje",
+            "preguntas_vistas",
+            "partida_iniciada",
+            "pregunta_actual",
+            "pregunta_respondida",
+            "partida_desafio"
+        ];
+
+        foreach ($variablesPartida as $variable) {
+            unset($_SESSION[$variable]);
+        }
+    }
+
+    private function mostrarVistaPartida($partida)
+    {
+        if (!$this->partidaEsValida($partida)) {
+            $this->generarNuevaPregunta();
+            $partida = $_SESSION["pregunta_actual"] ?? [];
+        }
+
+        $data = [
+            "partida" => $partida,
+            "puntaje" => $_SESSION["puntaje"] ?? 0
+        ];
+
+        $this->renderer->render("partida", $data);
+    }
+
+    private function obtenerPreguntaActual()
+    {
+        if (isset($_SESSION["pregunta_actual"]) && !empty($_SESSION["pregunta_actual"])) {
+            return $_SESSION["pregunta_actual"];
+        }
+
+        $this->generarNuevaPregunta();
+
+        if (!isset($_SESSION["pregunta_actual"])) {
+            $this->redirectTo("resumenPartida");
+        }
+
+        return $_SESSION["pregunta_actual"];
+    }
+
+    private function generarNuevaPregunta()
+    {
+        $preguntasVistas = $_SESSION["preguntas_vistas"] ?? [];
+
+        $nuevaPartida = $this->model->getPreguntaAleatoria($preguntasVistas);
+
+        if (empty($nuevaPartida)) {
+            $this->finalizarPartida();
+        }
+
+        $this->guardarPreguntaEnSesion($nuevaPartida);
+    }
+
+    private function finalizarPartida()
+    {
+        unset($_SESSION["partida_iniciada"]);
+        $this->redirectTo('resumenPartida');
+    }
+
+    private function guardarPreguntaEnSesion($partida)
+    {
+        $_SESSION["pregunta_actual"] = $partida;
+        $_SESSION["preguntas_vistas"][] = $partida["pregunta"]["pregunta_id"];
+        $_SESSION["pregunta_respondida"] = false;
+    }
+
+    private function iniciarNuevaPartida()
+    {
+        $this->limpiarPartidaActual();
+
         $_SESSION["puntaje"] = 0;
         $_SESSION["preguntas_vistas"] = [];
+
         $_SESSION["partida_iniciada"] = true;
         $_SESSION["partida_desafio"] = false;
 
+        unset($_SESSION["pregunta_actual"]);
+
         $this->redirectTo("jugarPartida");
     }
 
-    private function nuevaPartidaDesafio()
+    private function procesarPartida()
     {
-        $_SESSION["puntaje"] = 0;
-        $_SESSION["preguntas_vistas"] = [];
-        $_SESSION["partida_iniciada"] = true;
-        $_SESSION["partida_desafio"] = true;
-
-        $this->redirectTo("jugarPartida");
-    }
-
-    private function procesarPartida(){
         $idRespuesta = $_POST["idRespuesta"] ?? null;
 
-        if($this->model->verificarRespuesta($idRespuesta)){
-            $_SESSION["puntaje"]++;
+        if ($this->preguntaYaFueRespondida()) {
             $this->redirectTo("jugarPartida");
-        }else{
-            $this->redirectTo("resumenPartida");
         }
+
+        if ($this->model->verificarRespuesta($idRespuesta)) {
+            $this->procesarRespuestaCorrecta();
+        } else {
+            $this->procesarRespuestaIncorrecta();
+        }
+    }
+
+    private function preguntaYaFueRespondida()
+    {
+        return isset($_SESSION["pregunta_respondida"]) &&
+            $_SESSION["pregunta_respondida"] === true;
+    }
+
+    private function procesarRespuestaCorrecta()
+    {
+        $_SESSION["puntaje"]++;
+        $_SESSION["pregunta_respondida"] = true;
+
+        $this->generarNuevaPregunta();
+        $this->redirectTo("jugarPartida");
+    }
+
+    private function procesarRespuestaIncorrecta()
+    {
+        $this->redirectTo("resumenPartida");
+    }
+
+    private function partidaEsValida($partida)
+    {
+        return isset($partida["pregunta"]) && isset($partida["respuestas"]);
+    }
+
+    private function partidaEstaIniciada()
+    {
+        return isset($_SESSION["partida_iniciada"]) && $_SESSION["partida_iniciada"] === true;
     }
 
     private function isAuthenticated()
@@ -134,7 +233,7 @@ class GameController
 
     private function redirectTo($method)
     {
-        header("Location: $method");
+        header("Location: /game/$method");
         exit();
     }
 }

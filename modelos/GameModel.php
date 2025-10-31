@@ -9,81 +9,82 @@ class GameModel
         $this->conexion = $conexion;
     }
 
-    public function getCategorias()
+    public function getPreguntaAleatoria($preguntasVistas)
     {
-        $sql = "SELECT nombre FROM categorias";
-        $resultado = $this->conexion->query($sql);
-        return $resultado;
-    }
+        $pregunta = $this->obtenerPreguntaDeBD($preguntasVistas);
 
-    public function getPreguntas($categoria)
-    {
-        $sql = "SELECT 
-                p.id AS pregunta_id,
-                p.texto AS pregunta,
-                c.nombre AS categoria
-                FROM preguntas p
-                JOIN categorias c ON p.categoria_id = c.id
-                WHERE c.nombre = '$categoria'";
-        $resultado = $this->conexion->query($sql);
-        return $resultado;
-    }
-
-    public function getRespuestas($id_pregunta)
-    {
-        $sql = "SELECT id, texto 
-            FROM respuestas 
-            WHERE pregunta_id = '$id_pregunta'";
-        $resultado = $this->conexion->query($sql);
-        return $resultado;
-    }
-
-    public function getPartidaAleatoria($preguntasVistas = [])
-    {
-        $sql = "";
-        if(!empty($preguntasVistas)){
-            $idsExcluidos = implode(",", $preguntasVistas);
-
-            $sql = "SELECT p.id AS pregunta_id, p.
-                    texto AS pregunta, 
-                    c.nombre AS categoria
-            FROM preguntas p
-            JOIN categorias c ON p.categoria_id = c.id
-            WHERE p.id NOT IN ($idsExcluidos)
-            ORDER BY RAND()
-            LIMIT 1";
-        }else{
-            $sql = "SELECT p.id AS pregunta_id, 
-                    p.texto AS pregunta, 
-                    c.nombre AS categoria
-            FROM preguntas p
-            JOIN categorias c ON p.categoria_id = c.id
-            ORDER BY RAND()
-            LIMIT 1";
-        }
-
-        $pregunta = $this->conexion->query($sql);
-
-        if(empty($pregunta)){
+        if(empty($pregunta)) {
             return [];
         }
 
-        $preguntaRandom = $pregunta[0];
-        $respuestas = $this->getRespuestas($preguntaRandom['pregunta_id']);
+        $respuestas = $this->getRespuestas($pregunta['pregunta_id']);
         shuffle($respuestas);
 
+        $respuestaCorrecta = $this->getRespuestaCorrecta($pregunta['pregunta_id']);
+
         return [
-            "pregunta" => $preguntaRandom,
-            "respuestas" => $respuestas
+            "pregunta" => $pregunta,
+            "respuestas" => $respuestas,
+            "respuesta_correcta" => $respuestaCorrecta
         ];
     }
 
-    public function verificarRespuesta($idRespuesta){
-        if ($idRespuesta ==null) return false;
+    public function verificarRespuesta($idRespuesta)
+    {
+        if ($idRespuesta == null) {
+            return false;
+        }
 
         $sql = "SELECT es_correcta FROM respuestas WHERE id = $idRespuesta";
         $resultado = $this->conexion->query($sql);
 
-        return !empty($resultado) && $resultado[0]['es_correcta']==1;
+        if (empty($resultado)) {
+            return false;
+        }
+
+        $esCorrecta = $resultado[0]['es_correcta'];
+        return $esCorrecta == 1;
+    }
+
+    public function getRespuestaCorrecta($preguntaId)
+    {
+        $id = (int)$preguntaId;
+
+        $sql = "SELECT texto 
+                FROM respuestas 
+                WHERE pregunta_id = $id 
+                  AND es_correcta = 1 LIMIT 1";
+
+        $resultado = $this->conexion->query($sql);
+        return empty($resultado) ? 'No disponible' : $resultado[0]['texto'];
+    }
+
+    private function obtenerPreguntaDeBD($preguntasVistas)
+    {
+        $sql = "SELECT p.id AS pregunta_id, 
+                   p.texto AS pregunta, 
+                   c.nombre AS categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id";
+
+        if(!empty($preguntasVistas)){
+            $idsExcluidos = implode(",", $preguntasVistas);
+            $sql .= " WHERE p.id NOT IN ($idsExcluidos)";
+        }
+
+        $sql .= " ORDER BY RAND() LIMIT 1";
+
+        $resultado = $this->conexion->query($sql);
+        return empty($resultado) ? [] : $resultado[0];
+    }
+
+    private function getRespuestas($id_pregunta)
+    {
+        $sql = "SELECT id, texto 
+                FROM respuestas 
+                WHERE pregunta_id = '$id_pregunta'";
+
+        $resultado = $this->conexion->query($sql);
+        return $resultado;
     }
 }
