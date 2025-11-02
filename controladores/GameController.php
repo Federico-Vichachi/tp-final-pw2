@@ -61,7 +61,7 @@ class GameController
         if (!isset($_SESSION["puntaje"])) {
             return ['0', "No se registró un puntaje válido en la partida."];
         } else {
-            return [$_SESSION["puntaje"], "Respuesta incorrecta"];
+            return [$_SESSION["puntaje"], "Respuesta incorrecta o tiempo agotado"];
         }
     }
 
@@ -86,7 +86,8 @@ class GameController
             "partida_iniciada",
             "pregunta_actual",
             "pregunta_respondida",
-            "partida_desafio"
+            "partida_desafio",
+            "tiempo_inicio_pregunta"
         ];
 
         foreach ($variablesPartida as $variable) {
@@ -103,7 +104,8 @@ class GameController
 
         $data = [
             "partida" => $partida,
-            "puntaje" => $_SESSION["puntaje"] ?? 0
+            "puntaje" => $_SESSION["puntaje"] ?? 0,
+            "tiempo_limite" => 10
         ];
 
         $this->renderer->render("partida", $data);
@@ -148,6 +150,7 @@ class GameController
         $_SESSION["pregunta_actual"] = $partida;
         $_SESSION["preguntas_vistas"][] = $partida["pregunta"]["pregunta_id"];
         $_SESSION["pregunta_respondida"] = false;
+        $_SESSION["tiempo_inicio_pregunta"] = time();
     }
 
     private function iniciarNuevaPartida()
@@ -173,11 +176,31 @@ class GameController
             $this->redirectTo("jugarPartida");
         }
 
+        if ($this->tiempoExpirado()) {
+            $this->procesarTiempoExpirado();
+        }
+
         if ($this->model->verificarRespuesta($idRespuesta)) {
             $this->procesarRespuestaCorrecta();
         } else {
             $this->procesarRespuestaIncorrecta();
         }
+    }
+
+    private function tiempoExpirado()
+    {
+        if (!isset($_SESSION["tiempo_inicio_pregunta"])) {
+            return true;
+        }
+
+        $tiempoTranscurrido = time() - $_SESSION["tiempo_inicio_pregunta"];
+        return $tiempoTranscurrido > 10;
+    }
+
+    private function procesarTiempoExpirado()
+    {
+        $_SESSION["pregunta_respondida"] = true;
+        $this->redirectTo("resumenPartida");
     }
 
     private function preguntaYaFueRespondida()
