@@ -9,7 +9,44 @@ class GameModel
         $this->conexion = $conexion;
     }
 
-    public function getPreguntaAleatoria($preguntasVistas)
+    public function iniciarPartida($usuarioId)
+    {
+        $codigoPartida = uniqid('partida_', true);
+
+        $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado) 
+                VALUES ('$codigoPartida', $usuarioId, 'en_curso')";
+
+        $this->conexion->query($sql);
+
+        $sql = "SELECT id, codigo_partida FROM partidas WHERE codigo_partida = '$codigoPartida'";
+        $partida = $this->conexion->query($sql);
+
+        return empty($partida) ? null : $partida[0];
+    }
+
+    public function finalizarPartida($partidaId, $puntajeFinal)
+    {
+        $sql = "UPDATE partidas 
+                SET estado = 'finalizada', 
+                    puntaje_final = $puntajeFinal,
+                    fecha_fin = NOW()
+                WHERE id = $partidaId";
+
+        return $this->conexion->query($sql);
+    }
+
+    public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0)
+    {
+        $fallada = $preguntaFallada ? 1 : 0;
+
+        $sql = "INSERT INTO historial_preguntas 
+                (partida_id, pregunta_id, pregunta_fallada, tiempo_respuesta) 
+                VALUES ($partidaId, $preguntaId, $fallada, $tiempoRespuesta)";
+
+        return $this->conexion->query($sql);
+    }
+
+    public function getPreguntaAleatoria($preguntasVistas, $usuarioId)
     {
         $pregunta = $this->obtenerPreguntaDeBD($preguntasVistas);
 

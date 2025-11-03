@@ -1,4 +1,8 @@
+-- CREATE DATABASE --
+
 CREATE DATABASE preguntados;
+
+-- CREATE TABLE --
 
 CREATE TABLE usuario (
                          id INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,6 +40,30 @@ CREATE TABLE respuestas (
                             es_correcta BOOLEAN DEFAULT FALSE,
                             FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
 );
+
+CREATE TABLE partidas (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          codigo_partida VARCHAR(50) UNIQUE NOT NULL,
+                          usuario_id INT NOT NULL,
+                          fecha_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          fecha_fin TIMESTAMP NULL,
+                          puntaje_final INT DEFAULT 0,
+                          estado ENUM('en_curso', 'finalizada', 'abandonada') DEFAULT 'en_curso',
+                          FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
+CREATE TABLE historial_preguntas (
+                                     id INT AUTO_INCREMENT PRIMARY KEY,
+                                     partida_id INT NOT NULL,
+                                     pregunta_id INT NOT NULL,
+                                     pregunta_fallada BOOLEAN DEFAULT FALSE,
+                                     fecha_respuesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     tiempo_respuesta INT DEFAULT 0, -- segundos que tardó en responder
+                                     FOREIGN KEY (partida_id) REFERENCES partidas(id),
+                                     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
+-- INSERT INTO --
 
 INSERT INTO categorias (nombre)
 VALUES
