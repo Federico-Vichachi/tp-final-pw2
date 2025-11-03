@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../helpers/EmailService.php';
+
 class UserModel
 {
     private $conexion;
@@ -54,17 +57,64 @@ class UserModel
 
         $sqlInsert = $this->queryRegistrar($datos, $rutaFoto, $codigoValidacion, $cuentaActiva, $rol, $fechaRegistro);
         $resultadoInsert = $this->conexion->query($sqlInsert);
+        if ($resultadoInsert === true) {
+            $this->enviarCorreoDeValidacion($datos['email'], $codigoValidacion);
+        }
+
+
         return $this->errores($resultadoInsert);
     }
 
     public function prepararDatos()
     {
-        $codigoValidacion = uniqid();
+        $codigoValidacion = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
         $cuentaActiva = 0;
         $rol = "usuario";
         $fechaRegistro = date('Y-m-d H:i:s');
         return array($codigoValidacion, $cuentaActiva, $rol, $fechaRegistro);
     }
+
+    public function enviarCorreoDeValidacion($destinatario, $codigoValidacion)
+    {
+        $mailerService = new EmailService();
+        $asunto = "Validación de cuenta - Preguntados";
+        $emailEncoded = urlencode($destinatario);
+        $enlaceValidacion = "http://localhost/user/validar?email=$emailEncoded&codigo=$codigoValidacion";
+        $cuerpo = "<html>
+                    <head>
+                        <title>Validación de cuenta</title>
+                    </head>
+                    <body>
+                        <p>Gracias por registrarte en Preguntados.</p>
+                        <p>Tu código de validación es: <strong>$codigoValidacion</strong></p>
+                        <p>Por favor, ingresa este código en la página de validación para activar tu cuenta.</p>
+                        <p>O haz clic en el siguiente enlace para validar automáticamente:</p>
+                        <p><a href='$enlaceValidacion'>Validar mi cuenta</a></p>
+                    </body>
+                  </html>";
+        return $mailerService->enviarCorreo($destinatario, $asunto, $cuerpo);
+    }
+
+    public function validarUsuario($codigoIngresado, $email)
+    {
+        $sql = "SELECT id, codigo_validacion
+            FROM usuario
+            WHERE email = '$email' AND cuenta_activa = 0";
+        $resultado = $this->conexion->query($sql);
+
+        if (is_array($resultado) && count($resultado) > 0) {
+            $codigoAlmacenado = $resultado[0]['codigo_validacion'];
+
+            if ($codigoIngresado === $codigoAlmacenado) {
+                $sqlUpdate = "UPDATE usuario SET cuenta_activa = 1 WHERE email = '$email'";
+                $this->conexion->query($sqlUpdate);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     public function procesarImagen($file)
     {
