@@ -29,11 +29,17 @@ class UserController
     public function validar() {
         $this->redirectAuthenticated();
 
-        $mensaje = $_SESSION['mensaje_exito'] ?? null;
-        unset($_SESSION['mensaje_exito']);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->procesarValidacion();
+        }
+
+        // Pasar el email desde GET al template
+        $email = $_GET['email'] ?? '';
+        $codigo = $_GET['codigo'] ?? '';
 
         $this->renderer->render("validar", [
-            'mensaje' => $mensaje
+            'email' => $email,
+            'codigo' => $codigo
         ]);
     }
 
@@ -104,7 +110,35 @@ class UserController
         }
 
         $_SESSION['mensaje_exito'] = 'Registro exitoso. ¡Revisa tu correo para validar tu cuenta!';
-        $this->redirectTo('validar');
+        $email = urlencode($datos['email']);
+        $this->redirectTo("validar?email=$email");
+    }
+
+    public function procesarValidacion()
+    {
+        // Obtener email de POST o GET (si viene por URL)
+        $codigo = $_POST['codigo'] ?? $_GET['codigo'] ?? '';
+        $email = $_POST['email'] ?? $_GET['email'] ?? '';
+
+        if (empty($email)) {
+            $this->renderer->render("validar", [
+                'error' => "Email no especificado."
+            ]);
+            exit();
+        }
+
+        $validacionExitosa = $this->model->validarUsuario($codigo, $email);
+
+        if (!$validacionExitosa) {
+            $this->renderer->render("validar", [
+                'error' => "Código de validación incorrecto. Intenta nuevamente.",
+                'email' => $email
+            ]);
+            exit();
+        }
+
+        $_SESSION['mensaje_exito'] = 'Cuenta validada exitosamente. Ahora puedes ingresar.';
+        $this->redirectTo('ingresar');
     }
 
     public function perfil()
