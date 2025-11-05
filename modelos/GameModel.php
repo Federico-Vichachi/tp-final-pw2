@@ -12,9 +12,10 @@ class GameModel
     public function iniciarPartida($usuarioId)
     {
         $codigoPartida = uniqid('partida_', true);
+        $fechaInicio = date('Y-m-d H:i:s');
 
-        $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado) 
-                VALUES ('$codigoPartida', $usuarioId, 'en_curso')";
+        $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado, fecha_inicio) 
+                VALUES ('$codigoPartida', $usuarioId, 'en_curso', '$fechaInicio')";
 
         $this->conexion->query($sql);
 
@@ -26,10 +27,12 @@ class GameModel
 
     public function finalizarPartida($partidaId, $puntajeFinal)
     {
+        $fechaFin = date('Y-m-d H:i:s');
+
         $sql = "UPDATE partidas 
                 SET estado = 'finalizada', 
                     puntaje_final = $puntajeFinal,
-                    fecha_fin = NOW()
+                    fecha_fin = '$fechaFin'
                 WHERE id = $partidaId";
 
         return $this->conexion->query($sql);
@@ -38,10 +41,11 @@ class GameModel
     public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0)
     {
         $fallada = $preguntaFallada ? 1 : 0;
+        $fechaRespuesta = date('Y-m-d H:i:s');
 
         $sql = "INSERT INTO historial_preguntas 
-                (partida_id, pregunta_id, pregunta_fallada, tiempo_respuesta) 
-                VALUES ($partidaId, $preguntaId, $fallada, $tiempoRespuesta)";
+                (partida_id, pregunta_id, pregunta_fallada, fecha_respuesta,tiempo_respuesta) 
+                VALUES ($partidaId, $preguntaId, $fallada, '$fechaRespuesta', $tiempoRespuesta)";
 
         return $this->conexion->query($sql);
     }
