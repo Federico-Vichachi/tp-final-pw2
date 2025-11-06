@@ -9,7 +9,48 @@ class GameModel
         $this->conexion = $conexion;
     }
 
-    public function getPreguntaAleatoria($preguntasVistas)
+    public function iniciarPartida($usuarioId)
+    {
+        $codigoPartida = uniqid('partida_', true);
+        $fechaInicio = date('Y-m-d H:i:s');
+
+        $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado, fecha_inicio) 
+                VALUES ('$codigoPartida', $usuarioId, 'en_curso', '$fechaInicio')";
+
+        $this->conexion->query($sql);
+
+        $sql = "SELECT id, codigo_partida FROM partidas WHERE codigo_partida = '$codigoPartida'";
+        $partida = $this->conexion->query($sql);
+
+        return empty($partida) ? null : $partida[0];
+    }
+
+    public function finalizarPartida($partidaId, $puntajeFinal)
+    {
+        $fechaFin = date('Y-m-d H:i:s');
+
+        $sql = "UPDATE partidas 
+                SET estado = 'finalizada', 
+                    puntaje_final = $puntajeFinal,
+                    fecha_fin = '$fechaFin'
+                WHERE id = $partidaId";
+
+        return $this->conexion->query($sql);
+    }
+
+    public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0)
+    {
+        $fallada = $preguntaFallada ? 1 : 0;
+        $fechaRespuesta = date('Y-m-d H:i:s');
+
+        $sql = "INSERT INTO historial_preguntas 
+                (partida_id, pregunta_id, pregunta_fallada, fecha_respuesta,tiempo_respuesta) 
+                VALUES ($partidaId, $preguntaId, $fallada, '$fechaRespuesta', $tiempoRespuesta)";
+
+        return $this->conexion->query($sql);
+    }
+
+    public function getPreguntaAleatoria($preguntasVistas, $usuarioId)
     {
         $pregunta = $this->obtenerPreguntaDeBD($preguntasVistas);
 

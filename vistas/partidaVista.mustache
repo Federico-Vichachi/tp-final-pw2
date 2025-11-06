@@ -1,13 +1,13 @@
 <div class="w3-container w3-center w3-margin">
     <h3>Puntaje actual: {{puntaje}}</h3>
 
-    <p>Temporizador: <span id="tiempo">10</span></p>
+    <p>Temporizador: <span id="tiempo">{{tiempo_limite}}</span></p>
 
     {{#partida}}
         <p>Categoria: {{pregunta.categoria}}</p>
         <h2>Pregunta: {{pregunta.pregunta}}</h2>
 
-        <form method="POST" action="/game/jugarPartida?action=procesar">
+        <form method="POST" action="/game/jugarPartida" id="formPregunta">
             <div class="w3-padding">
 
                 {{#respuestas}}
@@ -22,14 +22,15 @@
     {{/partida}}
 
     <script>
-        let tiempo = 10;
+        let tiempo = {{tiempo_limite}};
+        const tiempoLimite = {{tiempo_limite}};
         const temporizador = setInterval(() => {
             tiempo--;
             document.querySelector('#tiempo').textContent = tiempo;
 
             if (tiempo <= 0) {
                 clearInterval(temporizador);
-                document.querySelector('form').submit();
+                document.querySelector('#formPregunta').submit();
             }
         }, 1000);
     </script>

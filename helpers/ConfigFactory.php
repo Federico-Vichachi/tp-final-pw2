@@ -22,12 +22,14 @@ class ConfigFactory
     public function __construct()
     {
         $this->config = parse_ini_file("config/config.ini");
+        date_default_timezone_set($this->config["php_timezone"]);
 
         $this->conexion= new MyConexion(
             $this->config["server"],
             $this->config["user"],
             $this->config["pass"],
-            $this->config["database"]
+            $this->config["database"],
+            $this->config["charset"]
         );
 
         $this->renderer = new MustacheRenderer("vistas");
