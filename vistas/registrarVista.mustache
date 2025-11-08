@@ -13,7 +13,7 @@
                     </div>
                 {{/error}}
 
-                <form method="POST" action="/user/registrar" enctype="multipart/form-data">
+                <form method="POST" action="/user/registrar" enctype="multipart/form-data" id="registroForm">
                     <div class="mb-3">
                         <label for="nombre_completo" class="form-label">Nombre completo</label>
                         <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo" value="{{#datos}}{{nombre_completo}}{{/datos}}" required>
@@ -33,14 +33,28 @@
                         </select>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="pais" class="form-label">País</label>
-                            <input type="text" class="form-control" id="pais" name="pais" placeholder="País" value="{{#datos}}{{pais}}{{/datos}}" required>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Selecciona tu ubicación en el mapa</label>
+                        <div class="alert alert-info">
+                            <small>Arrastra el marcador o haz clic en el mapa para seleccionar tu ubicación</small>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="ciudad" class="form-label">Ciudad</label>
-                            <input type="text" class="form-control" id="ciudad" name="ciudad" placeholder="Ciudad" value="{{#datos}}{{ciudad}}{{/datos}}" required>
+                        <div id="map" style="height: 400px; width: 100%;" class="mb-3"></div>
+
+                        <input type="hidden" id="pais" name="pais" value="{{#datos}}{{pais}}{{/datos}}" required>
+                        <input type="hidden" id="ciudad" name="ciudad" value="{{#datos}}{{ciudad}}{{/datos}}" required>
+                        <input type="hidden" id="latitud" name="latitud" value="{{#datos}}{{latitud}}{{/datos}}" required>
+                        <input type="hidden" id="longitud" name="longitud" value="{{#datos}}{{longitud}}{{/datos}}" required>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Ubicación seleccionada:</h6>
+                                <div id="ubicacion-info" class="text-muted">
+                                    {{#datos}}
+                                        {{pais}}, {{ciudad}} ({{latitud}}, {{longitud}})
+                                    {{/datos}}
+                                    {{^datos}}Selecciona una ubicación en el mapa{{/datos}}
+                                </div>
+                            </div>
                         </div>
                     </div>
 

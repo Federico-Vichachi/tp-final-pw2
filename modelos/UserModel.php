@@ -144,7 +144,7 @@ class UserModel
     {
         $passwordHash = password_hash($datos['password'], PASSWORD_BCRYPT);
         $sql = "INSERT INTO usuario (
-                    nombre_completo, anio_nacimiento, sexo, pais, ciudad, 
+                    nombre_completo, anio_nacimiento, sexo, pais, ciudad, latitud, longitud,
                     email, password, username, foto_perfil, codigo_validacion, 
                     cuenta_activa, rol, fecha_registro
                 ) VALUES (
@@ -153,6 +153,8 @@ class UserModel
                     '{$datos['sexo']}',
                     '{$datos['pais']}',
                     '{$datos['ciudad']}',
+                    '{$datos['latitud']}',
+                    '{$datos['longitud']}',
                     '{$datos['email']}',
                     '$passwordHash',
                     '{$datos['username']}',

@@ -91,6 +91,8 @@ class UserController
             'sexo' => $_POST['sexo'] ?? 'Prefiero no cargarlo',
             'pais' => $_POST['pais'] ?? '',
             'ciudad' => $_POST['ciudad'] ?? '',
+            'latitud' => $_POST['latitud'] ?? '',
+            'longitud' => $_POST['longitud'] ?? '',
             'email' => $_POST['email'] ?? '',
             'username' => $_POST['username'] ?? '',
             'password' => $_POST['password'] ?? ''
@@ -114,7 +116,7 @@ class UserController
         $this->redirectTo("validar?email=$email");
     }
 
-    public function procesarValidacion()
+    private function procesarValidacion()
     {
         // Obtener email de POST o GET (si viene por URL)
         $codigo = $_POST['codigo'] ?? $_GET['codigo'] ?? '';
@@ -193,7 +195,7 @@ class UserController
 
     private function redirectTo($method)
     {
-        header("Location: $method");
+        header("Location: /user/$method");
         exit();
     }
 }

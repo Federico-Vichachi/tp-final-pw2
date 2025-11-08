@@ -1,9 +1,8 @@
--- CREATE DATABASE --
+-- CREATE DATABASE PREGUNTADOS --
+CREATE DATABASE IF NOT EXISTS preguntados;
+USE preguntados;
 
-CREATE DATABASE preguntados;
-
--- CREATE TABLE --
-
+-- CREATE TABLE USUARIO CON COORDENADAS --
 CREATE TABLE usuario (
                          id INT AUTO_INCREMENT PRIMARY KEY,
                          nombre_completo VARCHAR(255) NOT NULL,
@@ -11,6 +10,8 @@ CREATE TABLE usuario (
                          sexo ENUM('Masculino', 'Femenino', 'Prefiero no cargarlo') DEFAULT 'Prefiero no cargarlo',
                          pais VARCHAR(100) NOT NULL,
                          ciudad VARCHAR(100) NOT NULL,
+                         latitud DECIMAL(10, 8) NOT NULL,
+                         longitud DECIMAL(11, 8) NOT NULL,
                          email VARCHAR(180) NOT NULL UNIQUE,
                          password VARCHAR(255) NOT NULL,
                          username VARCHAR(50) NOT NULL UNIQUE,
@@ -63,7 +64,7 @@ CREATE TABLE historial_preguntas (
                                      FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
 );
 
--- INSERT INTO --
+-- INSERT CATEGORIAS --
 
 INSERT INTO categorias (nombre)
 VALUES
@@ -71,6 +72,8 @@ VALUES
     ('Deporte'),
     ('Ciencia'),
     ('Geografía');
+
+-- INSERT PREGUNTAS --
 
 INSERT INTO preguntas (texto, categoria_id) VALUES
 -- HISTORIA (id_categoria = 1)
@@ -96,6 +99,8 @@ INSERT INTO preguntas (texto, categoria_id) VALUES
 ('¿Cuál es el país más grande del planeta?', 4),
 ('¿En qué continente se encuentra Egipto?', 4),
 ('¿Cuál es la capital de Australia?', 4);
+
+-- INSERT RESPUESTAS --
 
 INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES
 -- HISTORIA
