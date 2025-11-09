@@ -1,29 +1,26 @@
-<div class="w3-container w3-center w3-margin">
-    <h2>Puntaje actual: {{puntaje}}</h2>
+<div class="w3-container w3-center w3-margin" style="max-width: 600px; margin: auto;">
+    <div class="card" style="background: #f9f9f9; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2 style="margin-bottom: 10px;">Puntaje actual: {{puntaje}}</h2>
+        <p>Tiempo restante: <span id="tiempo">{{tiempo_limite}}</span></p>
 
-    <p>Tiempo restante: <span id="tiempo">{{tiempo_limite}}</span></p>
+        {{#partida}}
+            <p style="font-weight: bold;">Categoría: {{pregunta.categoria}}</p>
+            <h2 style="margin: 15px 0;">{{pregunta.pregunta}}</h2>
 
-    {{#partida}}
-        <p>Categoria: {{pregunta.categoria}}</p>
-        <h2>Pregunta: {{pregunta.pregunta}}</h2>
-
-        <form method="POST" action="/game/jugarPartida" id="formPregunta">
-            <div class="w3-padding">
-
-                {{#respuestas}}
-                    <button class="w3-button w3-blue w3-margin-bottom" type="submit" name="idRespuesta" value="{{id}}">
-                        {{texto}}
-                    </button>
-                    <br>
-                {{/respuestas}}
-
-            </div>
-        </form>
-    {{/partida}}
+            <form method="POST" action="/game/jugarPartida" id="formPregunta">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    {{#respuestas}}
+                        <button type="submit" name="idRespuesta" value="{{id}}" style="background-color: #007BFF; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s;">
+                            {{texto}}
+                        </button>
+                    {{/respuestas}}
+                </div>
+            </form>
+        {{/partida}}
+    </div>
 
     <script>
         let tiempo = {{tiempo_limite}};
-        const tiempoLimite = {{tiempo_limite}};
         const temporizador = setInterval(() => {
             tiempo--;
             document.querySelector('#tiempo').textContent = tiempo;
