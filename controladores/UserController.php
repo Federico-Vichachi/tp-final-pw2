@@ -146,7 +146,8 @@ class UserController
     public function perfil()
     {
         $this->redirectNotAuthenticated();
-        $this->renderer->render("perfil", []);
+        $usuario = $_SESSION["usuario"];
+        $this->renderer->render("perfil", ["usuario" => $usuario]);
     }
 
     private function aceptarInvitacion()
