@@ -109,7 +109,7 @@ class GameController
         $data = [
             "partida" => $partida,
             "puntaje" => $_SESSION["puntaje"] ?? 0,
-            "tiempo_limite" => 10,
+            "tiempo_limite" => $this->validarTiempoRestante(),
             "codigo_partida" => $_SESSION["partida_codigo"] ?? 'N/A'
         ];
 
@@ -307,5 +307,23 @@ class GameController
     {
         header("Location: /game/$method");
         exit();
+    }
+
+    private function validarTiempoRestante()
+    {
+        $tiempoLimite = 10;
+
+        if(!isset($_SESSION["tiempo_inicio_pregunta"])){
+            $_SESSION["tiempo_inicio_pregunta"] = time();
+        }
+
+        $tiempoTranscurrido = time() - $_SESSION["tiempo_inicio_pregunta"];
+        $tiempoRestante = $tiempoLimite - $tiempoTranscurrido;
+
+        if ($tiempoRestante <=0){
+            $this->procesarTiempoExpirado();
+            exit();
+        }
+        return $tiempoRestante;
     }
 }
