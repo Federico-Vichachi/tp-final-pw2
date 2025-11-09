@@ -1,11 +1,75 @@
-{{#usuario}}
-    <p>Nombre: {{nombre_completo}}</p>
-    <p>Usuario: {{username}}</p>
-    <p>Fecha de Registro: {{fecha_registro}}</p>
-    <p>El estado de tu cuenta es: {{cuenta_activa}}</p>
-{{/usuario}}
 
-<div><a href="/user/perfil">Mi Perfil</a></div>
-<div><a href="/game/jugarPartida?action=partidaIndividual">Crear Partida</a></div>
-<div><a href="">Invitaciones</a></div>
-<div><a href="/user/lobby?action=salir">Salir</a></div>
+<div class="container py-5">
+    <!-- Título de Bienvenida -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-2">Bienvenido al Juego del Saber</h1>
+        <p class="lead text-muted">Pon a prueba tus conocimientos</p>
+    </div>
+
+    {{#usuario}}
+    <!-- Sección Superior: Perfil y Ranking en laterales -->
+    <div class="row mb-4 g-3">
+        <!-- Card de Perfil - Lateral Izquierdo -->
+        <div class="col-12 col-md-6">
+            <a href="/user/perfil" class="text-decoration-none">
+                <div class="card shadow-sm h-100 hover-card" style="transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
+                                 alt="Foto de perfil"
+                                 class="rounded-circle border border-3 border-primary mb-3"
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                            <h5 class="card-title mb-1 fw-bold">{{nombre_completo}}</h5>
+                            <p class="card-text text-muted mb-2">@{{username}}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> Miembro desde {{fecha_registro}}
+                            </small>
+                            <div class="mt-3">
+                                <span class="badge bg-primary">Ver Perfil <i class="bi bi-chevron-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Botón de Ranking - Lateral Derecho -->
+        <div class="col-12 col-md-6">
+            <a href="/user/ranking" class="text-decoration-none">
+                <div class="card shadow-sm h-100 hover-card bg-gradient" style="transition: transform 0.2s, box-shadow 0.2s; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="card-body p-4 d-flex flex-column justify-content-center align-items-center text-white text-center">
+                        <i class="bi bi-trophy-fill" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                        <h4 class="fw-bold mb-2 text-dark">Ranking de Jugadores</h4>
+                        <p class="mb-3 text-dark">Descubre quiénes son los mejores</p>
+                        <div class="mt-2">
+                            <span class="badge bg-white text-dark">Ver Ranking <i class="bi bi-chevron-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Botón Principal JUGAR -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="d-grid gap-3 mb-3">
+                <a href="/game/jugarPartida?action=partidaIndividual" class="btn btn-primary btn-lg py-3 shadow-sm">
+                    <i class="bi bi-play-circle-fill me-2"></i>
+                    <span class="fs-4 fw-bold">JUGAR</span>
+                </a>
+            </div>
+
+            <!-- Botón Cerrar Sesión -->
+            <div class="d-grid">
+                <a href="/user/lobby?action=salir" class="btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+    {{/usuario}}
+</div>
+
+
