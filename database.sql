@@ -29,6 +29,7 @@ CREATE TABLE categorias (
 
 CREATE TABLE preguntas (
                            id INT AUTO_INCREMENT PRIMARY KEY,
+                           esta_activa BOOLEAN DEFAULT TRUE,
                            texto VARCHAR(255) NOT NULL,
                            categoria_id INT,
                            FOREIGN KEY (categoria_id) REFERENCES categorias(id)

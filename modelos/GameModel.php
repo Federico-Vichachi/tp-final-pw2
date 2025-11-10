@@ -106,11 +106,12 @@ class GameModel
                    p.texto AS pregunta, 
                    c.nombre AS categoria
             FROM preguntas p
-            JOIN categorias c ON p.categoria_id = c.id";
+            JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.esta_activa = 1";
 
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
-            $sql .= " WHERE p.id NOT IN ($idsExcluidos)";
+            $sql .= " AND p.id NOT IN ($idsExcluidos)";
         }
 
         $sql .= " ORDER BY RAND() LIMIT 1";

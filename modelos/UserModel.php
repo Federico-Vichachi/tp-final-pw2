@@ -180,4 +180,76 @@ class UserModel
                 'errores' => "Error al registrar el usuario en la base de datos."];
         }
     }
+
+    private function obtenerIdCategoria($datosSugerirPregunta)
+    {
+        $sql = "SELECT id 
+                FROM categorias 
+                WHERE nombre = '{$datosSugerirPregunta['categoria']}'";
+        $result = $this->conexion->query($sql);
+
+        if (is_array($result) && count($result) > 0) {
+            return $result[0]['id'];
+        } else {
+            return null;
+        }
+    }
+
+    private function obtenerQueryRespuestas($datosSugerirPregunta, $preguntaId)
+    {
+        $sql = "";
+        foreach ($datosSugerirPregunta['respuestas'] as $index => $respuesta) {
+            $esCorrecta = ($index == $datosSugerirPregunta['respuesta_correcta']) ? 1 : 0;
+            $sql .= "INSERT INTO respuestas (
+                            texto, es_correcta, pregunta_id
+                     ) VALUES (
+                               '{$respuesta}',
+                               $esCorrecta,
+                               $preguntaId
+                     ); ";
+        }
+        return $sql;
+    }
+
+    public function guardarSugerenciaPregunta($datosSugerirPregunta)
+    {
+        // Insertar la pregunta
+        $sql = "INSERT INTO preguntas (
+                   esta_activa, texto, categoria_id
+            ) VALUES (
+                      0,
+                      '{$datosSugerirPregunta['pregunta']}',
+                       {$this->obtenerIdCategoria($datosSugerirPregunta)}
+            )";
+
+        $resultado = $this->conexion->query($sql);
+
+        if ($resultado === true) {
+            $preguntaId = $this->conexion->insert_id();
+
+            // Preparar array de respuestas
+            $respuestas = [
+                $datosSugerirPregunta['opcion1'],
+                $datosSugerirPregunta['opcion2'],
+                $datosSugerirPregunta['opcion3'],
+                $datosSugerirPregunta['opcion4']
+            ];
+
+            // Insertar cada respuesta
+            foreach ($respuestas as $index => $respuesta) {
+                $esCorrecta = ($index == $datosSugerirPregunta['respuesta_correcta']) ? 1 : 0;
+                $sqlRespuesta = "INSERT INTO respuestas (
+                                    texto, es_correcta, pregunta_id
+                                 ) VALUES (
+                                           '$respuesta',
+                                           $esCorrecta,
+                                           $preguntaId
+                                 )";
+                $this->conexion->query($sqlRespuesta);
+            }
+        }
+
+        return $resultado;
+    }
 }
+

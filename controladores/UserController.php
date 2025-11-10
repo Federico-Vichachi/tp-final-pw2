@@ -64,6 +64,17 @@ class UserController
         ]);
     }
 
+    public function sugerirNuevaPregunta()
+    {
+        $this->redirectNotAuthenticated();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->procesarSugerenciaPregunta();
+        }
+
+        $this->renderer->render("sugerirPregunta", []);
+    }
+
     private function salir()
     {
         session_destroy();
@@ -141,6 +152,32 @@ class UserController
 
         $_SESSION['mensaje_exito'] = 'Cuenta validada exitosamente. Ahora puedes ingresar.';
         $this->redirectTo('ingresar');
+    }
+
+    private function procesarSugerenciaPregunta()
+    {
+        $datosSugerenciaPregunta = [
+            'usuario_id' => $_SESSION['usuario']['id'],
+            'categoria' => $_POST['categoria'] ?? '',
+            'pregunta' => $_POST['pregunta'] ?? '',
+            'opcion1' => $_POST['opcion1'] ?? '',
+            'opcion2' => $_POST['opcion2'] ?? '',
+            'opcion3' => $_POST['opcion3'] ?? '',
+            'opcion4' => $_POST['opcion4'] ?? '',
+            'respuesta_correcta' => $_POST['respuesta_correcta'] ?? ''
+        ];
+
+        $sugerenciaExitosa = $this->model->guardarSugerenciaPregunta($datosSugerenciaPregunta);
+
+        if (!$sugerenciaExitosa) {
+            $this->renderer->render("sugerirPregunta", [
+                'error' => "Error al enviar la sugerencia. Intenta nuevamente.",
+                'datos' => $datosSugerenciaPregunta
+            ]);
+            exit();
+        }
+        $_SESSION['mensaje_exito'] = 'Sugerencia de pregunta enviada exitosamente. ¡Gracias por contribuir!';
+        $this->redirectTo('lobby');
     }
 
     public function perfil()

@@ -1,0 +1,121 @@
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <!-- Título -->
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-primary">Sugerir Nueva Pregunta</h2>
+                <p class="text-muted">Ayúdanos a mejorar el juego sugiriendo nuevas preguntas</p>
+            </div>
+
+            <!-- Mensajes -->
+            {{#error}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Error:</strong> {{error}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/error}}
+
+            <!-- Formulario -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="/user/sugerirNuevaPregunta">
+
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label fw-bold">
+                                <i class="bi bi-tag-fill text-primary me-1"></i>
+                                Categoría
+                            </label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option value="Historia">Historia</option>
+                                <option value="Deporte">Deporte</option>
+                                <option value="Ciencia">Ciencia</option>
+                                <option value="Geografía">Geografía</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta -->
+                        <div class="mb-3">
+                            <label for="pregunta" class="form-label fw-bold">
+                                <i class="bi bi-question-circle-fill text-primary me-1"></i>
+                                Pregunta
+                            </label>
+                            <textarea
+                                class="form-control"
+                                id="pregunta"
+                                name="pregunta"
+                                rows="3"
+                                placeholder="Escribe tu pregunta aquí..."
+                                required
+                            >{{#datos}}{{pregunta}}{{/datos}}</textarea>
+                        </div>
+
+                        <!-- Opciones de Respuesta -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-list-check text-primary me-1"></i>
+                                Opciones de Respuesta
+                            </label>
+
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="0" required aria-label="Opción 1 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion1" placeholder="Opción 1" value="{{#datos}}{{opcion1}}{{/datos}}" required>
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="1" required aria-label="Opción 2 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion2" placeholder="Opción 2" value="{{#datos}}{{opcion2}}{{/datos}}" required>
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="2" required aria-label="Opción 3 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion3" placeholder="Opción 3" value="{{#datos}}{{opcion3}}{{/datos}}" required>
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="3" required aria-label="Opción 4 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion4" placeholder="Opción 4" value="{{#datos}}{{opcion4}}{{/datos}}" required>
+                            </div>
+
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Marca el círculo de la opción que sea la respuesta correcta
+                            </small>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send-fill me-2"></i>
+                                Enviar Sugerencia
+                            </button>
+                            <a href="/user/lobby" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Volver al Lobby
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Nota informativa -->
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="bi bi-lightbulb-fill me-2"></i>
+                <strong>Nota:</strong> Tu sugerencia será revisada por los editores antes de ser incluida en el juego.
+            </div>
+        </div>
+    </div>
+</div>
+
+

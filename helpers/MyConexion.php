@@ -21,4 +21,9 @@ class MyConexion
         }
         return $result;
     }
+
+    public function insert_id()
+    {
+        return $this->conexion->insert_id;
+    }
 }
