@@ -1,1 +1,65 @@
-<p>Estas en Ranking</p>
+<div class="container text-center col-8">
+    <div class="d-flex g-3 align-items-center justify-content-center gap-4">
+        <div class="btn btn-primary btn-lg py-3 shadow-sm">
+            <div class="fs-4 fw-bold">RANKING HISTORICO</div>
+        </div>
+        <div class="btn btn-secondary btn-lg py-3 shadow-sm">
+            <div class="fs-4 fw-bold">RANKING MENSUAL</div>
+        </div>
+    </div>
+
+    <div class="row bg-primary"
+         style="align-items: center;justify-content: center;background-color: #dee2e6; padding: 1rem 0;margin-top: 2.5rem;color: white;">
+        <div class="col">
+            <div class="container text-center">
+                <div class="row row-cols-flex">
+                    <div class="col-4 col-sm fs-6 fw-bold">Posición</div>
+                    <div class="col-4 col-sm fs-6 fw-bold">Avatar</div>
+                    <div class="col-4 col-sm fs-6 fw-bold">Nombre</div>
+                    <div class="col-4 col-sm fs-6 fw-bold">Puntaje</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{#historico}}
+        <a href="/game/jugador?id={{id}}" style="text-decoration: none;color: #212529;">
+            <div class="row poke" style="align-items: center; border: 1px solid #dee2e6; padding: 1.5rem 0;">
+                <div class="col d-flex align-items-center justify-content-center">
+                    <div class="container text-center">
+                        <div class="row align-items-center">
+                            <div class="col-3 d-flex justify-content-center">
+                                {{posicion}}
+                            </div>
+
+                            <div class="col-3 d-flex justify-content-center">
+                                <div class="text-center">
+                                    <img width="45px"
+                                         height="45px"
+                                         src="/public/imagenes/default-avatar.jpg"
+                                         alt="Foto de perfil"
+                                         class="rounded-circle border border-3 border-primary d-block mx-auto"
+                                         style="object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <div class="col-3 d-flex justify-content-center">
+                                {{username}}
+                            </div>
+
+                            <div class="col-3 d-flex justify-content-center">
+                                {{puntaje_final}} pts
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {{/historico}}
+
+    {{^historico}}
+        <div class="text-center py-4">
+            <p>No hay datos históricos disponibles</p>
+        </div>
+    {{/historico}}
+</div>

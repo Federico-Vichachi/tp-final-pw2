@@ -46,15 +46,44 @@ class GameController
         $this->renderer->render("resumenPartida", $data);
     }
 
+    public function jugador()
+    {
+        $this->redirectNotAuthenticated();
+
+        if (!isset($_GET["id"])) {
+            $this->redirectTo('ranking');
+        }
+
+        $perfil = $this->model->getUsuarioById($_GET["id"]);
+
+        if (empty($perfil)) {
+            $this->redirectTo('ranking');
+        }
+
+        $this->renderer->render("jugador", [
+            'perfil' => $perfil
+        ]);
+    }
+
     public function ranking()
     {
         $this->redirectNotAuthenticated();
-        $this->renderer->render("ranking", []);
+
+        $rankingHistorico = $this->model->getRankingHistorico();
+        $rankingHistorico = $this->agregarPosiciones($rankingHistorico);
+
+        $this->renderer->render("ranking", [
+            'historico' => $rankingHistorico
+        ]);
     }
 
-    private function desafiar()
+    private function agregarPosiciones($array)
     {
-        //Debe poder llamarse desde el ranking
+        $posicion = 1;
+        foreach ($array as &$item) {
+            $item['posicion'] = $posicion++;
+        }
+        return $array;
     }
 
     private function calcularResultadoPartida()

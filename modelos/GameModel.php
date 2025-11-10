@@ -100,6 +100,50 @@ class GameModel
         return empty($resultado) ? 'No disponible' : $resultado[0]['texto'];
     }
 
+    public function getRankingHistorico()
+    {
+        $partidas = $this->getMejoresPartidas();
+
+        if (empty($partidas)) {
+            return [];
+        }
+
+        $rankingCompleto = [];
+        foreach ($partidas as $partida) {
+            $usuario = $this->getUsuarioById($partida['usuario_id']);
+            if ($usuario) {
+                $rankingCompleto[] = array_merge($partida, $usuario);
+            }
+        }
+
+        return $rankingCompleto;
+    }
+
+    private function getMejoresPartidas()
+    {
+        $sql = "SELECT *
+            FROM partidas P1
+            WHERE P1.puntaje_final = (
+                SELECT MAX(P2.puntaje_final)
+                FROM partidas P2
+                WHERE P2.usuario_id = P1.usuario_id
+            )
+            ORDER BY P1.puntaje_final DESC";
+
+        $resultado = $this->conexion->query($sql);
+        return empty($resultado) ? [] : $resultado;
+    }
+
+    public function getUsuarioById($usuarioId)
+    {
+        $sql = "SELECT *
+            FROM usuario
+            WHERE id = $usuarioId";
+
+        $resultado = $this->conexion->query($sql);
+        return empty($resultado) ? [] : $resultado[0];
+    }
+
     private function obtenerPreguntaDeBD($preguntasVistas)
     {
         $sql = "SELECT p.id AS pregunta_id, 
