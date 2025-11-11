@@ -164,13 +164,107 @@ class GameModel
         return empty($resultado) ? [] : $resultado[0];
     }
 
-    private function getRespuestas($id_pregunta)
+    public function getRespuestas($id_pregunta)
     {
-        $sql = "SELECT id, texto 
+        $sql = "SELECT id, texto, es_correcta
                 FROM respuestas 
                 WHERE pregunta_id = '$id_pregunta'";
 
         $resultado = $this->conexion->query($sql);
         return $resultado;
     }
+
+    public function guardarReporte($preguntaId, $usuarioId, $motivo)
+    {
+        $sql = "INSERT INTO reportes (pregunta_id, usuario_id, motivo) 
+            VALUES ($preguntaId, $usuarioId, '$motivo')";
+
+        $this->conexion->query($sql);
+    }
+
+    public function getReportesPendientes()
+    {
+        $sql = "SELECT r.id, r.motivo, r.fecha_reporte,
+                   p.texto as pregunta_texto,
+                   p.id as pregunta_id,
+                   u.username as reportado_por
+            FROM reportes r
+            JOIN preguntas p ON r.pregunta_id = p.id
+            JOIN usuario u ON r.usuario_id = u.id
+            WHERE r.estado = 'pendiente'
+            ORDER BY r.fecha_reporte DESC";
+        return $this->conexion->query($sql);
+    }
+
+    public function getReportesRevisados()
+    {
+        $sql = "SELECT r.id, r.motivo, r.fecha_reporte,
+               p.texto as pregunta_texto,
+               u.username as reportado_por
+            FROM reportes r
+            JOIN preguntas p ON r.pregunta_id = p.id
+            JOIN usuario u ON r.usuario_id = u.id
+            WHERE r.estado = 'revisado'
+            ORDER BY r.fecha_reporte DESC";
+        return $this->conexion->query($sql);
+    }
+
+    public function marcarReporteRevisado($reporteId)
+    {
+        $sql = "UPDATE reportes SET estado = 'revisado' WHERE id = $reporteId";
+        $this->conexion->query($sql);
+    }
+
+    public function getTodasLasPreguntas()
+    {
+        $sql = "SELECT p.id, p.texto, c.nombre as categoria 
+                FROM preguntas p 
+                JOIN categorias c ON p.categoria_id = c.id
+                ORDER BY p.id DESC";
+        return $this->conexion->query($sql);
+    }
+
+    public function getCategorias()
+    {
+        $sql = "SELECT id, nombre FROM categorias ORDER BY nombre ASC";
+        return $this->conexion->query($sql);
+    }
+
+    public function crearPreguntaCompleta($data)
+    {
+        $texto = $data['texto'];
+        $categoria_id = (int)$data['categoria_id'];
+        $resp_correcta = $data['respuesta_correcta'];
+        $resp_incorrecta1 = $data['respuesta_incorrecta1'];
+        $resp_incorrecta2 = $data['respuesta_incorrecta2'];
+
+        $sqlPregunta = "INSERT INTO preguntas (texto, categoria_id) VALUES ('$texto', $categoria_id)";
+        $this->conexion->query($sqlPregunta);
+
+        $sqlUltimoId = "SELECT LAST_INSERT_ID() as last_id";
+        $resultadoId = $this->conexion->query($sqlUltimoId);
+        $preguntaId = $resultadoId[0]['last_id'];
+
+        $sqlResp1 = "INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($preguntaId, '$resp_correcta', 1)";
+        $this->conexion->query($sqlResp1);
+
+        $sqlResp2 = "INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($preguntaId, '$resp_incorrecta1', 0)";
+        $this->conexion->query($sqlResp2);
+
+        $sqlResp3 = "INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($preguntaId, '$resp_incorrecta2', 0)";
+        $this->conexion->query($sqlResp3);
+
+        return true;
+    }
+
+    public function eliminarPregunta($preguntaId)
+    {
+        $id = (int)$preguntaId;
+        $this->conexion->query("DELETE FROM reportes WHERE pregunta_id = $id");
+        $this->conexion->query("DELETE FROM historial_preguntas WHERE pregunta_id = $id");
+        $this->conexion->query("DELETE FROM respuestas WHERE pregunta_id = $id");
+        $this->conexion->query("DELETE FROM preguntas WHERE id = $id");
+        return true;
+    }
+
 }

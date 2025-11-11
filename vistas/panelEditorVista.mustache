@@ -1,0 +1,66 @@
+<div class="w3-container">
+    <h2>Panel de Editor</h2>
+    <p>Sos editor wachin</p>
+
+    <div class="w3-bar w3-margin-bottom">
+        <a href="/editor/verReportes" class="w3-bar-item w3-button w3-blue w3-round">Ver Reportes</a>
+        <a href="/editor/crearPreguntaForm" class="w3-bar-item w3-button w3-green w3-round">Crear Nueva Pregunta</a>
+        <a href="/user/lobby?action=salir" class="w3-bar-item w3-button w3-red w3-round" style="float: right;">Cerrar Sesión</a>
+    </div>
+
+    <h3>Listado de Preguntas</h3>
+    <table class="w3-table-all">
+        <thead>
+        <tr class="w3-light-grey">
+            <th>ID</th>
+            <th>Texto de la Pregunta</th>
+            <th>Categoria</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#preguntas}}
+            <tr>
+                <td>{{id}}</td>
+                <td>{{texto}}</td>
+                <td>{{categoria}}</td>
+                <td>
+                    <button onclick="toggleAnswers({{id}})" class="w3-button w3-tiny w3-blue w3-round">Ver Respuestas</button>
+                    <a href="/editor/eliminarPregunta?id={{id}}" onclick="return confirm('Estas seguro de que queres eliminar esta pregunta?');" class="w3-button w3-tiny w3-red w3-round">Eliminar</a>
+                </td>
+            </tr>
+            <tr id="answers-{{id}}" style="display:none;">
+                <td colspan="4">
+                    <div class="w3-container w3-padding w3-light-yellow">
+                        <b>Respuestas:</b>
+                        <ul class="w3-ul">
+                            {{#respuestas}}
+                                <li class="{{#es_correcta}}w3-pale-green{{/es_correcta}}{{^es_correcta}}w3-pale-red{{/es_correcta}}">
+                                    {{texto}}
+                                </li>
+                            {{/respuestas}}
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        {{/preguntas}}
+        {{^preguntas}}
+            <tr>
+                <td colspan="4">No hay preguntas para mostrar.</td>
+            </tr>
+        {{/preguntas}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function toggleAnswers(questionId) {
+        var answersRow = document.getElementById('answers-' + questionId);
+
+        if (answersRow.style.display === 'none') {
+            answersRow.style.display = 'table-row';
+        } else {
+            answersRow.style.display = 'none';
+        }
+    }
+</script>

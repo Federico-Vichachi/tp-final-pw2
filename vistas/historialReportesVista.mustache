@@ -1,0 +1,19 @@
+<h1>Historial de Reportes Revisados</h1>
+
+{{#reportes}}
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <p><strong>Pregunta Reportada:</strong> {{pregunta_texto}}</p>
+        <p><strong>Motivo del Reporte:</strong> {{motivo}}</p>
+        <p><strong>Reportado por:</strong> {{reportado_por}} el {{fecha_reporte}}</p>
+        <p><em>Este reporte ya ha sido gestionado.</em></p>
+    </div>
+{{/reportes}}
+
+{{^reportes}}
+    <p>No hay reportes en el historial.</p>
+{{/reportes}}
+
+<br>
+<a href="/editor/verReportes">Volver a Reportes Pendientes</a>
+<br>
+<a href="/editor/index">Volver al Panel Principal</a>

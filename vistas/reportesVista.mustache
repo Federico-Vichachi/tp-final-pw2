@@ -1,0 +1,38 @@
+<div class="w3-container">
+
+    <h1>Reportes de Preguntas Pendientes</h1>
+
+    {{#reportes}}
+        <div class="w3-card-4 w3-margin-bottom w3-padding">
+            <h4>Pregunta ID: {{pregunta_id}} - Reportada por: {{reportado_por}}</h4>
+            <p><b>Pregunta:</b> {{pregunta_texto}}</p>
+
+            <h5>Respuestas Registradas:</h5>
+            <ul class="w3-ul w3-border">
+                {{#respuestas}}
+                    <li class="{{#es_correcta}}w3-pale-green{{/es_correcta}}{{^es_correcta}}w3-pale-red{{/es_correcta}}">
+                        {{texto}} {{#es_correcta}}<b>(Correcta)</b>{{/es_correcta}}
+                    </li>
+                {{/respuestas}}
+            </ul>
+
+            <p><b>Motivo del Reporte:</b> {{motivo}}</p>
+            <p class="w3-small">Fecha: {{fecha_reporte}}</p>
+
+            <div class="w3-margin-top">
+                <a href="/editor/eliminarPregunta?id={{pregunta_id}}" class="w3-button w3-red w3-round">Eliminar Pregunta</a>
+                <a href="/editor/marcarReporteRevisado?id={{id}}" class="w3-button w3-blue w3-round">Marcar como Revisado</a>
+            </div>
+        </div>
+    {{/reportes}}
+
+    {{^reportes}}
+        <p>No hay reportes pendientes.</p>
+    {{/reportes}}
+
+    <hr>
+    <a href="/editor/historialReportes">Ver historial de reportes revisados</a>
+    <br>
+    <a href="/editor/index">Volver al Panel Principal</a>
+
+</div>

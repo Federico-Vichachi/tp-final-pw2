@@ -56,9 +56,16 @@ class UserController
     public function lobby()
     {
         $this->redirectNotAuthenticated();
+
         if (isset($_GET['action']) && $_GET['action'] === 'salir') {
             $this->salir();
         }
+
+        if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'editor') {
+            header('Location: /editor/index');
+            exit();
+        }
+
         $this->renderer->render("lobby",[
             'usuario' => $_SESSION['usuario']
         ]);
@@ -91,6 +98,14 @@ class UserController
             exit();
         }
         $_SESSION['usuario'] = $usuario;
+
+        if ($usuario['rol'] === 'editor') {
+            header('Location: /editor/index');
+        } else {
+            header('Location: /user/lobby');
+        }
+        exit();
+
         $this->redirectTo('lobby');
     }
 
@@ -216,7 +231,13 @@ class UserController
     private function redirectAuthenticated()
     {
         if ($this->isAuthenticated()) {
-            $this->redirectTo('lobby');
+            if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'editor') {
+                header('Location: /editor/index');
+                exit();
+            }
+
+            header('Location: /user/lobby');
+            exit();
         }
     }
 

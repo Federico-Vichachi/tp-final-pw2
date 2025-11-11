@@ -173,7 +173,7 @@ class UserModel
             return [
                 'ok' => true,
                 'errores' => []
-                ];
+            ];
         } else {
             return [
                 'ok' => false,

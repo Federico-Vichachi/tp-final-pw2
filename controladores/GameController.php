@@ -5,7 +5,8 @@ class GameController
     private $renderer;
     private $model;
 
-    public function __construct($GameModel, $renderer)
+
+    public function __construct($GameModel,$renderer)
     {
         $this->model = $GameModel;
         $this->renderer = $renderer;
@@ -18,6 +19,7 @@ class GameController
 
     public function jugarPartida()
     {
+        $this->verificarRolJugador();
         $this->redirectNotAuthenticated();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,8 +31,38 @@ class GameController
         }
 
         $partida = $this->obtenerPreguntaActual();
-
         $this->mostrarVistaPartida($partida);
+    }
+
+    public function reportarPregunta()
+    {
+        $this->redirectNotAuthenticated();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $preguntaId = $_POST['pregunta_id'] ?? null;
+            $motivo = $_POST['motivo'] ?? '';
+            $usuarioId = $_SESSION['usuario']['id'];
+
+            if ($preguntaId && !empty($motivo)) {
+                $this->model->guardarReporte($preguntaId, $usuarioId, $motivo);
+            }
+        }
+
+        $this->redirectToLobby();
+    }
+
+    private function verificarRolJugador()
+    {
+        if (isset($_SESSION['usuario'])) {
+            if ($_SESSION['usuario']['rol'] === 'editor') {
+                header('Location: /editor/index');
+                exit();
+            }
+            if ($_SESSION['usuario']['rol'] !== 'usuario') {
+                header('Location: /');
+                exit();
+            }
+        }
     }
 
     public function resumenPartida()
@@ -40,6 +72,7 @@ class GameController
         list($puntajeFinal, $mensaje) = $this->calcularResultadoPartida();
 
         $data = $this->prepararDatosResumen($puntajeFinal, $mensaje);
+        $data['historial_partida'] = $_SESSION["historial_partida"] ?? [];
 
         $this->finalizarPartidaEnBD($puntajeFinal);
         $this->limpiarPartidaActual();
@@ -79,11 +112,17 @@ class GameController
 
     private function agregarPosiciones($array)
     {
+        if (!is_array($array)) return [];
         $posicion = 1;
         foreach ($array as &$item) {
             $item['posicion'] = $posicion++;
         }
         return $array;
+    }
+
+    private function desafiar()
+    {
+        //Debe poder llamarse desde el ranking
     }
 
     private function calcularResultadoPartida()
@@ -120,7 +159,8 @@ class GameController
             "partida_desafio",
             "tiempo_inicio_pregunta",
             "partida_id",
-            "partida_codigo"
+            "partida_codigo" ,
+            "historial_partida"
         ];
 
         foreach ($variablesPartida as $variable) {
@@ -186,12 +226,12 @@ class GameController
         $_SESSION["preguntas_vistas"][] = $partida["pregunta"]["pregunta_id"];
         $_SESSION["pregunta_respondida"] = false;
         $_SESSION["tiempo_inicio_pregunta"] = time();
+        $_SESSION["historial_partida"][] = $partida["pregunta"];
     }
 
     private function iniciarNuevaPartida()
     {
         $this->limpiarPartidaActual();
-
         $usuarioId = $_SESSION["usuario"]["id"];
         $partida = $this->model->iniciarPartida($usuarioId);
 
@@ -202,12 +242,10 @@ class GameController
 
         $_SESSION["puntaje"] = 0;
         $_SESSION["preguntas_vistas"] = [];
-
+        $_SESSION["historial_partida"] = [];
         $_SESSION["partida_iniciada"] = true;
         $_SESSION["partida_desafio"] = false;
-
         unset($_SESSION["pregunta_actual"]);
-
         $this->redirectTo("jugarPartida");
     }
 
@@ -251,7 +289,6 @@ class GameController
 
         $partidaId = $_SESSION["partida_id"];
         $preguntaId = $_SESSION["pregunta_actual"]["pregunta"]["pregunta_id"];
-
         $this->model->registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta);
     }
 
@@ -276,7 +313,6 @@ class GameController
     {
         $tiempoRespuesta = $this->calcularTiempoRespuesta();
         $this->registrarRespuestaEnHistorial(true, $tiempoRespuesta);
-
         $_SESSION["pregunta_respondida"] = true;
         $this->redirectTo("resumenPartida");
     }
@@ -291,7 +327,6 @@ class GameController
     {
         $_SESSION["puntaje"]++;
         $_SESSION["pregunta_respondida"] = true;
-
         $this->generarNuevaPregunta();
         $this->redirectTo("jugarPartida");
     }
@@ -327,7 +362,8 @@ class GameController
         $this->redirectToLobby();
     }
 
-    private function redirectToLobby(){
+    private function redirectToLobby()
+    {
         header("Location: /user/lobby");
         exit();
     }
@@ -342,14 +378,14 @@ class GameController
     {
         $tiempoLimite = 10;
 
-        if(!isset($_SESSION["tiempo_inicio_pregunta"])){
+        if (!isset($_SESSION["tiempo_inicio_pregunta"])) {
             $_SESSION["tiempo_inicio_pregunta"] = time();
         }
 
         $tiempoTranscurrido = time() - $_SESSION["tiempo_inicio_pregunta"];
         $tiempoRestante = $tiempoLimite - $tiempoTranscurrido;
 
-        if ($tiempoRestante <=0){
+        if ($tiempoRestante <= 0) {
             $this->procesarTiempoExpirado();
             exit();
         }

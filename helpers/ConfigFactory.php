@@ -1,9 +1,11 @@
 <?php
+
 include_once("helpers/MyConexion.php");
 include_once("helpers/NewRouter.php");
 
 include_once("controladores/UserController.php");
 include_once("controladores/GameController.php");
+include_once("controladores/EditorController.php");
 
 include_once("modelos/UserModel.php");
 include_once("modelos/GameModel.php");
@@ -36,7 +38,7 @@ class ConfigFactory
         $this->objetos["router"] = new NewRouter($this, "UserController", "base");
         $this->objetos["UserController"] = new UserController(new UserModel($this->conexion), $this->renderer);
         $this->objetos["GameController"] = new GameController(new GameModel($this->conexion), $this->renderer);
-
+        $this->objetos["EditorController"] = new EditorController(new GameModel($this->conexion), $this->renderer);
     }
 
     public function get($objectName)

@@ -1,0 +1,28 @@
+<div class="w3-container">
+    <h2>Crear Nueva Pregunta</h2>
+    <form action="/editor/procesarCrearPregunta" method="POST" class="w3-card-4 w3-padding">
+
+        <label for="texto">Texto de la Pregunta:</label>
+        <textarea id="texto" name="texto" class="w3-input w3-border" required></textarea>
+
+        <label for="categoria_id" class="w3-margin-top">Categoría:</label>
+        <select id="categoria_id" name="categoria_id" class="w3-select w3-border" required>
+            <option value="" disabled selected>Selecciona una categoría</option>
+            {{#categorias}}
+                <option value="{{id}}">{{nombre}}</option>
+            {{/categorias}}
+        </select>
+
+        <label for="respuesta_correcta" class="w3-margin-top">Respuesta Correcta:</label>
+        <input type="text" id="respuesta_correcta" name="respuesta_correcta" class="w3-input w3-border" required>
+
+        <label for="respuesta_incorrecta1" class="w3-margin-top">Respuesta Incorrecta 1:</label>
+        <input type="text" id="respuesta_incorrecta1" name="respuesta_incorrecta1" class="w3-input w3-border" required>
+
+        <label for="respuesta_incorrecta2" class="w3-margin-top">Respuesta Incorrecta 2:</label>
+        <input type="text" id="respuesta_incorrecta2" name="respuesta_incorrecta2" class="w3-input w3-border" required>
+
+        <button type="submit" class="w3-button w3-green w3-margin-top">Guardar Pregunta</button>
+        <a href="/editor/index" class="w3-button w3-grey w3-margin-top">Cancelar</a>
+    </form>
+</div>

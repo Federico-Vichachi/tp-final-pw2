@@ -65,6 +65,17 @@ CREATE TABLE historial_preguntas (
                                      FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
 );
 
+CREATE TABLE reportes (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          pregunta_id INT NOT NULL,
+                          usuario_id INT NOT NULL,
+                          motivo TEXT NOT NULL,
+                          estado ENUM('pendiente', 'revisado') NOT NULL DEFAULT 'pendiente',
+                          fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          FOREIGN KEY (pregunta_id) REFERENCES preguntas(id),
+                          FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
 -- INSERT CATEGORIAS --
 
 INSERT INTO categorias (nombre)
