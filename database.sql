@@ -1,7 +1,3 @@
--- CREATE DATABASE PREGUNTADOS --
-CREATE DATABASE IF NOT EXISTS preguntados;
-USE preguntados;
-
 -- CREATE TABLE USUARIO CON COORDENADAS --
 CREATE TABLE usuario (
                          id INT AUTO_INCREMENT PRIMARY KEY,
@@ -19,19 +15,96 @@ CREATE TABLE usuario (
                          codigo_validacion VARCHAR(64) DEFAULT NULL,
                          cuenta_activa BOOLEAN DEFAULT FALSE,
                          rol ENUM('usuario', 'editor', 'administrador') DEFAULT 'usuario',
+                         puntos_acumulados INT DEFAULT 0,
+                         nivel INT DEFAULT 1,
                          fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- INSERT USUARIO --
+-- Usuario con rol 'usuario'
+INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,longitud,email,password,username,
+                     foto_perfil,codigo_validacion,cuenta_activa,rol,puntos_acumulados,nivel) VALUES (
+             'usuario',
+             1995,
+             'Masculino',
+             'España',
+             'Madrid',
+             40.4167754,
+             -3.7037902,
+             'usuario@gmail.com',
+             '$2y$10$HvPM1ZmBzdH5ZtZthhH/9emvHTWYpkYsdYM1y4Z736bq5KO1sXm.m',
+             'usuario',
+             '/public/imagenes/default-avatar.jpg',
+             '34582',
+             TRUE,
+             'usuario',
+             250,
+             3
+         );
+
+-- Usuario con rol 'editor'
+INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,longitud,email,password,username,
+                     foto_perfil,codigo_validacion,cuenta_activa,rol,puntos_acumulados,nivel) VALUES (
+             'editor',
+             1988,
+             'Masculino',
+             'México',
+             'Ciudad de México',
+             19.4326077,
+             -99.133208,
+             'editor@gmail.com',
+             '$2y$10$HvPM1ZmBzdH5ZtZthhH/9emvHTWYpkYsdYM1y4Z736bq5KO1sXm.m',
+             'editor',
+             '/public/imagenes/default-avatar.jpg',
+             '78945',
+             TRUE,
+             'editor',
+             1500,
+             10
+         );
+
+-- Usuario con rol 'administrador'
+INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,longitud,email,password,username,
+                     foto_perfil,codigo_validacion,cuenta_activa,rol,puntos_acumulados,nivel) VALUES (
+             'admin',
+             1982,
+             'Masculino',
+             'Argentina',
+             'Buenos Aires',
+             -34.6036844,
+             -58.3815591,
+             'admin@gmail.com',
+             '$2y$10$HvPM1ZmBzdH5ZtZthhH/9emvHTWYpkYsdYM1y4Z736bq5KO1sXm.m',
+             'admin',
+             '/public/imagenes/default-avatar.jpg',
+             NULL,
+             TRUE,
+             'administrador',
+             NULL,
+             NULL
+         );
+
 CREATE TABLE categorias (
                             id INT AUTO_INCREMENT PRIMARY KEY,
-                            nombre VARCHAR(100) NOT NULL
+                            nombre VARCHAR(100) NOT NULL,
+                            color VARCHAR(7) NOT NULL DEFAULT '#7f8c8d'
 );
+
+INSERT INTO categorias (nombre, color) VALUES
+('Historia', '#e74c3c'),      -- Rojo (representa pasión, eventos históricos)
+('Deporte', '#2ecc71'),       -- Verde (naturaleza, campos deportivos)
+('Ciencia', '#3498db'),       -- Azul (ciencia, tecnología)
+('Geografía', '#f39c12');     -- Naranja (tierra, mapas)
 
 CREATE TABLE preguntas (
                            id INT AUTO_INCREMENT PRIMARY KEY,
                            esta_activa BOOLEAN DEFAULT TRUE,
                            texto VARCHAR(255) NOT NULL,
                            categoria_id INT,
+                           nivel_pregunta INT DEFAULT 1,
+                           veces_acertada INT DEFAULT 0,
+                           veces_fallada INT DEFAULT 0,
+                           ratio_dificultad DECIMAL(5,4) DEFAULT 0.5,
                            FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
 
@@ -51,6 +124,7 @@ CREATE TABLE partidas (
                           fecha_fin DATETIME NULL,
                           puntaje_final INT DEFAULT 0,
                           estado ENUM('en_curso', 'finalizada', 'abandonada') DEFAULT 'en_curso',
+                          nivel_usuario INT DEFAULT 1,
                           FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
@@ -61,6 +135,7 @@ CREATE TABLE historial_preguntas (
                                      pregunta_fallada BOOLEAN DEFAULT FALSE,
                                      fecha_respuesta DATETIME NULL,
                                      tiempo_respuesta INT DEFAULT 0,
+                                     nivel_pregunta_partida INT DEFAULT 1,
                                      FOREIGN KEY (partida_id) REFERENCES partidas(id),
                                      FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
 );
@@ -76,109 +151,222 @@ CREATE TABLE reportes (
                           FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
--- INSERT CATEGORIAS --
-
-INSERT INTO categorias (nombre)
-VALUES
-    ('Historia'),
-    ('Deporte'),
-    ('Ciencia'),
-    ('Geografía');
-
 -- INSERT PREGUNTAS --
-
 INSERT INTO preguntas (texto, categoria_id) VALUES
 -- HISTORIA (id_categoria = 1)
 ('¿En qué año comenzó la Segunda Guerra Mundial?', 1),
 ('¿Quién fue el primer presidente de Estados Unidos?', 1),
 ('¿Qué civilización construyó las pirámides de Egipto?', 1),
 ('¿En qué año llegó Cristóbal Colón a América?', 1),
+('¿Quién pintó la "Mona Lisa"?', 1),
+('¿En qué año cayó el Imperio Romano de Occidente?', 1),
+('¿Quién fue el primer emperador de Roma?', 1),
+('¿Qué revolucionó la imprenta en el siglo XV?', 1),
+('¿Quién escribió "El Capital"?', 1),
+('¿En qué siglo se descubrió América?', 1),
+('¿Quién lideró la Revolución Rusa?', 1),
+('¿Qué imperio dominó Mesoamérica antes de los españoles?', 1),
+('¿Quién fue Cleopatra?', 1),
+('¿En qué año se firmó la Declaración de Independencia de EE.UU.?', 1),
+('¿Qué ciudad fue capital del Imperio Inca?', 1),
+('¿Quién conquistó el Imperio Azteca?', 1),
+('¿Qué tratado puso fin a la Primera Guerra Mundial?', 1),
+('¿Quién fue el líder nazi en la Segunda Guerra Mundial?', 1),
+('¿Qué dinastía gobernó China por más de 2000 años?', 1),
+('¿En qué año se disolvió la Unión Soviética?', 1),
+('¿Quién descubrió la penicilina?', 1),
+('¿Qué país inició la Revolución Industrial?', 1),
+('¿Quién fue el faraón más joven de Egipto?', 1),
+('¿En qué año llegó el hombre a la Luna?', 1),
+('¿Qué civilización inventó el cero?', 1),
 
 -- DEPORTE (id_categoria = 2)
 ('¿Cuántos jugadores tiene un equipo de fútbol en el campo?', 2),
 ('¿En qué deporte se utiliza una raqueta y una pelota amarilla?', 2),
 ('¿Qué país ganó el Mundial de Fútbol 2018?', 2),
 ('¿Qué atleta ganó más medallas olímpicas?', 2),
+('¿En qué deporte destaca Michael Jordan?', 2),
+('¿Cuántos rounds tiene un combate de boxeo profesional?', 2),
+('¿Qué país ganó el primer Mundial de Fútbol?', 2),
+('¿En qué deporte se usa un bate y un guante?', 2),
+('¿Qué tenista tiene más títulos de Grand Slam?', 2),
+('¿Cuántos jugadores hay en un equipo de baloncesto?', 2),
+('¿Qué país inventó el fútbol?', 2),
+('¿En qué deporte se usa un puck?', 2),
+('¿Qué nadador tiene el récord de medallas olímpicas?', 2),
+('¿Cuántos hoyos tiene un campo de golf estándar?', 2),
+('¿Qué país tiene más Copas del Mundo de fútbol?', 2),
+('¿En qué deporte se utiliza un boomerang?', 2),
+('¿Qué corredor tiene más títulos en Fórmula 1?', 2),
+('¿Cuántos sets se necesitan para ganar un partido de tenis?', 2),
+('¿Qué país ganó el Mundial de Rugby 2019?', 2),
+('¿En qué deporte se anotan "touchdowns"?', 2),
+('¿Qué gimnasta tiene la puntuación perfecta?', 2),
+('¿Cuántos jugadores hay en un equipo de béisbol?', 2),
+('¿Qué país tiene más medallas olímpicas?', 2),
+('¿En qué deporte se usa una red y un volante?', 2),
+('¿Qué deporte practicaba Diego Maradona?', 2),
 
 -- CIENCIA (id_categoria = 3)
 ('¿Cuál es el planeta más grande del sistema solar?', 3),
 ('¿Qué gas respiran los humanos para vivir?', 3),
 ('¿Quién formuló la teoría de la relatividad?', 3),
 ('¿Cuál es el símbolo químico del agua?', 3),
+('¿Qué partícula tiene carga positiva?', 3),
+('¿Quién propuso la teoría de la evolución?', 3),
+('¿Qué tipo de animal es una ballena?', 3),
+('¿Cuál es el hueso más largo del cuerpo humano?', 3),
+('¿Qué planeta es conocido como el "planeta rojo"?', 3),
+('¿Qué científico descubrió la gravedad?', 3),
+('¿Cuál es el elemento más abundante en la Tierra?', 3),
+('¿Qué enfermedad erradicó la vacuna de Jonas Salk?', 3),
+('¿Qué órgano bombea sangre en el cuerpo?', 3),
+('¿Cuál es la velocidad de la luz?', 3),
+('¿Qué planeta tiene anillos?', 3),
+('¿Qué vitaminas produce la piel con el sol?', 3),
+('¿Qué estudia la entomología?', 3),
+('¿Cuál es el metal líquido a temperatura ambiente?', 3),
+('¿Qué gas liberan las plantas en la fotosíntesis?', 3),
+('¿Qué planeta está más cerca del Sol?', 3),
+('¿Qué sangre es donante universal?', 3),
+('¿Qué partícula no tiene carga eléctrica?', 3),
+('¿Quién inventó el telescopio?', 3),
+('¿Qué planeta tiene más lunas?', 3),
+('¿Qué gas usan las plantas para la fotosíntesis?', 3),
 
 -- GEOGRAFÍA (id_categoria = 4)
 ('¿Cuál es el río más largo del mundo?', 4),
 ('¿Cuál es el país más grande del planeta?', 4),
 ('¿En qué continente se encuentra Egipto?', 4),
-('¿Cuál es la capital de Australia?', 4);
+('¿Cuál es la capital de Australia?', 4),
+('¿Qué montaña es la más alta del mundo?', 4),
+('¿Qué océano es el más grande?', 4),
+('¿Cuál es el país más poblado del mundo?', 4),
+('¿Qué desierto es el más grande del mundo?', 4),
+('¿Qué país tiene forma de bota?', 4),
+('¿Cuál es la capital de Canadá?', 4),
+('¿En qué continente está la Amazonía?', 4),
+('¿Qué país es el más pequeño del mundo?', 4),
+('¿Qué cordillera separa Europa de Asia?', 4),
+('¿Cuál es el lago más profundo del mundo?', 4),
+('¿Qué ciudad es conocida como "La Ciudad Eterna"?', 4),
+('¿En qué país se encuentra la Gran Barrera de Coral?', 4),
+('¿Qué país tiene más islas en el mundo?', 4),
+('¿Cuál es la capital de Brasil?', 4),
+('¿Qué estrecho separa África de Europa?', 4),
+('¿En qué país se encuentra el Kilimanjaro?', 4),
+('¿Qué río pasa por París?', 4),
+('¿Cuál es el país sin litoral más grande del mundo?', 4),
+('¿Qué ciudad es la más poblada de África?', 4),
+('¿En qué país se encuentra Machu Picchu?', 4),
+('¿Qué país es tanto una isla como un continente?', 4);
 
 -- INSERT RESPUESTAS --
-
 INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES
--- HISTORIA
-(1, '1939', 1),
-(1, '1914', 0),
-(1, '1945', 0),
+-- HISTORIA (Preguntas 1-25)
+(1, '1939', 1), (1, '1914', 0), (1, '1945', 0), (1, '1930', 0),
+(2, 'George Washington', 1), (2, 'Abraham Lincoln', 0), (2, 'Thomas Jefferson', 0), (2, 'John Adams', 0),
+(3, 'Egipcia', 1), (3, 'Romana', 0), (3, 'Griega', 0), (3, 'Persa', 0),
+(4, '1492', 1), (4, '1500', 0), (4, '1450', 0), (4, '1520', 0),
+(5, 'Leonardo da Vinci', 1), (5, 'Pablo Picasso', 0), (5, 'Vincent van Gogh', 0), (5, 'Miguel Ángel', 0),
+(6, '476 d.C.', 1), (6, '410 d.C.', 0), (6, '312 d.C.', 0), (6, '600 d.C.', 0),
+(7, 'César Augusto', 1), (7, 'Julio César', 0), (7, 'Nerón', 0), (7, 'Constantino', 0),
+(8, 'Johannes Gutenberg', 1), (8, 'Isaac Newton', 0), (8, 'Galileo Galilei', 0), (8, 'Leonardo da Vinci', 0),
+(9, 'Karl Marx', 1), (9, 'Adam Smith', 0), (9, 'Vladimir Lenin', 0), (9, 'Friedrich Engels', 0),
+(10, 'Siglo XV', 1), (10, 'Siglo XIV', 0), (10, 'Siglo XVI', 0), (10, 'Siglo XIII', 0),
+(11, 'Vladimir Lenin', 1), (11, 'Joseph Stalin', 0), (11, 'León Trotsky', 0), (11, 'Nikita Jrushchov', 0),
+(12, 'Imperio Azteca', 1), (12, 'Imperio Inca', 0), (12, 'Imperio Maya', 0), (12, 'Imperio Olmeca', 0),
+(13, 'Reina de Egipto', 1), (13, 'Emperatriz romana', 0), (13, 'Reina de Grecia', 0), (13, 'Faraona de Nubia', 0),
+(14, '1776', 1), (14, '1789', 0), (14, '1800', 0), (14, '1750', 0),
+(15, 'Cusco', 1), (15, 'Machu Picchu', 0), (15, 'Lima', 0), (15, 'Quito', 0),
+(16, 'Hernán Cortés', 1), (16, 'Francisco Pizarro', 0), (16, 'Cristóbal Colón', 0), (16, 'Simón Bolívar', 0),
+(17, 'Tratado de Versalles', 1), (17, 'Tratado de París', 0), (17, 'Tratado de Utrecht', 0), (17, 'Tratado de Tordesillas', 0),
+(18, 'Adolf Hitler', 1), (18, 'Benito Mussolini', 0), (18, 'Winston Churchill', 0), (18, 'Joseph Stalin', 0),
+(19, 'Dinastía Qing', 1), (19, 'Dinastía Ming', 0), (19, 'Dinastía Tang', 0), (19, 'Dinastía Han', 0),
+(20, '1991', 1), (20, '1989', 0), (20, '1995', 0), (20, '1975', 0),
+(21, 'Alexander Fleming', 1), (21, 'Louis Pasteur', 0), (21, 'Marie Curie', 0), (21, 'Robert Koch', 0),
+(22, 'Reino Unido', 1), (22, 'Francia', 0), (22, 'Alemania', 0), (22, 'Estados Unidos', 0),
+(23, 'Tutankamón', 1), (23, 'Ramsés II', 0), (23, 'Cleopatra', 0), (23, 'Akenatón', 0),
+(24, '1969', 1), (24, '1975', 0), (24, '1965', 0), (24, '1955', 0),
+(25, 'Mayas', 1), (25, 'Romanos', 0), (25, 'Griegos', 0), (25, 'Egipcios', 0),
 
-(2, 'George Washington', 1),
-(2, 'Abraham Lincoln', 0),
-(2, 'Thomas Jefferson', 0),
+-- DEPORTE (Preguntas 26-50)
+(26, '11', 1), (26, '10', 0), (26, '9', 0), (26, '12', 0),
+(27, 'Tenis', 1), (27, 'Golf', 0), (27, 'Bádminton', 0), (27, 'Pádel', 0),
+(28, 'Francia', 1), (28, 'Brasil', 0), (28, 'Alemania', 0), (28, 'Argentina', 0),
+(29, 'Michael Phelps', 1), (29, 'Usain Bolt', 0), (29, 'Simone Biles', 0), (29, 'Carl Lewis', 0),
+(30, 'Baloncesto', 1), (30, 'Fútbol', 0), (30, 'Béisbol', 0), (30, 'Rugby', 0),
+(31, '12', 1), (31, '10', 0), (31, '15', 0), (31, '8', 0),
+(32, 'Uruguay', 1), (32, 'Brasil', 0), (32, 'Argentina', 0), (32, 'Italia', 0),
+(33, 'Béisbol', 1), (33, 'Cricket', 0), (33, 'Hockey', 0), (33, 'Golf', 0),
+(34, 'Novak Djokovic', 1), (34, 'Rafael Nadal', 0), (34, 'Roger Federer', 0), (34, 'Andy Murray', 0),
+(35, '5', 1), (35, '6', 0), (35, '7', 0), (35, '4', 0),
+(36, 'Inglaterra', 1), (36, 'Brasil', 0), (36, 'Alemania', 0), (36, 'España', 0),
+(37, 'Hockey sobre hielo', 1), (37, 'Fútbol', 0), (37, 'Béisbol', 0), (37, 'Rugby', 0),
+(38, 'Michael Phelps', 1), (38, 'Mark Spitz', 0), (38, 'Ian Thorpe', 0), (38, 'Ryan Lochte', 0),
+(39, '18', 1), (39, '9', 0), (39, '12', 0), (39, '15', 0),
+(40, 'Brasil', 1), (40, 'Alemania', 0), (40, 'Italia', 0), (40, 'Argentina', 0),
+(41, 'Lanzamiento de boomerang', 1), (41, 'Tiro con arco', 0), (41, 'Jabalina', 0), (41, 'Discóbolo', 0),
+(42, 'Lewis Hamilton', 1), (42, 'Michael Schumacher', 0), (42, 'Sebastian Vettel', 0), (42, 'Ayrton Senna', 0),
+(43, '3', 1), (43, '2', 0), (43, '4', 0), (43, '5', 0),
+(44, 'Sudáfrica', 1), (44, 'Nueva Zelanda', 0), (44, 'Australia', 0), (44, 'Inglaterra', 0),
+(45, 'Fútbol americano', 1), (45, 'Rugby', 0), (45, 'Baloncesto', 0), (45, 'Béisbol', 0),
+(46, 'Nadia Comăneci', 1), (46, 'Simone Biles', 0), (46, 'Larisa Latynina', 0), (46, 'Olga Korbut', 0),
+(47, '9', 1), (47, '10', 0), (47, '8', 0), (47, '11', 0),
+(48, 'Estados Unidos', 1), (48, 'China', 0), (48, 'Rusia', 0), (48, 'Reino Unido', 0),
+(49, 'Bádminton', 1), (49, 'Tenis', 0), (49, 'Voleibol', 0), (49, 'Ping Pong', 0),
+(50, 'Fútbol', 1), (50, 'Béisbol', 0), (50, 'Baloncesto', 0), (50, 'Rugby', 0),
 
-(3, 'Egipcia', 1),
-(3, 'Romana', 0),
-(3, 'Griega', 0),
+-- CIENCIA (Preguntas 51-75)
+(51, 'Júpiter', 1), (51, 'Saturno', 0), (51, 'Marte', 0), (51, 'Venus', 0),
+(52, 'Oxígeno', 1), (52, 'Dióxido de carbono', 0), (52, 'Hidrógeno', 0), (52, 'Nitrógeno', 0),
+(53, 'Albert Einstein', 1), (53, 'Isaac Newton', 0), (53, 'Nikola Tesla', 0), (53, 'Stephen Hawking', 0),
+(54, 'H2O', 1), (54, 'O2', 0), (54, 'CO2', 0), (54, 'NaCl', 0),
+(55, 'Protón', 1), (55, 'Electrón', 0), (55, 'Neutrón', 0), (55, 'Fotón', 0),
+(56, 'Charles Darwin', 1), (56, 'Gregor Mendel', 0), (56, 'Louis Pasteur', 0), (56, 'Alfred Wallace', 0),
+(57, 'Mamífero', 1), (57, 'Pez', 0), (57, 'Reptil', 0), (57, 'Anfibio', 0),
+(58, 'Fémur', 1), (58, 'Tibia', 0), (58, 'Húmero', 0), (58, 'Radio', 0),
+(59, 'Marte', 1), (59, 'Júpiter', 0), (59, 'Venus', 0), (59, 'Saturno', 0),
+(60, 'Isaac Newton', 1), (60, 'Galileo Galilei', 0), (60, 'Albert Einstein', 0), (60, 'Nikola Tesla', 0),
+(61, 'Oxígeno', 1), (61, 'Hierro', 0), (61, 'Silicio', 0), (61, 'Aluminio', 0),
+(62, 'Polio', 1), (62, 'Viruela', 0), (62, 'Sarampión', 0), (62, 'Tuberculosis', 0),
+(63, 'Corazón', 1), (63, 'Pulmón', 0), (63, 'Hígado', 0), (63, 'Cerebro', 0),
+(64, '300,000 km/s', 1), (64, '150,000 km/s', 0), (64, '500,000 km/s', 0), (64, '1,000,000 km/s', 0),
+(65, 'Saturno', 1), (65, 'Júpiter', 0), (65, 'Urano', 0), (65, 'Neptuno', 0),
+(66, 'Vitamina D', 1), (66, 'Vitamina C', 0), (66, 'Vitamina A', 0), (66, 'Vitamina B', 0),
+(67, 'Insectos', 1), (67, 'Plantas', 0), (67, 'Animales', 0), (67, 'Rocas', 0),
+(68, 'Mercurio', 1), (68, 'Plomo', 0), (68, 'Hierro', 0), (68, 'Oro', 0),
+(69, 'Oxígeno', 1), (69, 'Dióxido de carbono', 0), (69, 'Nitrógeno', 0), (69, 'Hidrógeno', 0),
+(70, 'Mercurio', 1), (70, 'Venus', 0), (70, 'Marte', 0), (70, 'Tierra', 0),
+(71, 'Tipo O negativo', 1), (71, 'Tipo A', 0), (71, 'Tipo B', 0), (71, 'Tipo AB', 0),
+(72, 'Neutrón', 1), (72, 'Protón', 0), (72, 'Electrón', 0), (72, 'Fotón', 0),
+(73, 'Galileo Galilei', 1), (73, 'Isaac Newton', 0), (73, 'Johannes Kepler', 0), (73, 'Hans Lippershey', 0),
+(74, 'Júpiter', 1), (74, 'Saturno', 0), (74, 'Urano', 0), (74, 'Neptuno', 0),
+(75, 'Dióxido de carbono', 1), (75, 'Oxígeno', 0), (75, 'Nitrógeno', 0), (75, 'Hidrógeno', 0),
 
-(4, '1492', 1),
-(4, '1500', 0),
-(4, '1450', 0),
-
--- DEPORTE
-(5, '11', 1),
-(5, '10', 0),
-(5, '9', 0),
-
-(6, 'Tenis', 1),
-(6, 'Golf', 0),
-(6, 'Bádminton', 0),
-
-(7, 'Francia', 1),
-(7, 'Brasil', 0),
-(7, 'Alemania', 0),
-
-(8, 'Michael Phelps', 1),
-(8, 'Usain Bolt', 0),
-(8, 'Simone Biles', 0),
-
--- CIENCIA
-(9, 'Júpiter', 1),
-(9, 'Saturno', 0),
-(9, 'Marte', 0),
-
-(10, 'Oxígeno', 1),
-(10, 'Dióxido de carbono', 0),
-(10, 'Hidrógeno', 0),
-
-(11, 'Albert Einstein', 1),
-(11, 'Isaac Newton', 0),
-(11, 'Nikola Tesla', 0),
-
-(12, 'H₂O', 1),
-(12, 'O₂', 0),
-(12, 'CO₂', 0),
-
--- GEOGRAFÍA
-(13, 'Nilo', 1),
-(13, 'Amazonas', 0),
-(13, 'Yangtsé', 0),
-
-(14, 'Rusia', 1),
-(14, 'Canadá', 0),
-(14, 'China', 0),
-
-(15, 'África', 1),
-(15, 'Asia', 0),
-(15, 'Europa', 0),
-
-(16, 'Canberra', 1),
-(16, 'Sídney', 0),
-(16, 'Melbourne', 0);
+-- GEOGRAFÍA (Preguntas 76-100)
+(76, 'Nilo', 1), (76, 'Amazonas', 0), (76, 'Yangtsé', 0), (76, 'Misisipi', 0),
+(77, 'Rusia', 1), (77, 'Canadá', 0), (77, 'China', 0), (77, 'Estados Unidos', 0),
+(78, 'África', 1), (78, 'Asia', 0), (78, 'Europa', 0), (78, 'América', 0),
+(79, 'Canberra', 1), (79, 'Sídney', 0), (79, 'Melbourne', 0), (79, 'Perth', 0),
+(80, 'Everest', 1), (80, 'K2', 0), (80, 'Kilimanjaro', 0), (80, 'Aconcagua', 0),
+(81, 'Pacífico', 1), (81, 'Atlántico', 0), (81, 'Índico', 0), (81, 'Ártico', 0),
+(82, 'China', 1), (82, 'India', 0), (82, 'Estados Unidos', 0), (82, 'Indonesia', 0),
+(83, 'Sahara', 1), (83, 'Gobi', 0), (83, 'Kalahari', 0), (83, 'Atacama', 0),
+(84, 'Italia', 1), (84, 'Francia', 0), (84, 'España', 0), (84, 'Grecia', 0),
+(85, 'Ottawa', 1), (85, 'Toronto', 0), (85, 'Vancouver', 0), (85, 'Montreal', 0),
+(86, 'América del Sur', 1), (86, 'África', 0), (86, 'Asia', 0), (86, 'Oceanía', 0),
+(87, 'Vaticano', 1), (87, 'Mónaco', 0), (87, 'San Marino', 0), (87, 'Liechtenstein', 0),
+(88, 'Montes Urales', 1), (88, 'Alpes', 0), (88, 'Himalaya', 0), (88, 'Cáucaso', 0),
+(89, 'Baikal', 1), (89, 'Tanganica', 0), (89, 'Superior', 0), (89, 'Victoria', 0),
+(90, 'Roma', 1), (90, 'París', 0), (90, 'Atenas', 0), (90, 'Berlín', 0),
+(91, 'Australia', 1), (91, 'Brasil', 0), (91, 'Indonesia', 0), (91, 'Filipinas', 0),
+(92, 'Suecia', 1), (92, 'Noruega', 0), (92, 'Finlandia', 0), (92, 'Canadá', 0),
+(93, 'Brasilia', 1), (93, 'Río de Janeiro', 0), (93, 'Sao Paulo', 0), (93, 'Buenos Aires', 0),
+(94, 'Estrecho de Gibraltar', 1), (94, 'Bósforo', 0), (94, 'Dardanelos', 0), (94, 'Sicilia', 0),
+(95, 'Tanzania', 1), (95, 'Kenia', 0), (95, 'Uganda', 0), (95, 'Etiopía', 0),
+(96, 'Sena', 1), (96, 'Támesis', 0), (96, 'Rin', 0), (96, 'Danubio', 0),
+(97, 'Kazajistán', 1), (97, 'Mongolia', 0), (97, 'Paraguay', 0), (97, 'Bolivia', 0),
+(98, 'Lagos', 1), (98, 'El Cairo', 0), (98, 'Kinshasa', 0), (98, 'Johannesburgo', 0),
+(99, 'Perú', 1), (99, 'México', 0), (99, 'Colombia', 0), (99, 'Chile', 0),
+(100, 'Australia', 1), (100, 'Nueva Zelanda', 0), (100, 'Japón', 0), (100, 'Madagascar', 0);

@@ -1,10 +1,16 @@
 <div class="w3-container w3-center w3-margin" style="max-width: 600px; margin: auto;">
     <div class="card" style="background: #f9f9f9; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        <h2 style="margin-bottom: 10px;">Puntaje actual: {{puntaje}}</h2>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <h2>Puntaje: {{puntaje}}</h2>
+            <h2>Nivel: {{nivel_usuario}}</h2>
+        </div>
         <p>Tiempo restante: <span id="tiempo">{{tiempo_limite}}</span></p>
 
         {{#partida}}
-            <p style="font-weight: bold;">Categoría: {{pregunta.categoria}}</p>
+            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                <p style="font-weight: bold;">Categoría: {{pregunta.categoria}}</p>
+                <p style="font-weight: bold;">Dificultad: {{pregunta.nivel}}/10</p>
+            </div>
             <h2 style="margin: 15px 0;">{{pregunta.pregunta}}</h2>
 
             <form method="POST" action="/game/jugarPartida" id="formPregunta">

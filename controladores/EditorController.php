@@ -21,7 +21,7 @@ class EditorController
 
                 if (is_array($respuestas)) {
                     foreach ($respuestas as $r_key => $respuesta) {
-                        $respuestas[$r_key]['es_correcta'] = (bool)$respuesta['es_correcta'];
+                        $respuestas[$r_key]['es_correcta'] = isset($respuesta['es_correcta']) ? (bool)$respuesta['es_correcta'] : false;
                     }
                 }
 

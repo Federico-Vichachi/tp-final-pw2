@@ -11,15 +11,18 @@ class GameModel
 
     public function iniciarPartida($usuarioId)
     {
+        $usuario = $this->getUsuarioById($usuarioId);
+        $nivelUsuario = $usuario['nivel'] ?? 1;
+
         $codigoPartida = uniqid('partida_', true);
         $fechaInicio = date('Y-m-d H:i:s');
 
-        $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado, fecha_inicio) 
-                VALUES ('$codigoPartida', $usuarioId, 'en_curso', '$fechaInicio')";
+        $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado, fecha_inicio, nivel_usuario) 
+                VALUES ('$codigoPartida', $usuarioId, 'en_curso', '$fechaInicio', $nivelUsuario)";
 
         $this->conexion->query($sql);
 
-        $sql = "SELECT id, codigo_partida FROM partidas WHERE codigo_partida = '$codigoPartida'";
+        $sql = "SELECT id, codigo_partida, nivel_usuario FROM partidas WHERE codigo_partida = '$codigoPartida'";
         $partida = $this->conexion->query($sql);
 
         return empty($partida) ? null : $partida[0];
@@ -38,21 +41,39 @@ class GameModel
         return $this->conexion->query($sql);
     }
 
-    public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0)
+    public function actualizarPuntosUsuario($usuarioId, $puntosGanados)
+    {
+        $sql = "UPDATE usuario 
+                SET puntos_acumulados = puntos_acumulados + $puntosGanados 
+                WHERE id = $usuarioId";
+
+        $this->conexion->query($sql);
+        $this->actualizarNivelUsuario($usuarioId);
+    }
+
+    public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0, $nivelPregunta = 1)
     {
         $fallada = $preguntaFallada ? 1 : 0;
         $fechaRespuesta = date('Y-m-d H:i:s');
 
         $sql = "INSERT INTO historial_preguntas 
-                (partida_id, pregunta_id, pregunta_fallada, fecha_respuesta,tiempo_respuesta) 
-                VALUES ($partidaId, $preguntaId, $fallada, '$fechaRespuesta', $tiempoRespuesta)";
+                (partida_id, pregunta_id, pregunta_fallada, fecha_respuesta, tiempo_respuesta, nivel_pregunta_partida) 
+                VALUES ($partidaId, $preguntaId, $fallada, '$fechaRespuesta', $tiempoRespuesta, $nivelPregunta)";
 
-        return $this->conexion->query($sql);
+        $this->conexion->query($sql);
+        $this->actualizarEstadisticasPregunta($preguntaId, $fallada);
     }
 
     public function getPreguntaAleatoria($preguntasVistas, $usuarioId)
     {
-        $pregunta = $this->obtenerPreguntaDeBD($preguntasVistas);
+        $usuario = $this->getUsuarioById($usuarioId);
+        $nivelUsuario = $usuario['nivel'] ?? 1;
+
+        $pregunta = $this->obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario);
+
+        if(empty($pregunta)) {
+            $pregunta = $this->obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario);
+        }
 
         if(empty($pregunta)) {
             return [];
@@ -76,14 +97,16 @@ class GameModel
             return false;
         }
 
-        $sql = "SELECT es_correcta FROM respuestas WHERE id = $idRespuesta";
+        $id = (int)$idRespuesta;
+        $sql = "SELECT es_correcta FROM respuestas WHERE id = $id";
         $resultado = $this->conexion->query($sql);
 
-        if (empty($resultado)) {
+        $fila = $this->getSingleRow($resultado);
+        if (empty($fila)) {
             return false;
         }
 
-        $esCorrecta = $resultado[0]['es_correcta'];
+        $esCorrecta = $fila['es_correcta'];
         return $esCorrecta == 1;
     }
 
@@ -97,7 +120,8 @@ class GameModel
                   AND es_correcta = 1 LIMIT 1";
 
         $resultado = $this->conexion->query($sql);
-        return empty($resultado) ? 'No disponible' : $resultado[0]['texto'];
+        $fila = $this->getSingleRow($resultado);
+        return empty($fila) ? 'No disponible' : $fila['texto'];
     }
 
     public function getRankingHistorico()
@@ -119,6 +143,139 @@ class GameModel
         return $rankingCompleto;
     }
 
+    private function actualizarNivelUsuario($usuarioId)
+    {
+        $sql = "SELECT puntos_acumulados FROM usuario WHERE id = $usuarioId";
+        $resultado = $this->conexion->query($sql);
+
+        $fila = $this->getSingleRow($resultado);
+        if (empty($fila)) return;
+
+        $puntos = $fila['puntos_acumulados'];
+        $nuevoNivel = max(1, min(10, floor($puntos / 100) + 1));
+
+        $sql = "UPDATE usuario SET nivel = $nuevoNivel WHERE id = $usuarioId";
+        $this->conexion->query($sql);
+    }
+
+    private function actualizarEstadisticasPregunta($preguntaId, $fallada)
+    {
+        if ($fallada) {
+            $sql = "UPDATE preguntas 
+                    SET veces_fallada = veces_fallada + 1 
+                    WHERE id = $preguntaId";
+        } else {
+            $sql = "UPDATE preguntas 
+                    SET veces_acertada = veces_acertada + 1 
+                    WHERE id = $preguntaId";
+        }
+        $this->conexion->query($sql);
+        $this->calcularRatioDificultad($preguntaId);
+    }
+
+    private function calcularRatioDificultad($preguntaId)
+    {
+        $sql = "SELECT veces_acertada, veces_fallada 
+                FROM preguntas 
+                WHERE id = $preguntaId";
+        $resultado = $this->conexion->query($sql);
+
+        $fila = $this->getSingleRow($resultado);
+        if (empty($fila)) return;
+
+        $acertadas = $fila['veces_acertada'];
+        $falladas = $fila['veces_fallada'];
+        $total = $acertadas + $falladas;
+
+        if ($total > 0) {
+            $ratio = $acertadas / $total;
+
+            $nivel = max(1, min(10, ceil((1 - $ratio) * 10)));
+            $sql = "UPDATE preguntas 
+                    SET ratio_dificultad = $ratio, nivel_pregunta = $nivel 
+                    WHERE id = $preguntaId";
+            $this->conexion->query($sql);
+        }
+    }
+
+    private function obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario)
+    {
+        $sql = "SELECT p.id AS pregunta_id, 
+                       p.texto AS pregunta, 
+                       p.nivel_pregunta AS nivel,
+                       c.nombre AS categoria
+                FROM preguntas p
+                JOIN categorias c ON p.categoria_id = c.id
+                WHERE p.esta_activa = 1 
+                  AND p.nivel_pregunta = $nivelUsuario";
+
+        if(!empty($preguntasVistas)){
+            $idsExcluidos = implode(",", $preguntasVistas);
+            $sql .= " AND p.id NOT IN ($idsExcluidos)";
+        }
+
+        $sql .= " ORDER BY RAND() LIMIT 1";
+
+        $resultado = $this->conexion->query($sql);
+
+        // USAR EL MÉTODO AUXILIAR - línea 217 corregida
+        return $this->getSingleRow($resultado);
+    }
+
+    private function obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario, $rango = 2)
+    {
+        $nivelMin = max(1, $nivelUsuario - $rango);
+        $nivelMax = min(10, $nivelUsuario + $rango);
+
+        $sql = "SELECT p.id AS pregunta_id, 
+                       p.texto AS pregunta, 
+                       p.nivel_pregunta AS nivel,
+                       c.nombre AS categoria
+                FROM preguntas p
+                JOIN categorias c ON p.categoria_id = c.id
+                WHERE p.esta_activa = 1 
+                  AND p.nivel_pregunta BETWEEN $nivelMin AND $nivelMax";
+
+        if(!empty($preguntasVistas)){
+            $idsExcluidos = implode(",", $preguntasVistas);
+            $sql .= " AND p.id NOT IN ($idsExcluidos)";
+        }
+
+        $sql .= " ORDER BY ABS(p.nivel_pregunta - $nivelUsuario), RAND() LIMIT 1";
+
+        $resultado = $this->conexion->query($sql);
+
+        // USAR EL MÉTODO AUXILIAR
+        return $this->getSingleRow($resultado);
+    }
+
+    private function getArrayResult($resultado)
+    {
+        // Si ya es un array, lo retornamos
+        if (is_array($resultado)) {
+            return $resultado;
+        }
+
+        // Si es un objeto mysqli_result, lo convertimos a array
+        if (is_object($resultado) && get_class($resultado) === 'mysqli_result') {
+            if ($resultado->num_rows > 0) {
+                return $resultado->fetch_all(MYSQLI_ASSOC);
+            } else {
+                return [];
+            }
+        }
+
+        // Si es booleano u otro tipo, retornamos array vacío
+        return [];
+    }
+
+    private function getSingleRow($resultado)
+    {
+        $arrayResult = $this->getArrayResult($resultado);
+        return empty($arrayResult) ? [] : $arrayResult[0];
+    }
+
+
     private function getMejoresPartidas()
     {
         $sql = "SELECT *
@@ -131,17 +288,21 @@ class GameModel
             ORDER BY P1.puntaje_final DESC";
 
         $resultado = $this->conexion->query($sql);
-        return empty($resultado) ? [] : $resultado;
+
+        // USAR EL MÉTODO AUXILIAR
+        return $this->getArrayResult($resultado);
     }
 
     public function getUsuarioById($usuarioId)
     {
-        $sql = "SELECT *
-            FROM usuario
-            WHERE id = $usuarioId";
+        $sql = "SELECT id, nombre_completo, username, nivel, puntos_acumulados
+                FROM usuario
+                WHERE id = $usuarioId";
 
         $resultado = $this->conexion->query($sql);
-        return empty($resultado) ? [] : $resultado[0];
+
+        // USAR EL MÉTODO AUXILIAR
+        return $this->getSingleRow($resultado);
     }
 
     private function obtenerPreguntaDeBD($preguntasVistas)
@@ -171,7 +332,9 @@ class GameModel
                 WHERE pregunta_id = '$id_pregunta'";
 
         $resultado = $this->conexion->query($sql);
-        return $resultado;
+
+        // USAR EL MÉTODO AUXILIAR
+        return $this->getArrayResult($resultado);
     }
 
     public function guardarReporte($preguntaId, $usuarioId, $motivo)

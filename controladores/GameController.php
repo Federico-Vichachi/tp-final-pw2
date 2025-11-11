@@ -69,9 +69,13 @@ class GameController
     {
         $this->redirectNotAuthenticated();
 
-        list($puntajeFinal, $mensaje) = $this->calcularResultadoPartida();
+        list($puntajeFinal, $mensaje, $puntosGanados) = $this->calcularResultadoPartida();
 
-        $data = $this->prepararDatosResumen($puntajeFinal, $mensaje);
+        if (isset($_SESSION["usuario"]["id"])) {
+            $this->model->actualizarPuntosUsuario($_SESSION["usuario"]["id"], $puntosGanados);
+        }
+
+        $data = $this->prepararDatosResumen($puntajeFinal, $mensaje, $puntosGanados);
         $data['historial_partida'] = $_SESSION["historial_partida"] ?? [];
 
         $this->finalizarPartidaEnBD($puntajeFinal);
@@ -110,6 +114,32 @@ class GameController
         ]);
     }
 
+    private function calcularResultadoPartida()
+    {
+        if (!isset($_SESSION["puntaje"])) {
+            return [0, "No se registró un puntaje válido en la partida.", 0];
+        }
+
+        $puntajeFinal = $_SESSION["puntaje"];
+
+        $nivelUsuario = $_SESSION["nivel_usuario"] ?? 1;
+        $puntosGanados = $puntajeFinal * $nivelUsuario;
+
+        return [$puntajeFinal, "¡Partida finalizada!", $puntosGanados];
+    }
+
+    private function registrarRespuestaEnHistorial($preguntaFallada, $tiempoRespuesta, $nivelPregunta)
+    {
+        if (!isset($_SESSION["usuario"]) || !isset($_SESSION["pregunta_actual"]) || !isset($_SESSION["partida_id"])) {
+            return;
+        }
+
+        $partidaId = $_SESSION["partida_id"];
+        $preguntaId = $_SESSION["pregunta_actual"]["pregunta"]["pregunta_id"];
+
+        $this->model->registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta, $nivelPregunta);
+    }
+
     private function agregarPosiciones($array)
     {
         if (!is_array($array)) return [];
@@ -125,26 +155,24 @@ class GameController
         //Debe poder llamarse desde el ranking
     }
 
-    private function calcularResultadoPartida()
-    {
-        if (!isset($_SESSION["puntaje"])) {
-            return ['0', "No se registró un puntaje válido en la partida."];
-        } else {
-            return [$_SESSION["puntaje"], "Respuesta incorrecta o tiempo agotado"];
-        }
-    }
-
-    private function prepararDatosResumen($puntajeFinal, $mensaje)
+    private function prepararDatosResumen($puntajeFinal, $mensaje, $puntosGanados)
     {
         $preguntaActual = $_SESSION["pregunta_actual"] ?? [];
+
+        $usuarioActualizado = [];
+        if (isset($_SESSION["usuario"]["id"])) {
+            $usuarioActualizado = $this->model->getUsuarioById($_SESSION["usuario"]["id"]);
+        }
 
         return [
             "categoria" => $preguntaActual['pregunta']['categoria'] ?? 'Desconocida',
             "pregunta" => $preguntaActual['pregunta']['pregunta'] ?? 'No disponible',
             "respuestaCorrecta" => $preguntaActual['respuesta_correcta'] ?? 'No disponible',
             "puntajeFinal" => $puntajeFinal,
+            "puntosGanados" => $puntosGanados,
             "mensaje" => $mensaje,
-            "codigoPartida" => $_SESSION["partida_codigo"] ?? 'N/A'
+            "codigoPartida" => $_SESSION["partida_codigo"] ?? 'N/A',
+            "usuario" => $usuarioActualizado
         ];
     }
 
@@ -178,6 +206,7 @@ class GameController
         $data = [
             "partida" => $partida,
             "puntaje" => $_SESSION["puntaje"] ?? 0,
+            "nivel_usuario" => $_SESSION["nivel_usuario"] ?? 1,
             "tiempo_limite" => $this->validarTiempoRestante(),
             "codigo_partida" => $_SESSION["partida_codigo"] ?? 'N/A'
         ];
@@ -238,6 +267,7 @@ class GameController
         if ($partida) {
             $_SESSION["partida_id"] = $partida["id"];
             $_SESSION["partida_codigo"] = $partida["codigo_partida"];
+            $_SESSION["nivel_usuario"] = $partida["nivel_usuario"];
         }
 
         $_SESSION["puntaje"] = 0;
@@ -263,7 +293,8 @@ class GameController
 
         $tiempoRespuesta = $this->calcularTiempoRespuesta();
         $respuestaCorrecta = $this->model->verificarRespuesta($idRespuesta);
-        $this->registrarRespuestaEnHistorial(!$respuestaCorrecta, $tiempoRespuesta);
+        $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
+        $this->registrarRespuestaEnHistorial(!$respuestaCorrecta, $tiempoRespuesta, $nivelPregunta);
 
         if ($respuestaCorrecta) {
             $this->procesarRespuestaCorrecta();
@@ -279,17 +310,6 @@ class GameController
         }
 
         return time() - $_SESSION["tiempo_inicio_pregunta"];
-    }
-
-    private function registrarRespuestaEnHistorial($preguntaFallada, $tiempoRespuesta)
-    {
-        if (!isset($_SESSION["usuario"]) || !isset($_SESSION["pregunta_actual"]) || !isset($_SESSION["partida_id"])) {
-            return;
-        }
-
-        $partidaId = $_SESSION["partida_id"];
-        $preguntaId = $_SESSION["pregunta_actual"]["pregunta"]["pregunta_id"];
-        $this->model->registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta);
     }
 
     private function finalizarPartidaEnBD($puntajeFinal)
