@@ -257,4 +257,18 @@ class UserController
         header("Location: /user/$method");
         exit();
     }
+
+    public function verificarEmail()
+    {
+        header('Content-type: application/json');
+        $email = $_GET['email'] ?? '';
+
+        if ($email === '') {
+            echo json_encode(['existe' => false]);
+            return;
+        }
+
+        $emailExistente = $this->model->emailExiste($email);
+        echo json_encode(['existe' => $emailExistente]);
+    }
 }

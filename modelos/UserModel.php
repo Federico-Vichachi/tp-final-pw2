@@ -251,5 +251,13 @@ class UserModel
 
         return $resultado;
     }
+
+    public function emailExiste($email)
+    {
+        $sql = "SELECT id FROM usuario WHERE email = '$email'";
+        $result = $this->conexion->query($sql);
+
+        return(is_array($result) && count($result)>0);
+    }
 }
 
