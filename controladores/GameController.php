@@ -106,12 +106,20 @@ class GameController
     {
         $this->redirectNotAuthenticated();
 
-        $rankingHistorico = $this->model->getRankingHistorico();
-        $rankingHistorico = $this->agregarPosiciones($rankingHistorico);
+        $ranking = $_GET['ranking'] ?? 'partidas';
+        $data = [];
 
-        $this->renderer->render("ranking", [
-            'historico' => $rankingHistorico
-        ]);
+        if ($ranking === 'jugadores') {
+            $jugadores = $this->model->getRankingJugadores();
+            $data['jugadores'] = $this->agregarPosiciones($jugadores);
+            $data['vista_activa'] = 'jugadores';
+        } else {
+            $partidas = $this->model->getRankingPartidas();
+            $data['partidas'] = $this->agregarPosiciones($partidas);
+            $data['vista_activa'] = 'partidas';
+        }
+
+        $this->renderer->render("ranking", $data);
     }
 
     private function calcularResultadoPartida()

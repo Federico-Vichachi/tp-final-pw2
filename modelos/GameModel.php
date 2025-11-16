@@ -124,7 +124,7 @@ class GameModel
         return empty($fila) ? 'No disponible' : $fila['texto'];
     }
 
-    public function getRankingHistorico()
+    public function getRankingPartidas()
     {
         $partidas = $this->getMejoresPartidas();
 
@@ -141,6 +141,17 @@ class GameModel
         }
 
         return $rankingCompleto;
+    }
+
+    public function getRankingJugadores()
+    {
+        $jugadores = $this->getMejoresJugadores();
+
+        if (empty($jugadores)) {
+            return [];
+        }
+
+        return $jugadores;
     }
 
     private function actualizarNivelUsuario($usuarioId)
@@ -217,8 +228,6 @@ class GameModel
         $sql .= " ORDER BY RAND() LIMIT 1";
 
         $resultado = $this->conexion->query($sql);
-
-        // USAR EL MÉTODO AUXILIAR - línea 217 corregida
         return $this->getSingleRow($resultado);
     }
 
@@ -244,19 +253,15 @@ class GameModel
         $sql .= " ORDER BY ABS(p.nivel_pregunta - $nivelUsuario), RAND() LIMIT 1";
 
         $resultado = $this->conexion->query($sql);
-
-        // USAR EL MÉTODO AUXILIAR
         return $this->getSingleRow($resultado);
     }
 
     private function getArrayResult($resultado)
     {
-        // Si ya es un array, lo retornamos
         if (is_array($resultado)) {
             return $resultado;
         }
 
-        // Si es un objeto mysqli_result, lo convertimos a array
         if (is_object($resultado) && get_class($resultado) === 'mysqli_result') {
             if ($resultado->num_rows > 0) {
                 return $resultado->fetch_all(MYSQLI_ASSOC);
@@ -265,7 +270,6 @@ class GameModel
             }
         }
 
-        // Si es booleano u otro tipo, retornamos array vacío
         return [];
     }
 
@@ -288,8 +292,17 @@ class GameModel
             ORDER BY P1.puntaje_final DESC";
 
         $resultado = $this->conexion->query($sql);
+        return $this->getArrayResult($resultado);
+    }
 
-        // USAR EL MÉTODO AUXILIAR
+    private function getMejoresJugadores()
+    {
+        $sql = "SELECT *
+            FROM usuario U
+            WHERE U.rol = 'usuario'
+            ORDER BY U.puntos_acumulados DESC";
+
+        $resultado = $this->conexion->query($sql);
         return $this->getArrayResult($resultado);
     }
 
@@ -300,8 +313,6 @@ class GameModel
                 WHERE id = $usuarioId";
 
         $resultado = $this->conexion->query($sql);
-
-        // USAR EL MÉTODO AUXILIAR
         return $this->getSingleRow($resultado);
     }
 
@@ -332,8 +343,6 @@ class GameModel
                 WHERE pregunta_id = '$id_pregunta'";
 
         $resultado = $this->conexion->query($sql);
-
-        // USAR EL MÉTODO AUXILIAR
         return $this->getArrayResult($resultado);
     }
 
