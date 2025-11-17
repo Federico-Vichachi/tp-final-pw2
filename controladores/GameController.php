@@ -339,7 +339,8 @@ class GameController
     private function procesarTiempoExpirado()
     {
         $tiempoRespuesta = $this->calcularTiempoRespuesta();
-        $this->registrarRespuestaEnHistorial(true, $tiempoRespuesta);
+        $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
+        $this->registrarRespuestaEnHistorial(true, $tiempoRespuesta, $nivelPregunta);
         $_SESSION["pregunta_respondida"] = true;
         $this->redirectTo("resumenPartida");
     }

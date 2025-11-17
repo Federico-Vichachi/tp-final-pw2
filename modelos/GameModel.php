@@ -133,10 +133,19 @@ class GameModel
         }
 
         $rankingCompleto = [];
+        $usuariosProcesados = [];
+
         foreach ($partidas as $partida) {
-            $usuario = $this->getUsuarioById($partida['usuario_id']);
-            if ($usuario) {
-                $rankingCompleto[] = array_merge($partida, $usuario);
+            if (isset($partida['usuario_id'])) {
+                if (in_array($partida['usuario_id'], $usuariosProcesados)) {
+                    continue;
+                }
+
+                $usuario = $this->getUsuarioById($partida['usuario_id']);
+                if ($usuario && !empty($usuario)) {
+                    $rankingCompleto[] = array_merge($partida, $usuario);
+                    $usuariosProcesados[] = $partida['usuario_id'];
+                }
             }
         }
 
@@ -212,13 +221,14 @@ class GameModel
     private function obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario)
     {
         $sql = "SELECT p.id AS pregunta_id, 
-                       p.texto AS pregunta, 
-                       p.nivel_pregunta AS nivel,
-                       c.nombre AS categoria
-                FROM preguntas p
-                JOIN categorias c ON p.categoria_id = c.id
-                WHERE p.esta_activa = 1 
-                  AND p.nivel_pregunta = $nivelUsuario";
+                   p.texto AS pregunta, 
+                   p.nivel_pregunta AS nivel,
+                   c.nombre AS categoria,
+                   c.color AS color_categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.esta_activa = 1 
+              AND p.nivel_pregunta = $nivelUsuario";
 
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
@@ -237,13 +247,14 @@ class GameModel
         $nivelMax = min(10, $nivelUsuario + $rango);
 
         $sql = "SELECT p.id AS pregunta_id, 
-                       p.texto AS pregunta, 
-                       p.nivel_pregunta AS nivel,
-                       c.nombre AS categoria
-                FROM preguntas p
-                JOIN categorias c ON p.categoria_id = c.id
-                WHERE p.esta_activa = 1 
-                  AND p.nivel_pregunta BETWEEN $nivelMin AND $nivelMax";
+                   p.texto AS pregunta, 
+                   p.nivel_pregunta AS nivel,
+                   c.nombre AS categoria,
+                   c.color AS color_categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.esta_activa = 1 
+              AND p.nivel_pregunta BETWEEN $nivelMin AND $nivelMax";
 
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
