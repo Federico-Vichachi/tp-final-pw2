@@ -308,12 +308,20 @@ class GameModel
 
     public function getUsuarioById($usuarioId)
     {
-        $sql = "SELECT id, nombre_completo, username, nivel, puntos_acumulados
-                FROM usuario
-                WHERE id = $usuarioId";
+        $sql = "SELECT id, nombre_completo, username, nivel, puntos_acumulados, 
+                   pais, ciudad, latitud, longitud
+            FROM usuario
+            WHERE id = $usuarioId";
 
         $resultado = $this->conexion->query($sql);
-        return $this->getSingleRow($resultado);
+        $usuario = $this->getSingleRow($resultado);
+
+        if ($usuario) {
+            $usuario['latitud'] = (float)$usuario['latitud'];
+            $usuario['longitud'] = (float)$usuario['longitud'];
+        }
+
+        return $usuario;
     }
 
     private function obtenerPreguntaDeBD($preguntasVistas)
@@ -439,4 +447,59 @@ class GameModel
         return true;
     }
 
+    public function getPartidasByUsuarioId($usuarioId)
+    {
+        $sql = "SELECT codigo_partida, fecha_inicio, puntaje_final 
+            FROM partidas 
+            WHERE usuario_id = $usuarioId 
+            ORDER BY fecha_inicio DESC";
+
+        return $this->conexion->query($sql);
+    }
+
+    public function getEstadisticasJugador($usuarioId)
+    {
+        return [
+            'total_partidas' => $this->getTotalPartidas($usuarioId),
+            'preguntas_correctas' => $this->getPreguntasCorrectas($usuarioId),
+            'preguntas_falladas' => $this->getPreguntasFalladas($usuarioId),
+            'mejor_puntaje' => $this->getMejorPuntaje($usuarioId)
+        ];
+    }
+
+    private function getTotalPartidas($usuarioId)
+    {
+        $sql = "SELECT COUNT(*) as total FROM partidas WHERE usuario_id = $usuarioId";
+        $resultado = $this->conexion->query($sql);
+        return $resultado[0]['total'] ?? 0;
+    }
+
+    private function getPreguntasCorrectas($usuarioId)
+    {
+        $sql = "SELECT COUNT(*) as correctas 
+            FROM historial_preguntas hp 
+            JOIN partidas p ON hp.partida_id = p.id 
+            WHERE p.usuario_id = $usuarioId AND hp.pregunta_fallada = 0";
+        $resultado = $this->conexion->query($sql);
+        return $resultado[0]['correctas'] ?? 0;
+    }
+
+    private function getPreguntasFalladas($usuarioId)
+    {
+        $sql = "SELECT COUNT(*) as falladas 
+            FROM historial_preguntas hp 
+            JOIN partidas p ON hp.partida_id = p.id 
+            WHERE p.usuario_id = $usuarioId AND hp.pregunta_fallada = 1";
+        $resultado = $this->conexion->query($sql);
+        return $resultado[0]['falladas'] ?? 0;
+    }
+
+    private function getMejorPuntaje($usuarioId)
+    {
+        $sql = "SELECT MAX(puntaje_final) as mejor_puntaje 
+            FROM partidas 
+            WHERE usuario_id = $usuarioId";
+        $resultado = $this->conexion->query($sql);
+        return $resultado[0]['mejor_puntaje'] ?? 0;
+    }
 }

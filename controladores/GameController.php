@@ -91,14 +91,13 @@ class GameController
             $this->redirectTo('ranking');
         }
 
-        $perfil = $this->model->getUsuarioById($_GET["id"]);
-
-        if (empty($perfil)) {
-            $this->redirectTo('ranking');
-        }
+        $usuarioId = $_GET["id"];
+        $perfil = $this->model->getUsuarioById($usuarioId);
+        $estadisticas = $this->model->getEstadisticasJugador($usuarioId);
 
         $this->renderer->render("jugador", [
-            'perfil' => $perfil
+            'perfil' => $perfil,
+            'estadisticas' => $estadisticas
         ]);
     }
 

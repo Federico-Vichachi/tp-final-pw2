@@ -1,9 +1,149 @@
-<div class="d-grid gap-3 mb-3">
-    <div class="btn btn-primary btn-lg py-3 shadow-sm">
-        <span class="fs-4 fw-bold">PERFIL JUGADOR</span>
+<div class="container py-3">
+    <!-- Título Principal -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-2">Perfil del Jugador</h1>
     </div>
+
+    {{#perfil}}
+        <!-- Sección Superior: Perfil y Mapa -->
+        <div class="row mb-4 g-3">
+            <!-- Información del Jugador -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <img src="/public/imagenes/default-avatar.jpg"
+                             alt="Foto de perfil"
+                             class="rounded-circle border border-3 border-primary mb-3"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+
+                        <h4 class="fw-bold text-primary">{{nombre_completo}}</h4>
+                        <p class="text-muted mb-3">@{{username}}</p>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <small class="text-muted d-block">Nivel</small>
+                                    <strong class="fs-5">{{nivel}}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <small class="text-muted d-block">Puntaje Total</small>
+                                    <strong class="fs-5">{{puntos_acumulados}}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Ubicación del Jugador</h5>
+
+                        <!-- Mapa interactivo -->
+                        <div id="map" style="height: 220px; width: 100%;" class="mb-3"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas de Resumen -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h5 class="mb-3">Resumen de Estadísticas</h5>
+            </div>
+
+            <!-- Total Partidas -->
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card text-center border-primary">
+                    <div class="card-body">
+                        <i class="bi bi-controller display-6 text-primary mb-2"></i>
+                        <h3 class="text-primary">{{estadisticas.total_partidas}}</h3>
+                        <p class="text-muted mb-0">Partidas Jugadas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mejor Partida -->
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card text-center border-warning">
+                    <div class="card-body">
+                        <i class="bi bi-trophy display-6 text-warning mb-2"></i>
+                        <h3 class="text-warning">{{estadisticas.mejor_puntaje}}</h3>
+                        <p class="text-muted mb-0">Mejor Puntaje</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preguntas Correctas -->
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card text-center border-success">
+                    <div class="card-body">
+                        <i class="bi bi-check-circle display-6 text-success mb-2"></i>
+                        <h3 class="text-success">{{estadisticas.preguntas_correctas}}</h3>
+                        <p class="text-muted mb-0">Preguntas Correctas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preguntas Falladas -->
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card text-center border-danger">
+                    <div class="card-body">
+                        <i class="bi bi-x-circle display-6 text-danger mb-2"></i>
+                        <h3 class="text-danger">{{estadisticas.preguntas_falladas}}</h3>
+                        <p class="text-muted mb-0">Preguntas Falladas</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Botón Volver -->
+        <div class="text-center mt-4">
+            <a href="/game/ranking?ranking=jugadores" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Volver al Ranking
+            </a>
+        </div>
+    {{/perfil}}
+
+    {{^perfil}}
+        <div class="text-center py-5">
+            <p class="text-muted">Jugador no encontrado</p>
+            <a href="/game/ranking?ranking=jugadores" class="btn btn-primary">Volver al Ranking</a>
+        </div>
+    {{/perfil}}
 </div>
 
-{{#perfil}}
-    {{username}}
-{{/perfil}}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mapa = document.getElementById('map');
+        const ubicacionInfo = document.getElementById('ubicacion-info');
+
+        // Si no hay mapa, salir
+        if (!mapa) return;
+
+        // Usar las coordenadas del perfil para centrar el mapa
+        const latitud = {{perfil.latitud}};
+        const longitud = {{perfil.longitud}};
+        const ciudad = "{{perfil.ciudad}}";
+        const pais = "{{perfil.pais}}";
+
+        // Inicializar mapa centrado en la ubicación del jugador
+        const map = L.map('map').setView([latitud, longitud], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Marcador en la ubicación del jugador (no arrastrable)
+        const marker = L.marker([latitud, longitud], {draggable: false}).addTo(map);
+
+        // Popup con información del jugador
+        marker.bindPopup(`${ciudad}, ${pais}`).openPopup();
+    });
+</script>
