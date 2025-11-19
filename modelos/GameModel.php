@@ -224,7 +224,8 @@ class GameModel
                    p.texto AS pregunta, 
                    p.nivel_pregunta AS nivel,
                    c.nombre AS categoria,
-                   c.color AS color_categoria
+                   c.color AS color_categoria,
+                   c.imagen AS imagen_categoria
             FROM preguntas p
             JOIN categorias c ON p.categoria_id = c.id
             WHERE p.esta_activa = 1 
@@ -250,7 +251,8 @@ class GameModel
                    p.texto AS pregunta, 
                    p.nivel_pregunta AS nivel,
                    c.nombre AS categoria,
-                   c.color AS color_categoria
+                   c.color AS color_categoria,
+                   c.imagen AS imagen_categoria
             FROM preguntas p
             JOIN categorias c ON p.categoria_id = c.id
             WHERE p.esta_activa = 1 
@@ -320,7 +322,7 @@ class GameModel
     public function getUsuarioById($usuarioId)
     {
         $sql = "SELECT id, nombre_completo, username, nivel, puntos_acumulados, 
-                   pais, ciudad, latitud, longitud
+                   pais, ciudad, latitud, longitud, foto_perfil
             FROM usuario
             WHERE id = $usuarioId";
 

@@ -34,7 +34,7 @@ INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,lo
              'usuario@gmail.com',
              '$2y$10$HvPM1ZmBzdH5ZtZthhH/9emvHTWYpkYsdYM1y4Z736bq5KO1sXm.m',
              'usuario',
-             '/public/imagenes/default-avatar.jpg',
+             '/public/imagenes/editor.jpg',
              '34582',
              TRUE,
              'usuario',
@@ -55,7 +55,7 @@ INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,lo
              'editor@gmail.com',
              '$2y$10$HvPM1ZmBzdH5ZtZthhH/9emvHTWYpkYsdYM1y4Z736bq5KO1sXm.m',
              'editor',
-             '/public/imagenes/default-avatar.jpg',
+             '/public/imagenes/usuario.jpg',
              '78945',
              TRUE,
              'editor',
@@ -76,7 +76,7 @@ INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,lo
              'admin@gmail.com',
              '$2y$10$HvPM1ZmBzdH5ZtZthhH/9emvHTWYpkYsdYM1y4Z736bq5KO1sXm.m',
              'admin',
-             '/public/imagenes/default-avatar.jpg',
+             '/public/imagenes/admin.jpg',
              NULL,
              TRUE,
              'administrador',
@@ -87,14 +87,15 @@ INSERT INTO usuario (nombre_completo,anio_nacimiento,sexo,pais,ciudad,latitud,lo
 CREATE TABLE categorias (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             nombre VARCHAR(100) NOT NULL,
-                            color VARCHAR(7) NOT NULL DEFAULT '#7f8c8d'
+                            color VARCHAR(7) NOT NULL DEFAULT '#7f8c8d',
+                            imagen VARCHAR(255) NOT NULL DEFAULT '/public/imagenes/default-categoria.png'
 );
 
-INSERT INTO categorias (nombre, color) VALUES
-('Historia', '#e74c3c'),      -- Rojo (representa pasión, eventos históricos)
-('Deporte', '#2ecc71'),       -- Verde (naturaleza, campos deportivos)
-('Ciencia', '#3498db'),       -- Azul (ciencia, tecnología)
-('Geografía', '#f39c12');     -- Naranja (tierra, mapas)
+INSERT INTO categorias (nombre, color, imagen) VALUES
+('Historia', '#FFFF00', '/public/imagenes/historia.png'),
+('Deporte', '#FFA500', '/public/imagenes/deporte.png'),
+('Ciencia', '#008000', '/public/imagenes/ciencia.png'),
+('Geografía', '#0000FF', '/public/imagenes/geografía.png');
 
 CREATE TABLE preguntas (
                            id INT AUTO_INCREMENT PRIMARY KEY,
@@ -311,7 +312,7 @@ INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES
 (43, '3', 1), (43, '2', 0), (43, '4', 0), (43, '5', 0),
 (44, 'Sudáfrica', 1), (44, 'Nueva Zelanda', 0), (44, 'Australia', 0), (44, 'Inglaterra', 0),
 (45, 'Fútbol americano', 1), (45, 'Rugby', 0), (45, 'Baloncesto', 0), (45, 'Béisbol', 0),
-(46, 'Nadia Comăneci', 1), (46, 'Simone Biles', 0), (46, 'Larisa Latynina', 0), (46, 'Olga Korbut', 0),
+(46, 'Nadia Comaneci', 1), (46, 'Simone Biles', 0), (46, 'Larisa Latynina', 0), (46, 'Olga Korbut', 0),
 (47, '9', 1), (47, '10', 0), (47, '8', 0), (47, '11', 0),
 (48, 'Estados Unidos', 1), (48, 'China', 0), (48, 'Rusia', 0), (48, 'Reino Unido', 0),
 (49, 'Bádminton', 1), (49, 'Tenis', 0), (49, 'Voleibol', 0), (49, 'Ping Pong', 0),

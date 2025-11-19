@@ -71,14 +71,19 @@ class GameController
 
         list($puntajeFinal, $mensaje, $puntosGanados) = $this->calcularResultadoPartida();
 
-        if (isset($_SESSION["usuario"]["id"])) {
+        if (isset($_SESSION["usuario"]["id"]) && $this->huboPartidaReal()) {
             $this->model->actualizarPuntosUsuario($_SESSION["usuario"]["id"], $puntosGanados);
         }
 
         $data = $this->prepararDatosResumen($puntajeFinal, $mensaje, $puntosGanados);
         $data['historial_partida'] = $_SESSION["historial_partida"] ?? [];
 
-        $this->finalizarPartidaEnBD($puntajeFinal);
+        $data['hubo_partida'] = $this->huboPartidaReal();
+
+        if ($data['hubo_partida']) {
+            $this->finalizarPartidaEnBD($puntajeFinal);
+        }
+
         $this->limpiarPartidaActual();
         $this->renderer->render("resumenPartida", $data);
     }
@@ -123,16 +128,27 @@ class GameController
 
     private function calcularResultadoPartida()
     {
+        if (!$this->huboPartidaReal()) {
+            return [0, "No se inició ninguna partida válida.", 0];
+        }
+
         if (!isset($_SESSION["puntaje"])) {
             return [0, "No se registró un puntaje válido en la partida.", 0];
         }
 
-        $puntajeFinal = $_SESSION["puntaje"];
+        $puntajeFinal = $_SESSION["puntaje"] ?? 0;
 
         $nivelUsuario = $_SESSION["nivel_usuario"] ?? 1;
         $puntosGanados = $puntajeFinal * $nivelUsuario;
 
         return [$puntajeFinal, "¡Partida finalizada!", $puntosGanados];
+    }
+
+    private function huboPartidaReal()
+    {
+        return !empty($_SESSION["historial_partida"]) ||
+            (isset($_SESSION["partida_iniciada"]) && $_SESSION["partida_iniciada"] === true) ||
+            (isset($_SESSION["puntaje"]) && $_SESSION["puntaje"] > 0);
     }
 
     private function registrarRespuestaEnHistorial($preguntaFallada, $tiempoRespuesta, $nivelPregunta)
@@ -157,30 +173,43 @@ class GameController
         return $array;
     }
 
-    private function desafiar()
+    private function agregarLetras($array)
     {
-        //Debe poder llamarse desde el ranking
+        if (!is_array($array)) return [];
+
+        $posicion = 0;
+        foreach ($array as &$item) {
+            $item['posicion'] = chr(65 + $posicion);
+            $posicion++;
+        }
+        return $array;
     }
 
     private function prepararDatosResumen($puntajeFinal, $mensaje, $puntosGanados)
     {
         $preguntaActual = $_SESSION["pregunta_actual"] ?? [];
 
+        $datosPregunta = [];
+        if (!empty($preguntaActual) && isset($preguntaActual['pregunta'])) {
+            $datosPregunta = [
+                "categoria" => $preguntaActual['pregunta']['categoria'] ?? 'Desconocida',
+                "pregunta" => $preguntaActual['pregunta']['pregunta'] ?? 'No disponible',
+                "respuestaCorrecta" => $preguntaActual['respuesta_correcta'] ?? 'No disponible',
+            ];
+        }
+
         $usuarioActualizado = [];
         if (isset($_SESSION["usuario"]["id"])) {
             $usuarioActualizado = $this->model->getUsuarioById($_SESSION["usuario"]["id"]);
         }
 
-        return [
-            "categoria" => $preguntaActual['pregunta']['categoria'] ?? 'Desconocida',
-            "pregunta" => $preguntaActual['pregunta']['pregunta'] ?? 'No disponible',
-            "respuestaCorrecta" => $preguntaActual['respuesta_correcta'] ?? 'No disponible',
+        return array_merge($datosPregunta, [
             "puntajeFinal" => $puntajeFinal,
             "puntosGanados" => $puntosGanados,
             "mensaje" => $mensaje,
             "codigoPartida" => $_SESSION["partida_codigo"] ?? 'N/A',
             "usuario" => $usuarioActualizado
-        ];
+        ]);
     }
 
     private function limpiarPartidaActual()
@@ -199,7 +228,9 @@ class GameController
         ];
 
         foreach ($variablesPartida as $variable) {
-            unset($_SESSION[$variable]);
+            if (isset($_SESSION[$variable])) {
+                unset($_SESSION[$variable]);
+            }
         }
     }
 
@@ -208,6 +239,10 @@ class GameController
         if (!$this->partidaEsValida($partida)) {
             $this->generarNuevaPregunta();
             $partida = $_SESSION["pregunta_actual"] ?? [];
+        }
+
+        if (isset($partida['respuestas'])) {
+            $partida['respuestas'] = $this->agregarLetras($partida['respuestas']);
         }
 
         $data = [

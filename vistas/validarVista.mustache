@@ -1,70 +1,323 @@
-<div class="row justify-content-center">
-    <div class="col-12 col-md-6 col-lg-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-envelope-check text-primary mb-3" viewBox="0 0 16 16">
-                        <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z"/>
-                        <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-1.993-1.679a.5.5 0 0 0-.686.172l-1.17 1.95-.547-.547a.5.5 0 0 0-.708.708l.774.773a.75.75 0 0 0 1.174-.144l1.335-2.226a.5.5 0 0 0-.172-.686"/>
-                    </svg>
-                    <h2 class="card-title mb-2">Validar tu email</h2>
-                    <p class="text-muted">Hemos enviado un código de 5 dígitos a tu correo electrónico</p>
+<div class="container py-4" style="max-width: 600px;">
+    <!-- Card Principal de Validación -->
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h2 class="mb-0 fw-bold">
+                <i class="bi bi-envelope-check me-2"></i>
+                Validar tu Email
+            </h2>
+            <p class="lead mb-0 mt-2 opacity-75">Hemos enviado un código de verificación a tu correo</p>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Icono Principal -->
+            <div class="text-center mb-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 80px; height: 80px;">
+                    <i class="bi bi-envelope-check-fill text-primary" style="font-size: 2rem;"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Verificación Requerida</h3>
+                <p class="text-muted mb-0">Ingresa el código de 5 dígitos que enviamos a:</p>
+                <p class="fw-bold text-primary mb-0">{{email}}</p>
+            </div>
+
+            <!-- Alertas -->
+            {{#success}}
+                <div class="alert alert-success border-0 shadow-sm mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                        <div>
+                            <strong class="fw-bold">{{success}}</strong>
+                        </div>
+                    </div>
+                </div>
+            {{/success}}
+
+            {{#error}}
+                <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div>
+                            <strong class="fw-bold">{{error}}</strong>
+                        </div>
+                    </div>
+                </div>
+            {{/error}}
+
+            {{#info}}
+                <div class="alert alert-info border-0 shadow-sm mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                        <div>
+                            {{info}}
+                        </div>
+                    </div>
+                </div>
+            {{/info}}
+
+            <!-- Formulario de Validación -->
+            <form method="POST" action="/user/validar" id="validationForm">
+                <input type="hidden" name="email" value="{{email}}">
+
+                <!-- Campo de Código -->
+                <div class="mb-4">
+                    <label for="codigo" class="form-label fw-medium text-dark text-center w-100 mb-3">
+                        <i class="bi bi-shield-check me-1 text-primary"></i>
+                        Código de Verificación
+                    </label>
+                    <div class="position-relative">
+                        <input
+                                type="text"
+                                class="form-control form-control-lg text-center fs-2 fw-bold letter-spacing"
+                                id="codigo"
+                                name="codigo"
+                                value="{{codigo}}"
+                                placeholder="00000"
+                                maxlength="5"
+                                pattern="[0-9]{5}"
+                                inputmode="numeric"
+                                autocomplete="one-time-code"
+                                required
+                                style="letter-spacing: 1em; font-family: 'Courier New', monospace; padding: 1rem 1.5rem; border-radius: 12px;">
+                        <div class="position-absolute top-50 end-0 translate-middle-y me-3">
+                            <i class="bi bi-key-fill text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="form-text text-center mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-clock-history me-1"></i>
+                            Ingresa los 5 dígitos que recibiste por email
+                        </small>
+                    </div>
                 </div>
 
-                {{#success}}
-                    <div class="alert alert-success" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        <strong>{{success}}</strong>
-                    </div>
-                {{/success}}
+                <!-- Botón de Validación -->
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold shadow-sm">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Validar Código
+                    </button>
+                </div>
 
-                {{#error}}
-                    <div class="alert alert-danger" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <strong>{{error}}</strong>
+                <!-- Información Adicional -->
+                <div class="card border-0 bg-light">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            El código expirará en 7 dias por seguridad
+                        </small>
                     </div>
-                {{/error}}
-
-                {{#info}}
-                    <div class="alert alert-info" role="alert">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        {{info}}
-                    </div>
-                {{/info}}
-
-                <form method="POST" action="/user/validar" id="validationForm">
-                    <!-- Campo oculto para mantener el email -->
-                    <input type="hidden" name="email" value="{{email}}">
-
-                    <div class="mb-4">
-                        <label for="codigo" class="form-label text-center d-block fw-semibold">Ingresa el código de verificación</label>
-                        <input
-                            type="text"
-                            class="form-control form-control-lg text-center fs-3 letter-spacing"
-                            id="codigo"
-                            name="codigo"
-                            value="{{codigo}}"
-                            placeholder="00000"
-                            maxlength="5"
-                            pattern="[0-9]{5}"
-                            inputmode="numeric"
-                            autocomplete="off"
-                            required
-                            style="letter-spacing: 0.5em; font-family: 'Courier New', monospace;">
-                        <div class="form-text text-center">Ingresa los 5 dígitos que recibiste por email</div>
-                    </div>
-
-                    <div class="d-grid gap-2 mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle me-2" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
-                            </svg>
-                            Validar código
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Estilos CSS adicionales para mantener consistencia -->
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,123,255,0.4) !important;
+    }
+
+    .form-control {
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        transform: translateY(-1px);
+    }
+
+    .alert {
+        border-radius: 10px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Estilos específicos para el input del código */
+    .letter-spacing {
+        letter-spacing: 1em !important;
+        padding-right: 1em !important;
+    }
+
+    /* Efecto para el código cuando está completo */
+    .code-complete {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%) !important;
+        border-color: #28a745 !important;
+    }
+
+    /* Animación para el reenvío */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .resend-pulse {
+        animation: pulse 0.6s ease-in-out;
+    }
+
+    @media (max-width: 576px) {
+        .container {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .card-body {
+            padding: 2rem 1.5rem !important;
+        }
+
+        .form-control-lg {
+            font-size: 1.5rem !important;
+            padding: 0.75rem 1rem !important;
+        }
+
+        .letter-spacing {
+            letter-spacing: 0.8em !important;
+        }
+    }
+
+    /* Mejora visual para el ícono de verificación */
+    .bg-primary-opacity {
+        background-color: rgba(0, 123, 255, 0.1) !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const validationForm = document.getElementById('validationForm');
+        const codigoInput = document.getElementById('codigo');
+        const submitButton = validationForm.querySelector('button[type="submit"]');
+        const resendLink = document.getElementById('resendCode');
+
+        // Auto-avance y formato del código
+        codigoInput.addEventListener('input', function(e) {
+            // Permitir solo números
+            this.value = this.value.replace(/[^0-9]/g, '');
+
+            // Limitar a 5 dígitos
+            if (this.value.length > 5) {
+                this.value = this.value.slice(0, 5);
+            }
+
+            // Cambiar estilo cuando esté completo
+            if (this.value.length === 5) {
+                this.classList.add('code-complete');
+                // Auto-enfocar el botón de enviar
+                submitButton.focus();
+            } else {
+                this.classList.remove('code-complete');
+            }
+
+            // Auto-enviar cuando esté completo (opcional)
+            if (this.value.length === 5 && this.checkValidity()) {
+                // validationForm.submit(); // Descomentar para auto-enviar
+            }
+        });
+
+        // Prevenir caracteres no numéricos
+        codigoInput.addEventListener('keydown', function(e) {
+            // Permitir: backspace, delete, tab, escape, enter, flechas
+            if ([46, 8, 9, 27, 13, 110, 190].includes(e.keyCode) ||
+                    // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true) ||
+                    // Permitir: números del teclado principal y numpad
+                    (e.keyCode >= 48 && e.keyCode <= 57) ||
+                    (e.keyCode >= 96 && e.keyCode <= 105)) {
+                return;
+            }
+            e.preventDefault();
+        });
+
+        // Manejo del reenvío de código
+        let resendCooldown = 0;
+        resendLink.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (resendCooldown > 0) {
+                alert(`Espera ${resendCooldown} segundos antes de reenviar`);
+                return;
+            }
+
+            // Efecto visual
+            this.classList.add('resend-pulse');
+            setTimeout(() => {
+                this.classList.remove('resend-pulse');
+            }, 600);
+
+            // Simular reenvío (aquí iría tu lógica de reenvío)
+            alert('Código reenviado. Revisa tu bandeja de entrada.');
+
+            // Cooldown de 60 segundos
+            resendCooldown = 60;
+            const originalText = this.innerHTML;
+            this.innerHTML = `Reenviar código (${resendCooldown}s)`;
+            this.style.pointerEvents = 'none';
+
+            const countdown = setInterval(() => {
+                resendCooldown--;
+                this.innerHTML = `Reenviar código (${resendCooldown}s)`;
+
+                if (resendCooldown <= 0) {
+                    clearInterval(countdown);
+                    this.innerHTML = originalText;
+                    this.style.pointerEvents = 'auto';
+                }
+            }, 1000);
+        });
+
+        // Manejo del envío del formulario
+        validationForm.addEventListener('submit', function(e) {
+            // Validación del código
+            if (codigoInput.value.length !== 5) {
+                e.preventDefault();
+                codigoInput.focus();
+                return;
+            }
+
+            // Efecto de carga
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Validando...
+            `;
+        });
+
+        // Auto-enfocar el campo del código al cargar
+        codigoInput.focus();
+
+        // Efectos de interacción
+        codigoInput.addEventListener('focus', function() {
+            this.style.transform = 'translateY(-1px)';
+        });
+
+        codigoInput.addEventListener('blur', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+</script>

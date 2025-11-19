@@ -1,31 +1,72 @@
-<div class="row justify-content-center">
-    <div class="col-12 col-md-8 col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h2 class="card-title text-center mb-4">Registrar usuario</h2>
+<div class="container py-4" style="max-width: 800px;">
+    <!-- Card Principal de Registro -->
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h2 class="mb-0 fw-bold">
+                <i class="bi bi-person-plus me-2"></i>
+                Registrar Usuario
+            </h2>
+            <p class="lead mb-0 mt-2 opacity-75">Crea tu cuenta para comenzar a jugar</p>
+        </div>
 
-                {{#error}}
-                    <div class="alert alert-danger" role="alert">
-                        <strong>{{error}}</strong>
-                        {{#errores}}
-                            <div>{{.}}</div>
-                        {{/errores}}
+        <div class="card-body p-4">
+            {{#error}}
+                <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div>
+                            <strong class="fw-bold">{{error}}</strong>
+                            {{#errores}}
+                                <div class="small mt-1">{{.}}</div>
+                            {{/errores}}
+                        </div>
                     </div>
-                {{/error}}
+                </div>
+            {{/error}}
 
-                <form method="POST" action="/user/registrar" enctype="multipart/form-data" id="registroForm">
-                    <div class="mb-3">
-                        <label for="nombre_completo" class="form-label">Nombre completo</label>
-                        <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo" value="{{#datos}}{{nombre_completo}}{{/datos}}" required>
+            <form method="POST" action="/user/registrar" enctype="multipart/form-data" id="registroForm">
+                <!-- Información Personal -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-person-vcard me-2"></i>
+                            Información Personal
+                        </h5>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="anio_nacimiento" class="form-label">Año de nacimiento</label>
-                        <input type="number" class="form-control" id="anio_nacimiento" name="anio_nacimiento" placeholder="Año de nacimiento" value="{{#datos}}{{anio_nacimiento}}{{/datos}}" required>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="nombre_completo" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-person me-1 text-primary"></i>
+                            Nombre completo
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="nombre_completo"
+                               name="nombre_completo"
+                               placeholder="Ingresa tu nombre completo"
+                               value="{{#datos}}{{nombre_completo}}{{/datos}}"
+                               required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="sexo" class="form-label">Sexo</label>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="anio_nacimiento" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-calendar me-1 text-primary"></i>
+                            Año de nacimiento
+                        </label>
+                        <input type="number"
+                               class="form-control"
+                               id="anio_nacimiento"
+                               name="anio_nacimiento"
+                               placeholder="Ej: 1990"
+                               value="{{#datos}}{{anio_nacimiento}}{{/datos}}"
+                               required>
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="sexo" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-gender-ambiguous me-1 text-primary"></i>
+                            Sexo
+                        </label>
                         <select name="sexo" id="sexo" class="form-select" required>
                             <option value="Femenino" {{#datos}}{{#sexo_femenino}}selected{{/sexo_femenino}}{{/datos}}>Femenino</option>
                             <option value="Masculino" {{#datos}}{{#sexo_masculino}}selected{{/sexo_masculino}}{{/datos}}>Masculino</option>
@@ -33,57 +74,347 @@
                         </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Selecciona tu ubicación en el mapa</label>
-                        <div class="alert alert-info">
-                            <small>Arrastra el marcador o haz clic en el mapa para seleccionar tu ubicación</small>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="file" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-image me-1 text-primary"></i>
+                            Foto de perfil (opcional)
+                        </label>
+                        <input type="file"
+                               class="form-control"
+                               id="file"
+                               name="file"
+                               accept="image/*">
+                        <small class="text-muted">Formatos: JPG, PNG, GIF. Máx: 5MB</small>
+                    </div>
+                </div>
+
+                <!-- Ubicación -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            Ubicación
+                        </h5>
+
+                        <div class="alert alert-info border-0 shadow-sm mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <div>
+                                    <strong class="fw-bold">Selecciona tu ubicación</strong>
+                                    <div class="small mt-1">Arrastra el marcador o haz clic en el mapa para seleccionar tu ubicación</div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="map" style="height: 400px; width: 100%;" class="mb-3"></div>
+
+                        <div id="map" style="height: 300px; width: 100%; border-radius: 8px;" class="mb-3"></div>
 
                         <input type="hidden" id="pais" name="pais" value="{{#datos}}{{pais}}{{/datos}}" required>
                         <input type="hidden" id="ciudad" name="ciudad" value="{{#datos}}{{ciudad}}{{/datos}}" required>
                         <input type="hidden" id="latitud" name="latitud" value="{{#datos}}{{latitud}}{{/datos}}" required>
                         <input type="hidden" id="longitud" name="longitud" value="{{#datos}}{{longitud}}{{/datos}}" required>
 
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Ubicación seleccionada:</h6>
-                                <div id="ubicacion-info" class="text-muted">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body py-3">
+                                <h6 class="card-title fw-bold text-dark mb-2">
+                                    <i class="bi bi-pin-map me-1"></i>
+                                    Ubicación seleccionada:
+                                </h6>
+                                <div id="ubicacion-info" class="text-muted fw-medium">
                                     {{#datos}}
                                         {{pais}}, {{ciudad}} ({{latitud}}, {{longitud}})
                                     {{/datos}}
-                                    {{^datos}}Selecciona una ubicación en el mapa{{/datos}}
+                                    {{^datos}}
+                                        <span class="text-warning">Selecciona una ubicación en el mapa</span>
+                                    {{/datos}}
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{#datos}}{{email}}{{/datos}}" oninput="this.value=this.value.trim()"  required>
-                        <small id="msgEmail"></small>
+                <!-- Información de Cuenta -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-shield-lock me-2"></i>
+                            Información de Cuenta
+                        </h5>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Usuario</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" value="{{#datos}}{{username}}{{/datos}}" required>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="email" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-envelope me-1 text-primary"></i>
+                            Email
+                        </label>
+                        <input type="email"
+                               class="form-control"
+                               id="email"
+                               name="email"
+                               placeholder="tu@email.com"
+                               value="{{#datos}}{{email}}{{/datos}}"
+                               oninput="this.value=this.value.trim()"
+                               required>
+                        <small id="msgEmail" class="form-text"></small>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="username" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-at me-1 text-primary"></i>
+                            Usuario
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="username"
+                               name="username"
+                               placeholder="Nombre de usuario"
+                               value="{{#datos}}{{username}}{{/datos}}"
+                               required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="file" class="form-label">Foto de perfil (opcional)</label>
-                        <input type="file" class="form-control" id="file" name="file" accept="image/*">
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="password" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-key me-1 text-primary"></i>
+                            Contraseña
+                        </label>
+                        <input type="password"
+                               class="form-control"
+                               id="password"
+                               name="password"
+                               placeholder="Crea una contraseña segura"
+                               required>
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="confirm_password" class="form-label fw-medium text-dark mb-2">
+                            <i class="bi bi-key-fill me-1 text-primary"></i>
+                            Confirmar contraseña
+                        </label>
+                        <input type="password"
+                               class="form-control"
+                               id="confirm_password"
+                               name="confirm_password"
+                               placeholder="Repite tu contraseña"
+                               required>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <!-- Botón de Registro -->
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold shadow-sm">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Crear Cuenta
+                    </button>
+                </div>
+
+                <!-- Enlace de Login -->
+                <div class="text-center">
+                    <small class="text-muted">
+                        ¿Ya tienes cuenta?
+                        <a href="/user/ingresar" class="text-primary text-decoration-none fw-medium">
+                            Inicia sesión aquí
+                        </a>
+                    </small>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Estilos CSS adicionales para mantener consistencia -->
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,123,255,0.4) !important;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        transform: translateY(-1px);
+    }
+
+    .alert {
+        border-radius: 10px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Mejoras para el mapa */
+    #map {
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    #map:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Estados de validación */
+    .is-valid {
+        border-color: #198754 !important;
+    }
+
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 2rem 1.5rem !important;
+        }
+
+        #map {
+            height: 250px !important;
+        }
+    }
+
+    /* Efectos para las secciones */
+    h5.text-primary {
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const registroForm = document.getElementById('registroForm');
+        const submitButton = registroForm.querySelector('button[type="submit"]');
+
+        // Inicializar mapa
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let marker = L.marker([0, 0], {draggable: true}).addTo(map);
+
+        // Evento para actualizar ubicación cuando se mueve el marcador
+        marker.on('move', function(e) {
+            const latlng = marker.getLatLng();
+            updateLocationInfo(latlng.lat, latlng.lng);
+        });
+
+        // Evento para colocar marcador al hacer clic en el mapa
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateLocationInfo(e.latlng.lat, e.latlng.lng);
+        });
+
+        // Función para obtener información de ubicación
+        function updateLocationInfo(lat, lng) {
+            document.getElementById('latitud').value = lat;
+            document.getElementById('longitud').value = lng;
+
+            // Usar Nominatim para obtener información de la ubicación
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const country = data.address.country || 'País no identificado';
+                        const city = data.address.city || data.address.town || data.address.village || 'Ciudad no identificada';
+
+                        document.getElementById('pais').value = country;
+                        document.getElementById('ciudad').value = city;
+
+                        document.getElementById('ubicacion-info').innerHTML = `
+                        <strong class="text-success">${country}, ${city}</strong><br>
+                        <small>(${lat.toFixed(4)}, ${lng.toFixed(4)})</small>
+                    `;
+                    })
+                    .catch(error => {
+                        console.error('Error obteniendo ubicación:', error);
+                        document.getElementById('ubicacion-info').innerHTML = `
+                        <span class="text-warning">Error obteniendo ubicación. Coordenadas: (${lat.toFixed(4)}, ${lng.toFixed(4)})</span>
+                    `;
+                    });
+        }
+
+        // Validación de contraseñas
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+
+        function validatePasswords() {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.classList.add('is-invalid');
+                confirmPassword.classList.remove('is-valid');
+                return false;
+            } else {
+                confirmPassword.classList.remove('is-invalid');
+                confirmPassword.classList.add('is-valid');
+                return true;
+            }
+        }
+
+        password.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+
+        // Manejo del envío del formulario
+        registroForm.addEventListener('submit', function(e) {
+            // Validar ubicación
+            const lat = document.getElementById('latitud').value;
+            const lng = document.getElementById('longitud').value;
+
+            if (!lat || !lng || lat == 0 || lng == 0) {
+                e.preventDefault();
+                alert('Por favor, selecciona una ubicación en el mapa');
+                return;
+            }
+
+            // Validar contraseñas
+            if (!validatePasswords()) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+
+            // Efecto de carga
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Creando cuenta...
+            `;
+        });
+
+        // Efectos de interacción
+        const inputs = registroForm.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-1px)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>

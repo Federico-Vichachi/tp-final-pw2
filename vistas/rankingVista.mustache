@@ -1,140 +1,257 @@
-<div class="container text-center col-8">
-    <div class="d-flex g-3 align-items-center justify-content-center gap-4">
-        <a href="/game/ranking?ranking=partidas">
-            <div class="btn {{#vista_activa}}{{#partidas}}btn-primary{{/partidas}}{{^partidas}}btn-secondary{{/partidas}}{{/vista_activa}} btn-lg py-3 shadow-sm">
-                <div class="fs-4 fw-bold">MEJORES PARTIDAS</div>
-            </div>
-        </a>
-        <a href="/game/ranking?ranking=jugadores">
-            <div class="btn {{#vista_activa}}{{#jugadores}}btn-primary{{/jugadores}}{{^jugadores}}btn-secondary{{/jugadores}}{{/vista_activa}} btn-lg py-3 shadow-sm">
-                <div class="fs-4 fw-bold">MEJORES JUGADORES</div>
-            </div>
-        </a>
-    </div>
+<div class="container py-4" style="max-width: 1200px;">
+    <!-- Card Principal del Ranking -->
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h2 class="mb-0 fw-bold">
+                <i class="bi bi-trophy me-2"></i>
+                Ranking de Jugadores
+            </h2>
+            <p class="lead mb-0 mt-2 opacity-75">Descubre a los mejores competidores</p>
+        </div>
 
-    <div class="jugadores" {{^jugadores}}hidden{{/jugadores}}>
-        <div class="row bg-primary"
-             style="align-items: center;justify-content: center;background-color: #dee2e6; padding: 1rem 0;margin-top: 2.5rem;color: white;">
-            <div class="col">
-                <div class="container text-center">
-                    <div class="row row-cols-flex">
-                        <div class="col-4 col-sm fs-6 fw-bold">Posición</div>
-                        <div class="col-4 col-sm fs-6 fw-bold">Avatar</div>
-                        <div class="col-4 col-sm fs-6 fw-bold">Nombre</div>
-                        <div class="col-4 col-sm fs-6 fw-bold">Puntaje</div>
+        <div class="card-body p-4">
+            <!-- Selector de Vista -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="d-flex gap-3 align-items-center justify-content-center">
+                        <a href="/game/ranking?ranking=partidas" class="text-decoration-none flex-fill">
+                            <div class="btn {{#vista_activa}}{{#partidas}}btn-primary{{/partidas}}{{^partidas}}btn-outline-primary{{/partidas}}{{/vista_activa}} w-100 py-3 shadow-sm">
+                                <div class="fw-bold fs-5">
+                                    <i class="bi bi-controller me-2"></i>
+                                    MEJORES PARTIDAS
+                                </div>
+                            </div>
+                        </a>
+                        <a href="/game/ranking?ranking=jugadores" class="text-decoration-none flex-fill">
+                            <div class="btn {{#vista_activa}}{{#jugadores}}btn-primary{{/jugadores}}{{^jugadores}}btn-outline-primary{{/jugadores}}{{/vista_activa}} w-100 py-3 shadow-sm">
+                                <div class="fw-bold fs-5">
+                                    <i class="bi bi-people me-2"></i>
+                                    MEJORES JUGADORES
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido del Ranking -->
+            <div class="row">
+                <div class="col-12">
+                    <!-- Ranking de Jugadores -->
+                    <div class="jugadores" {{^jugadores}}hidden{{/jugadores}}>
+                        <!-- Header de la Tabla -->
+                        <div class="card bg-primary text-white mb-3">
+                            <div class="card-body py-3">
+                                <div class="row align-items-center text-center">
+                                    <div class="col-3 col-md-2">
+                                        <h6 class="mb-0 fw-bold">Posición</h6>
+                                    </div>
+                                    <div class="col-3 col-md-2">
+                                        <h6 class="mb-0 fw-bold">Avatar</h6>
+                                    </div>
+                                    <div class="col-3 col-md-4">
+                                        <h6 class="mb-0 fw-bold">Jugador</h6>
+                                    </div>
+                                    <div class="col-3 col-md-4">
+                                        <h6 class="mb-0 fw-bold">Puntaje Total</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Jugadores -->
+                        {{#jugadores}}
+                            <a href="/game/jugador?id={{id}}" class="text-decoration-none">
+                            <div class="card shadow-sm mb-3 hover-card border-0">
+                                <div class="card-body py-3">
+                                    <div class="row align-items-center text-center">
+                                        <div class="col-3 col-md-2">
+                                            <div class="position-relative">
+                                                {{#top3}}
+                                                    <span class="badge bg-warning text-dark fs-6" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                                                        {{posicion}}
+                                                    </span>
+                                                {{/top3}}
+                                                {{^top3}}
+                                                    <span class="badge bg-light text-primary fs-6" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                                                        {{posicion}}
+                                                    </span>
+                                                {{/top3}}
+                                            </div>
+                                        </div>
+                                        <div class="col-3 col-md-2">
+                                            <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
+                                                 alt="Foto de perfil"
+                                                 class="rounded-circle border border-2 border-primary"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        </div>
+                                        <div class="col-3 col-md-4">
+                                            <h6 class="mb-0 fw-bold text-dark">{{username}}</h6>
+                                            <small class="text-muted">{{pais}}</small>
+                                        </div>
+                                        <div class="col-3 col-md-4">
+                                                <span class="badge bg-success fs-6 py-2">
+                                                    {{puntos_acumulados}} pts
+                                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </a>
+                        {{/jugadores}}
+
+                        {{^jugadores}}
+                            {{#vista_activa}}
+                                {{^jugadores}}
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-emoji-frown display-1 text-muted mb-3"></i>
+                                        <h4 class="text-muted mb-3">No hay jugadores disponibles</h4>
+                                        <p class="text-muted">Aún no hay jugadores registrados en el ranking</p>
+                                    </div>
+                                {{/jugadores}}
+                            {{/vista_activa}}
+                        {{/jugadores}}
+                    </div>
+
+                    <!-- Ranking de Partidas -->
+                    <div class="partidas" {{^partidas}}hidden{{/partidas}}>
+                        <!-- Header de la Tabla -->
+                        <div class="card bg-primary text-white mb-3">
+                            <div class="card-body py-3">
+                                <div class="row align-items-center text-center">
+                                    <div class="col-3 col-md-2">
+                                        <h6 class="mb-0 fw-bold">Posición</h6>
+                                    </div>
+                                    <div class="col-3 col-md-2">
+                                        <h6 class="mb-0 fw-bold">Avatar</h6>
+                                    </div>
+                                    <div class="col-3 col-md-4">
+                                        <h6 class="mb-0 fw-bold">Jugador</h6>
+                                    </div>
+                                    <div class="col-3 col-md-4">
+                                        <h6 class="mb-0 fw-bold">Puntaje Partida</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Partidas -->
+                        {{#partidas}}
+                            <a href="/game/jugador?id={{id}}" class="text-decoration-none">
+                            <div class="card shadow-sm mb-3 hover-card border-0">
+                                <div class="card-body py-3">
+                                    <div class="row align-items-center text-center">
+                                        <div class="col-3 col-md-2">
+                                            <div class="position-relative">
+                                                {{#top3}}
+                                                    <span class="badge bg-warning text-dark fs-6" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                                                        {{posicion}}
+                                                    </span>
+                                                {{/top3}}
+                                                {{^top3}}
+                                                    <span class="badge bg-light text-primary fs-6" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                                                        {{posicion}}
+                                                    </span>
+                                                {{/top3}}
+                                            </div>
+                                        </div>
+                                        <div class="col-3 col-md-2">
+                                            <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
+                                                 alt="Foto de perfil"
+                                                 class="rounded-circle border border-2 border-primary"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        </div>
+                                        <div class="col-3 col-md-4">
+                                            <h6 class="mb-0 fw-bold text-dark">{{username}}</h6>
+                                            <small class="text-muted">{{nombre_completo}}</small>
+                                        </div>
+                                        <div class="col-3 col-md-4">
+                                                <span class="badge bg-info fs-6 py-2">
+                                                    {{puntaje_final}} pts
+                                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </a>
+                        {{/partidas}}
+
+                        {{^partidas}}
+                            {{#vista_activa}}
+                                {{^partidas}}
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-emoji-frown display-1 text-muted mb-3"></i>
+                                        <h4 class="text-muted mb-3">No hay partidas disponibles</h4>
+                                        <p class="text-muted">Aún no hay partidas registradas en el ranking</p>
+                                    </div>
+                                {{/partidas}}
+                            {{/vista_activa}}
+                        {{/partidas}}
                     </div>
                 </div>
             </div>
         </div>
-
-        {{#jugadores}}
-            <a href="/game/jugador?id={{id}}" style="text-decoration: none;color: #212529;">
-            <div class="row poke" style="align-items: center; border: 1px solid #dee2e6; padding: 1.5rem 0;">
-                <div class="col d-flex align-items-center justify-content-center">
-                    <div class="container text-center">
-                        <div class="row align-items-center">
-                            <div class="col-3 d-flex justify-content-center">
-                                {{posicion}}
-                            </div>
-
-                            <div class="col-3 d-flex justify-content-center">
-                                <div class="text-center">
-                                    <img width="45px"
-                                         height="45px"
-                                         src="/public/imagenes/default-avatar.jpg"
-                                         alt="Foto de perfil"
-                                         class="rounded-circle border border-3 border-primary d-block mx-auto"
-                                         style="object-fit: cover;">
-                                </div>
-                            </div>
-
-                            <div class="col-3 d-flex justify-content-center">
-                                {{username}}
-                            </div>
-
-                            <div class="col-3 d-flex justify-content-center">
-                                {{puntos_acumulados}} pts
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </a>
-        {{/jugadores}}
-
-        {{^jugadores}}
-            {{#vista_activa}}
-                {{#jugadores}}
-                {{/jugadores}}
-                {{^jugadores}}
-                    <div class="text-center py-4">
-                        <p>No hay jugadores disponibles</p>
-                    </div>
-                {{/jugadores}}
-            {{/vista_activa}}
-        {{/jugadores}}
-    </div>
-
-    <div class="partidas" {{^partidas}}hidden{{/partidas}}>
-        <div class="row bg-primary"
-             style="align-items: center;justify-content: center;background-color: #dee2e6; padding: 1rem 0;margin-top: 2.5rem;color: white;">
-            <div class="col">
-                <div class="container text-center">
-                    <div class="row row-cols-flex">
-                        <div class="col-4 col-sm fs-6 fw-bold">Posición</div>
-                        <div class="col-4 col-sm fs-6 fw-bold">Avatar</div>
-                        <div class="col-4 col-sm fs-6 fw-bold">Nombre</div>
-                        <div class="col-4 col-sm fs-6 fw-bold">Puntaje</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{#partidas}}
-            <a href="/game/jugador?id={{id}}" style="text-decoration: none;color: #212529;">
-            <div class="row poke" style="align-items: center; border: 1px solid #dee2e6; padding: 1.5rem 0;">
-                <div class="col d-flex align-items-center justify-content-center">
-                    <div class="container text-center">
-                        <div class="row align-items-center">
-                            <div class="col-3 d-flex justify-content-center">
-                                {{posicion}}
-                            </div>
-
-                            <div class="col-3 d-flex justify-content-center">
-                                <div class="text-center">
-                                    <img width="45px"
-                                         height="45px"
-                                         src="/public/imagenes/default-avatar.jpg"
-                                         alt="Foto de perfil"
-                                         class="rounded-circle border border-3 border-primary d-block mx-auto"
-                                         style="object-fit: cover;">
-                                </div>
-                            </div>
-
-                            <div class="col-3 d-flex justify-content-center">
-                                {{username}}
-                            </div>
-
-                            <div class="col-3 d-flex justify-content-center">
-                                {{puntaje_final}} pts
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </a>
-        {{/partidas}}
-
-        {{^partidas}}
-            {{#vista_activa}}
-                {{#partidas}}
-                {{/partidas}}
-                {{^partidas}}
-                    <div class="text-center py-4">
-                        <p>No hay partidas disponibles</p>
-                    </div>
-                {{/partidas}}
-            {{/vista_activa}}
-        {{/partidas}}
     </div>
 </div>
+
+<!-- Estilos CSS adicionales para mantener consistencia -->
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .btn {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .badge {
+        border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .fs-6 {
+            font-size: 0.9rem !important;
+        }
+
+        .d-flex.gap-3 {
+            gap: 1rem !important;
+        }
+    }
+
+    /* Estilos para los top 3 */
+    .bg-warning {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    }
+
+    .bg-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%) !important;
+    }
+</style>

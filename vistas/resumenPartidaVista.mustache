@@ -1,68 +1,208 @@
-<div class="w3-container" style="max-width: 700px; margin: 2rem auto;">
-
-    <div class="w3-container w3-center w3-margin">
-        <h2>{{mensaje}}</h2>
-        <p>La respuesta correcta a la pregunta
-            "{{pregunta}}" de la categoria {{categoria}} era: {{respuestaCorrecta}}</p>
-        <div class="w3-panel w3-pale-green w3-padding">
-            <h3>¡Resumen de Puntos!</h3>
-            <p>Puntaje de la partida: <strong>{{puntajeFinal}}</strong></p>
-            <p>Puntos ganados: <strong>+{{puntosGanados}}</strong></p>
-            {{#usuario}}
-                <p>Puntos acumulados: <strong>{{puntos_acumulados}}</strong></p>
-                <p>Tu nivel actual: <strong>{{nivel}}</strong></p>
-            {{/usuario}}
+<div class="container py-4" style="max-width: 800px;">
+    <!-- Card Principal de Resumen -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h2 class="mb-0 fw-bold">
+                <i class="bi bi-trophy me-2"></i>
+                {{mensaje}}
+            </h2>
         </div>
-        <a href="/game/jugarPartida" class="w3-button w3-green w3-margin-top">Jugar de Nuevo</a>
-        <a href="/user/lobby" class="w3-button w3-blue w3-margin-top">Volver al Lobby</a>
+
+        <div class="card-body p-4">
+            {{#hubo_partida}}
+                <!-- Contenido cuando SÍ hubo partida jugada -->
+                {{#pregunta}}
+                    <!-- Información de la pregunta (solo si existe) -->
+                    <div class="text-center mb-4">
+                        <p class="lead mb-3">
+                            La respuesta correcta a la pregunta
+                            <strong>"{{pregunta}}"</strong> de la categoría
+                            <span class="badge bg-info text-dark">{{categoria}}</span> era:
+                        </p>
+                        <div class="alert alert-success fs-5 fw-bold">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            {{respuestaCorrecta}}
+                        </div>
+                    </div>
+                {{/pregunta}}
+
+                <!-- Resumen de puntos -->
+                <div class="row g-3 text-center">
+                    {{#puntajeFinal}}
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 bg-light rounded border">
+                                <h5 class="text-primary mb-2">Puntaje de la Partida</h5>
+                                <h3 class="text-success fw-bold display-6">{{puntajeFinal}}</h3>
+                            </div>
+                        </div>
+                    {{/puntajeFinal}}
+
+                    {{#puntosGanados}}
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 bg-light rounded border">
+                                <h5 class="text-primary mb-2">Puntos Ganados</h5>
+                                <h3 class="text-warning fw-bold display-6">+{{puntosGanados}}</h3>
+                            </div>
+                        </div>
+                    {{/puntosGanados}}
+                </div>
+            {{/hubo_partida}}
+
+            {{^hubo_partida}}
+                <!-- Contenido cuando NO hubo partida jugada -->
+                <div class="text-center py-4">
+                    <i class="bi bi-emoji-frown display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted mb-3">No se registraron partidas</h4>
+                    <p class="text-muted">
+                        No hay datos de partida disponibles.<br>
+                        ¡Comienza una nueva partida para acumular puntos!
+                    </p>
+                </div>
+            {{/hubo_partida}}
+
+            <!-- Información del usuario (siempre visible si existe) -->
+            {{#usuario}}
+                <div class="row g-3 text-center mt-4">
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 bg-light rounded border">
+                            <h5 class="text-primary mb-2">Puntos Acumulados</h5>
+                            <h4 class="text-info fw-bold">{{puntos_acumulados}}</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 bg-light rounded border">
+                            <h5 class="text-primary mb-2">Tu Nivel Actual</h5>
+                            <h4 class="text-purple fw-bold">{{nivel}}</h4>
+                        </div>
+                    </div>
+                </div>
+            {{/usuario}}
+
+            <!-- Botones de acción (siempre visibles) -->
+            <div class="text-center mt-4">
+                <div class="d-grid gap-2 d-md-block">
+                    <a href="/game/jugarPartida" class="btn btn-success btn-lg me-md-2 mb-2">
+                        <i class="bi bi-play-circle-fill me-2"></i>
+                        Jugar de Nuevo
+                    </a>
+                    <a href="/user/lobby" class="btn btn-primary btn-lg mb-2">
+                        <i class="bi bi-house-fill me-2"></i>
+                        Volver al Lobby
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="w3-container w3-center">
-        <h4>Historial de la Partida</h4>
-        <p class="w3-small w3-text-grey">Si crees que alguna pregunta es incorrecta, podes reportarla.</p>
-    </div>
+    <!-- Historial de la Partida -->
+    {{#hubo_partida}}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light text-center py-3">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Historial de la Partida
+                </h4>
+                <p class="text-muted mb-0 mt-1">
+                    <small>Si crees que alguna pregunta es incorrecta, puedes reportarla</small>
+                </p>
+            </div>
 
-    <table class="w3-table-all w3-card">
-        <thead>
-        <tr class="w3-light-grey">
-            <th>Categoria</th>
-            <th>Pregunta</th>
-            <th>Accion</th>
-        </tr>
-        </thead>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {{#historial_partida}}
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <span class="badge bg-info text-dark mb-2 mb-md-0">{{categoria}}</span>
+                                </div>
+                                <div class="col-md-7">
+                                    <p class="mb-0 fw-medium">{{pregunta}}</p>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <button class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#reportForm-{{pregunta_id}}"
+                                            aria-expanded="false"
+                                            aria-controls="reportForm-{{pregunta_id}}">
+                                        <i class="bi bi-flag me-1"></i>
+                                        Reportar
+                                    </button>
+                                </div>
+                            </div>
 
-        <tbody>
-        {{#historial_partida}}
-            <tr>
-                <td>{{categoria}}</td>
-                <td>{{pregunta}}</td>
-                <td>
-                    <button onclick="toggleReportForm('{{pregunta_id}}')" class="w3-button w3-red w3-tiny w3-round">Reportar</button>
-                </td>
-            </tr>
-            <tr id="report-form-{{pregunta_id}}" style="display:none;">
-                <td colspan="3" class="w3-light-grey">
-                    <form action="/game/reportarPregunta" method="POST" class="w3-container w3-padding">
-                        <input type="hidden" name="pregunta_id" value="{{pregunta_id}}">
-                        <label for="motivo-{{pregunta_id}}"><b>Motivo del reporte:</b></label>
-                        <textarea name="motivo" id="motivo-{{pregunta_id}}" class="w3-input w3-border" style="margin: 8px 0;" required></textarea>
-                        <button type="submit" class="w3-button w3-red">Enviar Reporte</button>
-                    </form>
-                </td>
-            </tr>
-        {{/historial_partida}}
-        </tbody>
-    </table>
+                            <!-- Formulario de Reporte (Collapsible) -->
+                            <div class="collapse mt-3" id="reportForm-{{pregunta_id}}">
+                                <div class="card card-body bg-light">
+                                    <form action="/game/reportarPregunta" method="POST">
+                                        <input type="hidden" name="pregunta_id" value="{{pregunta_id}}">
+                                        <div class="mb-3">
+                                            <label for="motivo-{{pregunta_id}}" class="form-label fw-bold">
+                                                Motivo del reporte:
+                                            </label>
+                                            <textarea name="motivo" id="motivo-{{pregunta_id}}"
+                                                      class="form-control"
+                                                      rows="3"
+                                                      placeholder="Describe el problema con esta pregunta..."
+                                                      required></textarea>
+                                        </div>
+                                        <div class="alert alert-info py-2">
+                                            <small>
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Tu reporte será revisado por nuestros editores.
+                                            </small>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="bi bi-send me-1"></i>
+                                            Enviar Reporte
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {{/historial_partida}}
 
+                    {{^historial_partida}}
+                        <div class="list-group-item text-center py-4">
+                            <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+                            <p class="text-muted mb-0">No hay historial disponible</p>
+                        </div>
+                    {{/historial_partida}}
+                </div>
+            </div>
+        </div>
+    {{/hubo_partida}}
 </div>
 
-<script>
-    function toggleReportForm(preguntaId) {
-        var formRow = document.getElementById('report-form-' + preguntaId);
-        if (formRow.style.display === 'none') {
-            formRow.style.display = 'table-row';
-        } else {
-            formRow.style.display = 'none';
+<!-- Estilos CSS adicionales -->
+<style>
+    .text-purple {
+        color: #6f42c1 !important;
+    }
+
+    .btn-success, .btn-primary {
+        min-width: 180px;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 1.5rem 1.25rem;
+    }
+
+    .list-group-item:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    @media (max-width: 768px) {
+        .display-6 {
+            font-size: 1.75rem;
+        }
+
+        .btn-lg {
+            width: 100%;
         }
     }
-</script>
+</style>

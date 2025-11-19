@@ -65,9 +65,9 @@ class UserController
             header('Location: /editor/index');
             exit();
         }
-
+        $usuario = $this->model->getUsuarioById($_SESSION['usuario']['id']);
         $this->renderer->render("lobby",[
-            'usuario' => $_SESSION['usuario']
+            'usuario' => $usuario
         ]);
     }
 
@@ -150,7 +150,7 @@ class UserController
 
         if (empty($email)) {
             $this->renderer->render("validar", [
-                'error' => "Email no especificado."
+                'error' => "Error en la validación."
             ]);
             exit();
         }
@@ -198,8 +198,10 @@ class UserController
     public function perfil()
     {
         $this->redirectNotAuthenticated();
-        $usuario = $_SESSION["usuario"];
-        $this->renderer->render("perfil", ["usuario" => $usuario]);
+        $usuario = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        $this->renderer->render("perfil",[
+            'usuario' => $usuario
+        ]);
     }
 
     private function aceptarInvitacion()

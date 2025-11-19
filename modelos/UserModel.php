@@ -28,6 +28,36 @@ class UserModel
         return null;
     }
 
+    public function getUsuarioById($usuarioId)
+    {
+        $sql = "SELECT id, nombre_completo, username, nivel, puntos_acumulados, 
+                   pais, ciudad, latitud, longitud, foto_perfil, fecha_registro,
+                   email, sexo, rol, anio_nacimiento
+            FROM usuario
+            WHERE id = $usuarioId";
+
+        $resultado = $this->conexion->query($sql);
+
+        if (is_array($resultado) && count($resultado) > 0) {
+            $usuario = $resultado[0];
+
+            if (empty($usuario['foto_perfil']) || $usuario['foto_perfil'] === 'NULL') {
+                $usuario['foto_perfil'] = '/public/imagenes/default-avatar.jpg';
+            }
+
+            if (isset($usuario['latitud'])) {
+                $usuario['latitud'] = (float)$usuario['latitud'];
+            }
+            if (isset($usuario['longitud'])) {
+                $usuario['longitud'] = (float)$usuario['longitud'];
+            }
+
+            return $usuario;
+        }
+
+        return null;
+    }
+
     public function registrarUsuario($datos, $file) {
         if (empty($datos['nombre_completo'])
             || empty($datos['email'])
@@ -128,7 +158,7 @@ class UserModel
             }
 
             if (move_uploaded_file($file['tmp_name'], $rutaDestino)) {
-                $rutaFoto = "'public/imagenes/$nombreArchivo'";
+                $rutaFoto = "'/public/imagenes/$nombreArchivo'";
             }
         }
         return $rutaFoto;

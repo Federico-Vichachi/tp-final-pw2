@@ -1,132 +1,218 @@
-<div class="container py-3">
-    <!-- Título Principal -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-primary mb-2">Perfil del Jugador</h1>
-    </div>
+<div class="container py-4" style="max-width: 1200px;">
+    <!-- Card Principal del Perfil -->
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h2 class="mb-0 fw-bold">
+                <i class="bi bi-person-badge me-2"></i>
+                Perfil del Jugador
+            </h2>
+        </div>
 
-    {{#perfil}}
-        <!-- Sección Superior: Perfil y Mapa -->
-        <div class="row mb-4 g-3">
-            <!-- Información del Jugador -->
-            <div class="col-12 col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body p-4 text-center">
-                        <img src="/public/imagenes/default-avatar.jpg"
-                             alt="Foto de perfil"
-                             class="rounded-circle border border-3 border-primary mb-3"
-                             style="width: 100px; height: 100px; object-fit: cover;">
+        {{#perfil}}
+            <div class="card-body p-4">
+                <!-- Sección Superior: Información del Jugador y Mapa -->
+                <div class="row mb-5 g-4">
+                    <!-- Información del Jugador -->
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-bold text-primary">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    Información del Jugador
+                                </h5>
+                            </div>
+                            <div class="card-body p-4 text-center">
+                                <img src="{{#perfil.foto_perfil}}{{perfil.foto_perfil}}{{/perfil.foto_perfil}}{{^perfil.foto_perfil}}/public/imagenes/default-avatar.jpg{{/perfil.foto_perfil}}"
+                                     alt="Foto de perfil"
+                                     class="rounded-circle border border-3 border-primary mb-3"
+                                     style="width: 100px; height: 100px; object-fit: cover;">
 
-                        <h4 class="fw-bold text-primary">{{nombre_completo}}</h4>
-                        <p class="text-muted mb-3">@{{username}}</p>
+                                <h4 class="fw-bold text-primary mb-1">{{nombre_completo}}</h4>
+                                <p class="text-muted mb-3">@{{username}}</p>
 
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted d-block">Nivel</small>
-                                    <strong class="fs-5">{{nivel}}</strong>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="bg-light rounded p-3 border">
+                                            <small class="text-muted d-block">Nivel</small>
+                                            <strong class="fs-4 text-primary">{{nivel}}</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="bg-light rounded p-3 border">
+                                            <small class="text-muted d-block">Puntaje Total</small>
+                                            <strong class="fs-4 text-success">{{puntos_acumulados}}</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted d-block">Puntaje Total</small>
-                                    <strong class="fs-5">{{puntos_acumulados}}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Mapa de Ubicación -->
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-bold text-primary">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    Ubicación del Jugador
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div id="map" style="height: 250px; width: 100%; border-radius: 8px;" class="mb-3"></div>
+                                <div class="text-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        {{perfil.ciudad}} - {{perfil.pais}}
+                                    </small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Mapa -->
-            <div class="col-12 col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Ubicación del Jugador</h5>
+                <!-- Estadísticas de Resumen -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card-header bg-light py-3 mb-3 rounded">
+                            <h5 class="mb-0 fw-bold text-primary">
+                                <i class="bi bi-graph-up me-2"></i>
+                                Resumen de Estadísticas
+                            </h5>
+                        </div>
+                    </div>
 
-                        <!-- Mapa interactivo -->
-                        <div id="map" style="height: 220px; width: 100%;" class="mb-3"></div>
+                    <!-- Total Partidas -->
+                    <div class="col-6 col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <i class="bi bi-controller display-6 text-primary mb-3"></i>
+                                <h3 class="text-primary fw-bold">{{estadisticas.total_partidas}}</h3>
+                                <p class="text-muted mb-0 fw-medium">Partidas Jugadas</p>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Mejor Partida -->
+                    <div class="col-6 col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <i class="bi bi-trophy display-6 text-warning mb-3"></i>
+                                <h3 class="text-warning fw-bold">{{estadisticas.mejor_puntaje}}</h3>
+                                <p class="text-muted mb-0 fw-medium">Mejor Puntaje</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preguntas Correctas -->
+                    <div class="col-6 col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <i class="bi bi-check-circle display-6 text-success mb-3"></i>
+                                <h3 class="text-success fw-bold">{{estadisticas.preguntas_correctas}}</h3>
+                                <p class="text-muted mb-0 fw-medium">Preguntas Correctas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preguntas Falladas -->
+                    <div class="col-6 col-md-3 mb-3">
+                        <div class="card text-center border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <i class="bi bi-x-circle display-6 text-danger mb-3"></i>
+                                <h3 class="text-danger fw-bold">{{estadisticas.preguntas_falladas}}</h3>
+                                <p class="text-muted mb-0 fw-medium">Preguntas Falladas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Volver -->
+                <div class="text-center mt-4">
+                    <div class="d-grid gap-2" style="max-width: 250px; margin: 0 auto;">
+                        <a href="/game/ranking?ranking=jugadores" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Volver al Ranking
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
+        {{/perfil}}
 
-        <!-- Estadísticas de Resumen -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h5 class="mb-3">Resumen de Estadísticas</h5>
-            </div>
-
-            <!-- Total Partidas -->
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card text-center border-primary">
-                    <div class="card-body">
-                        <i class="bi bi-controller display-6 text-primary mb-2"></i>
-                        <h3 class="text-primary">{{estadisticas.total_partidas}}</h3>
-                        <p class="text-muted mb-0">Partidas Jugadas</p>
-                    </div>
+        {{^perfil}}
+            <div class="card-body p-5">
+                <div class="text-center py-4">
+                    <i class="bi bi-emoji-frown display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted mb-3">Jugador no encontrado</h4>
+                    <p class="text-muted mb-4">El jugador que buscas no existe o no está disponible</p>
+                    <a href="/game/ranking?ranking=jugadores" class="btn btn-primary">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver al Ranking
+                    </a>
                 </div>
             </div>
-
-            <!-- Mejor Partida -->
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card text-center border-warning">
-                    <div class="card-body">
-                        <i class="bi bi-trophy display-6 text-warning mb-2"></i>
-                        <h3 class="text-warning">{{estadisticas.mejor_puntaje}}</h3>
-                        <p class="text-muted mb-0">Mejor Puntaje</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Preguntas Correctas -->
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card text-center border-success">
-                    <div class="card-body">
-                        <i class="bi bi-check-circle display-6 text-success mb-2"></i>
-                        <h3 class="text-success">{{estadisticas.preguntas_correctas}}</h3>
-                        <p class="text-muted mb-0">Preguntas Correctas</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Preguntas Falladas -->
-            <div class="col-6 col-md-3 mb-3">
-                <div class="card text-center border-danger">
-                    <div class="card-body">
-                        <i class="bi bi-x-circle display-6 text-danger mb-2"></i>
-                        <h3 class="text-danger">{{estadisticas.preguntas_falladas}}</h3>
-                        <p class="text-muted mb-0">Preguntas Falladas</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Botón Volver -->
-        <div class="text-center mt-4">
-            <a href="/game/ranking?ranking=jugadores" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left me-2"></i>Volver al Ranking
-            </a>
-        </div>
-    {{/perfil}}
-
-    {{^perfil}}
-        <div class="text-center py-5">
-            <p class="text-muted">Jugador no encontrado</p>
-            <a href="/game/ranking?ranking=jugadores" class="btn btn-primary">Volver al Ranking</a>
-        </div>
-    {{/perfil}}
+        {{/perfil}}
+    </div>
 </div>
 
+<!-- Estilos CSS adicionales para mantener consistencia -->
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-header.bg-light {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .btn-outline-primary {
+        border-width: 2px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+    }
+
+    .bg-light.rounded {
+        transition: all 0.3s ease;
+    }
+
+    .bg-light.rounded:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .display-6 {
+            font-size: 2.5rem !important;
+        }
+    }
+
+    /* Mejoras visuales para las tarjetas de estadísticas */
+    .card.text-center:hover {
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
+</style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const mapa = document.getElementById('map');
-        const ubicacionInfo = document.getElementById('ubicacion-info');
 
-        // Si no hay mapa, salir
-        if (!mapa) return;
+        // Si no hay mapa o no hay perfil, salir
+        if (!mapa || !{{#perfil}}true{{/perfil}}{{^perfil}}false{{/perfil}}) return;
 
         // Usar las coordenadas del perfil para centrar el mapa
         const latitud = {{perfil.latitud}};
@@ -141,9 +227,13 @@
         }).addTo(map);
 
         // Marcador en la ubicación del jugador (no arrastrable)
-        const marker = L.marker([latitud, longitud], {draggable: false}).addTo(map);
-
-        // Popup con información del jugador
-        marker.bindPopup(`${ciudad}, ${pais}`).openPopup();
+        const marker = L.marker([latitud, longitud], {
+            draggable: false,
+            icon: L.divIcon({
+                html: '<i class="bi bi-geo-alt-fill text-primary" style="font-size: 24px;"></i>',
+                iconSize: [24, 24],
+                className: 'text-danger'
+            })
+        }).addTo(map);
     });
 </script>

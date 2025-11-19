@@ -1,78 +1,127 @@
-<div class="container py-5">
-    <!-- Título de Bienvenida -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-primary mb-2">Bienvenido al Juego del Saber</h1>
-        <p class="lead text-muted">Pon a prueba tus conocimientos</p>
-    </div>
+<div class="container py-4" style="max-width: 1000px;">
+    <!-- Card Principal del Lobby -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h1 class="mb-0 fw-bold">
+                <i class="bi bi-joystick me-2"></i>
+                Bienvenido al Juego del Saber
+            </h1>
+            <p class="lead mb-0 mt-2 opacity-75">Pon a prueba tus conocimientos</p>
+        </div>
 
-    {{#usuario}}
-    <!-- Sección Superior: Perfil y Ranking en laterales -->
-    <div class="row mb-4 g-3">
-        <!-- Card de Perfil - Lateral Izquierdo -->
-        <div class="col-12 col-md-6">
-            <a href="/user/perfil" class="text-decoration-none">
-                <div class="card shadow-sm h-100 hover-card" style="transition: transform 0.2s, box-shadow 0.2s;">
-                    <div class="card-body p-4">
-                        <div class="d-flex flex-column align-items-center text-center">
-                            <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
-                                 alt="Foto de perfil"
-                                 class="rounded-circle border border-3 border-primary mb-3"
-                                 style="width: 100px; height: 100px; object-fit: cover;">
-                            <h5 class="card-title mb-1 fw-bold">{{nombre_completo}}</h5>
-                            <p class="card-text text-muted mb-2">@{{username}}</p>
-                            <small class="text-muted">
-                                <i class="bi bi-calendar"></i> Miembro desde {{fecha_registro}}
-                            </small>
-                            <div class="mt-3">
-                                <span class="badge bg-primary">Ver Perfil <i class="bi bi-chevron-right"></i></span>
+        {{#usuario}}
+            <div class="card-body p-4">
+                <!-- Sección Superior: Perfil y Ranking -->
+                <div class="row mb-4 g-3">
+                    <!-- Card de Perfil -->
+                    <div class="col-12 col-md-6">
+                        <a href="/user/perfil" class="text-decoration-none">
+                            <div class="card shadow-sm h-100 hover-card border-0" style="transition: transform 0.2s, box-shadow 0.2s;">
+                                <div class="card-body p-4">
+                                    <div class="d-flex flex-column align-items-center text-center">
+                                        <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
+                                             alt="Foto de perfil"
+                                             class="rounded-circle border border-3 border-primary mb-3"
+                                             style="width: 100px; height: 100px; object-fit: cover;">
+                                        <h5 class="card-title mb-1 fw-bold text-primary">{{nombre_completo}}</h5>
+                                        <p class="card-text text-muted mb-2">@{{username}}</p>
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar me-1"></i> Miembro desde {{fecha_registro}}
+                                        </small>
+                                        <div class="mt-3">
+                                            <span class="badge bg-primary">Ver Perfil <i class="bi bi-chevron-right ms-1"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </a>
+                    </div>
+
+                    <!-- Card de Ranking -->
+                    <div class="col-12 col-md-6">
+                        <a href="/game/ranking?ranking=partidas" class="text-decoration-none">
+                            <div class="card shadow-sm h-100 border-0 text-white"
+                                 style="background: linear-gradient(135deg, #346874 0%, #1bb141 100%); transition: transform 0.2s, box-shadow 0.2s;">
+                                <div class="card-body p-4 d-flex flex-column justify-content-center align-items-center text-center">
+                                    <i class="bi bi-trophy-fill text-warning mb-3" style="font-size: 3.5rem;"></i>
+                                    <h4 class="fw-bold mb-2">Ranking de Jugadores</h4>
+                                    <p class="mb-3 opacity-75">Descubre quiénes son los mejores</p>
+                                    <div class="mt-2">
+                                        <span class="badge bg-light text-primary">Ver Ranking <i class="bi bi-chevron-right ms-1"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-            </a>
-        </div>
 
-        <!-- Botón de Ranking - Lateral Derecho -->
-        <div class="col-12 col-md-6">
-            <a href="/game/ranking?ranking=partidas" class="text-decoration-none">
-                <div class="card shadow-sm h-100 hover-card bg-gradient" style="transition: transform 0.2s, box-shadow 0.2s; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <div class="card-body p-4 d-flex flex-column justify-content-center align-items-center text-white text-center">
-                        <i class="bi bi-trophy-fill text-primary" style="font-size: 4rem; margin-bottom: 1rem;"></i>
-                        <h4 class="fw-bold mb-2 text-dark">Ranking de Jugadores</h4>
-                        <p class="mb-3 text-dark">Descubre quiénes son los mejores</p>
-                        <div class="mt-2">
-                            <span class="badge bg-white text-dark">Ver Ranking <i class="bi bi-chevron-right"></i></span>
-                        </div>
+                <!-- Botones de Acción Principal -->
+                <div class="text-center">
+                    <div class="d-grid gap-3 mb-4" style="max-width: 500px; margin: 0 auto;">
+                        <!-- Botón Principal JUGAR -->
+                        <a href="/game/jugarPartida?action=partidaIndividual"
+                           class="btn btn-primary btn-lg py-3 shadow-sm fw-bold">
+                            <i class="bi bi-play-circle-fill me-2"></i>
+                            <span class="fs-4">JUGAR</span>
+                        </a>
+
+                        <!-- Botón Sugerir Pregunta -->
+                        <a href="/user/sugerirNuevaPregunta"
+                           class="btn btn-outline-primary btn-lg py-2">
+                            <i class="bi bi-lightbulb-fill me-2"></i>
+                            Sugerir Nueva Pregunta
+                        </a>
+                    </div>
+
+                    <!-- Botón Cerrar Sesión -->
+                    <div class="d-grid" style="max-width: 500px; margin: 0 auto;">
+                        <a href="/user/lobby?action=salir"
+                           class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Cerrar Sesión
+                        </a>
                     </div>
                 </div>
-            </a>
-        </div>
-    </div>
-
-    <!-- Botón Principal JUGAR -->
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="d-grid gap-3 mb-3">
-                <a href="/game/jugarPartida?action=partidaIndividual" class="btn btn-primary btn-lg py-3 shadow-sm">
-                    <i class="bi bi-play-circle-fill me-2"></i>
-                    <span class="fs-4 fw-bold">JUGAR</span>
-                </a>
-
-                <!-- Botón Sugerir Pregunta -->
-                <a href="/user/sugerirNuevaPregunta" class="btn btn-outline-primary btn-lg py-2">
-                    <i class="bi bi-lightbulb-fill me-2"></i>
-                    Sugerir Nueva Pregunta
-                </a>
             </div>
-
-            <!-- Botón Cerrar Sesión -->
-            <div class="d-grid">
-                <a href="/user/lobby?action=salir" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i>
-                    Cerrar Sesión
-                </a>
-            </div>
-        </div>
+        {{/usuario}}
     </div>
-    {{/usuario}}
 </div>
+
+<!-- Estilos CSS adicionales para mantener consistencia -->
+<style>
+    .hover-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    }
+
+    .btn-outline-primary:hover {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+</style>

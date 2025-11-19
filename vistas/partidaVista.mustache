@@ -1,40 +1,232 @@
-<div class="w3-container w3-center w3-margin" style="max-width: 600px; margin: auto;">
-    <div class="card" style="background: #f9f9f9; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <h2>Puntaje: {{puntaje}}</h2>
-            <h2>Nivel: {{nivel_usuario}}</h2>
-        </div>
-        <p>Tiempo restante: <span id="tiempo">{{tiempo_limite}}</span></p>
+<div class="container py-4" style="max-width: 1200px;">
+    <!-- Card Principal de la Partida -->
+    <div class="card shadow-lg border-0" style="border-radius: 16px; overflow: hidden;background-color: {{partida.pregunta.color_categoria}}">
+        <div class="row g-0">
+            {{#partida}}
+                <!-- Columna Izquierda: Información de Categoría -->
+                <div class="col-12 col-md-4">
+                    <div class="card-header text-white text-center py-5 h-100 d-flex flex-column justify-content-center"
+                         style="background: linear-gradient(135deg, {{pregunta.color_categoria}} 0%, {{#darkenColor}}{{pregunta.color_categoria}}{{/darkenColor}} 100%); min-height: 500px;">
 
-        {{#partida}}
-            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
-                <p style="font-weight: bold;">Categoría: {{pregunta.categoria}}</p>
-                <p style="font-weight: bold;">Dificultad: {{pregunta.nivel}}/10</p>
-            </div>
-            <h2 style="margin: 15px 0;">{{pregunta.pregunta}}</h2>
+                        <!-- Imagen de Categoría -->
+                        <div class="text-center mb-4">
+                            <img src="{{pregunta.imagen_categoria}}"
+                                 alt="{{pregunta.categoria}}"
+                                 class="img-fluid"
+                                 style="width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
+                        </div>
 
-            <form method="POST" action="/game/jugarPartida" id="formPregunta">
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                    {{#respuestas}}
-                        <button type="submit" name="idRespuesta" value="{{id}}" style="background-color: {{partida.pregunta.color_categoria}}; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s;">
-                            {{texto}}
-                        </button>
-                    {{/respuestas}}
+                        <!-- Nombre de Categoría -->
+                        <h1 class="display-6 fw-bold mb-4 text-shadow">{{pregunta.categoria}}</h1>
+
+                        <!-- Información de Nivel y Tiempo -->
+                        <div class="d-flex flex-column gap-3 align-items-center mb-4">
+                        <span class="badge bg-light text-dark fs-6 py-2 px-3 shadow-sm">
+                            <i class="bi bi-star-fill text-warning me-2"></i>
+                            Nivel {{pregunta.nivel}}
+                        </span>
+                            <span class="badge bg-light text-dark fs-6 py-2 px-3 shadow-sm" id="badge-tiempo">
+                            <i class="bi bi-clock me-2"></i>
+                            <span id="tiempo">{{tiempo_limite}}</span> segundos
+                        </span>
+                        </div>
+
+                        <!-- Información del Jugador (Desktop) -->
+                        <div class="d-none d-md-block mt-auto">
+                            <div class="row g-2 text-center">
+                                <div class="col-12 mb-3">
+                                    <div class="p-3 bg-white bg-opacity-20 rounded text-black shadow-sm">
+                                        <h6 class="mb-1 opacity-75">Puntaje Actual</h6>
+                                        <h4 class="fw-bold mb-0 text-dark">{{puntaje}}</h4>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 bg-white bg-opacity-20 rounded text-black shadow-sm">
+                                        <h6 class="mb-1 opacity-75">Tu Nivel</h6>
+                                        <h4 class="fw-bold mb-0 text-dark">{{nivel_usuario}}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        {{/partida}}
-    </div>
 
-    <script>
-        let tiempo = {{tiempo_limite}};
+                <!-- Columna Derecha: Pregunta y Respuestas -->
+                <div class="col-12 col-md-8">
+                    <div class="card-body py-4 h-100" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 500px;">
+
+                        <!-- Información del Jugador (Mobile) -->
+                        <div class="row text-center mb-4 d-md-none">
+                            <div class="col-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body py-3">
+                                        <h6 class="text-primary mb-1">Puntaje Actual</h6>
+                                        <h4 class="text-success fw-bold mb-0">{{puntaje}}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body py-3">
+                                        <h6 class="text-primary mb-1">Tu Nivel</h6>
+                                        <h4 class="text-warning fw-bold mb-0">{{nivel_usuario}}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card de Pregunta -->
+                        <div class="text-center mb-4">
+                            <div class="card border-0 shadow-sm bg-white">
+                                <div class="card-body p-4">
+                                    <h2 class="fw-bold text-dark mb-0" style="line-height: 1.4; font-size: 1.5rem;">
+                                        {{pregunta.pregunta}}
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulario de Respuestas -->
+                        <form method="POST" action="/game/jugarPartida" id="formPregunta">
+                            <div class="row g-3 px-2">
+                                {{#respuestas}}
+                                    <div class="col-12">
+                                        <button type="submit"
+                                                name="idRespuesta"
+                                                value="{{id}}"
+                                                class="btn w-100 py-3 text-start d-flex align-items-center answer-btn"
+                                                style="background: white;
+                                                   border: 2px solid #e9ecef;
+                                                   border-radius: 12px;
+                                                   font-size: 16px;
+                                                   transition: all 0.3s ease;
+                                                   box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                        <span class="badge me-3 d-flex align-items-center justify-content-center"
+                                              style="font-size: 14px; width: 36px; height: 36px;
+                                                      background: linear-gradient(135deg, {{pregunta.color_categoria}} 0%, {{#darkenColor}}{{pregunta.color_categoria}}{{/darkenColor}} 100%);
+                                                      color: white;">
+                                            {{posicion}}
+                                        </span>
+                                            <span class="flex-grow-1 fw-medium text-dark">{{texto}}</span>
+                                            <i class="bi bi-chevron-right text-muted ms-2"></i>
+                                        </button>
+                                    </div>
+                                {{/respuestas}}
+                            </div>
+                        </form>
+
+                        <!-- Información Adicional -->
+                        <div class="text-center mt-4 px-2">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body py-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Selecciona la respuesta correcta antes de que se acabe el tiempo
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/partida}}
+        </div>
+    </div>
+</div>
+
+<!-- Estilos CSS adicionales -->
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .answer-btn {
+        transition: all 0.3s ease !important;
+    }
+
+    .answer-btn:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+        border-color: {{#partida}}{{pregunta.color_categoria}}{{/partida}} !important;
+    }
+
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* Estilo para tiempo crítico */
+    .tiempo-critico {
+        animation: pulse 0.8s infinite !important;
+        background: linear-gradient(135deg, #f8d7da 0%, #f1aeb5 100%) !important;
+        color: #721c24 !important;
+        border: 1px solid #f1aeb5 !important;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Mejoras visuales para los badges */
+    .badge {
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .display-6 {
+            font-size: 2rem !important;
+        }
+
+        .answer-btn {
+            padding: 1rem 1.25rem !important;
+        }
+    }
+
+    /* Efecto de carga para la pregunta */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-body > * {
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let tiempo = {{#partida}}{{tiempo_limite}}{{/partida}};
+        const tiempoElement = document.getElementById('tiempo');
+        const badgeTiempo = document.getElementById('badge-tiempo');
+
+        // Temporizador
         const temporizador = setInterval(() => {
             tiempo--;
-            document.querySelector('#tiempo').textContent = tiempo;
+            if (tiempoElement) {
+                tiempoElement.textContent = tiempo;
+            }
 
+            // Cambiar estilo cuando el tiempo sea crítico
+            if (tiempo <= 10 && badgeTiempo) {
+                badgeTiempo.classList.add('tiempo-critico');
+            }
+
+            // Tiempo agotado
             if (tiempo <= 0) {
                 clearInterval(temporizador);
-                document.querySelector('#formPregunta').submit();
+                document.getElementById('formPregunta').submit();
             }
         }, 1000);
-    </script>
-</div>
+    });
+</script>
