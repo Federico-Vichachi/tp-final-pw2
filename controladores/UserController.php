@@ -75,11 +75,18 @@ class UserController
     {
         $this->redirectNotAuthenticated();
 
+        $data = [];
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarSugerenciaPregunta();
         }
 
-        $this->renderer->render("sugerirPregunta", []);
+        // Pasar datos del usuario a la vista
+        if (isset($_SESSION['usuario'])) {
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        }
+
+        $this->renderer->render("sugerirPregunta", $data);
     }
 
     private function salir()
@@ -185,10 +192,17 @@ class UserController
         $sugerenciaExitosa = $this->model->guardarSugerenciaPregunta($datosSugerenciaPregunta);
 
         if (!$sugerenciaExitosa) {
-            $this->renderer->render("sugerirPregunta", [
+            $data = [
                 'error' => "Error al enviar la sugerencia. Intenta nuevamente.",
                 'datos' => $datosSugerenciaPregunta
-            ]);
+            ];
+
+            // Pasar datos del usuario a la vista en caso de error
+            if (isset($_SESSION['usuario'])) {
+                $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+            }
+
+            $this->renderer->render("sugerirPregunta", $data);
             exit();
         }
         $_SESSION['mensaje_exito'] = 'Sugerencia de pregunta enviada exitosamente. ¡Gracias por contribuir!';

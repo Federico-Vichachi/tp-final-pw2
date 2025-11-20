@@ -84,6 +84,10 @@ class GameController
             $this->finalizarPartidaEnBD($puntajeFinal);
         }
 
+        if (isset($_SESSION['usuario'])) {
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        }
+
         $this->limpiarPartidaActual();
         $this->renderer->render("resumenPartida", $data);
     }
@@ -100,10 +104,16 @@ class GameController
         $perfil = $this->model->getUsuarioById($usuarioId);
         $estadisticas = $this->model->getEstadisticasJugador($usuarioId);
 
-        $this->renderer->render("jugador", [
+        $data = [
             'perfil' => $perfil,
             'estadisticas' => $estadisticas
-        ]);
+        ];
+
+        if (isset($_SESSION['usuario'])) {
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        }
+
+        $this->renderer->render("jugador", $data);
     }
 
     public function ranking()
@@ -121,6 +131,10 @@ class GameController
             $partidas = $this->model->getRankingPartidas();
             $data['partidas'] = $this->agregarPosiciones($partidas);
             $data['vista_activa'] = 'partidas';
+        }
+
+        if (isset($_SESSION['usuario'])) {
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
         }
 
         $this->renderer->render("ranking", $data);
@@ -252,6 +266,10 @@ class GameController
             "tiempo_limite" => $this->validarTiempoRestante(),
             "codigo_partida" => $_SESSION["partida_codigo"] ?? 'N/A'
         ];
+
+        if (isset($_SESSION['usuario'])) {
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        }
 
         $this->renderer->render("partida", $data);
     }
