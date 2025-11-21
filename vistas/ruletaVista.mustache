@@ -1,0 +1,25 @@
+
+<script>const categorias = [{{#categorias}}{ nombre: "{{nombre}}", imagen: "{{imagen}}", color:"{{color}}" }{{^last}},{{/last}}{{/categorias}}].filter(cat => cat.nombre && cat.imagen && cat.color);</script>
+
+{{#mensaje}}
+    <div class="alert alert-success">{{mensaje}}</div>
+{{/mensaje}}
+<div class="conteiner text-center mt-4">
+    <div id="mensajeCategoria" class="alert alert-info" style="display: none;"></div>
+    <canvas id="ruleta" width="500" height="500"></canvas>
+    <br>
+
+    <button id="btnGirar" class="btn btn-primary mt-3">Girar</button>
+    <button id="btnProceder" class="btn btn-success mt-3" style="display: none;">Proceder a la partida</button>
+</div>
+<style>
+    #ruleta {
+        border: 5px solid #ccc;
+        border-radius: 50%;
+    }
+
+    #btnGirar {
+        margin-top: 20px;
+    }
+</style>
+

@@ -22,17 +22,21 @@ class GameController
         $this->verificarRolJugador();
         $this->redirectNotAuthenticated();
 
+        if (isset($_GET['categoria'])) {
+            $_SESSION['categoria_seleccionada'] = $_GET['categoria'];
+            unset($_SESSION["pregunta_actual"]);
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarPartida();
         }
-
         if (!$this->partidaEstaIniciada()) {
             $this->iniciarNuevaPartida();
         }
-
         $partida = $this->obtenerPreguntaActual();
         $this->mostrarVistaPartida($partida);
     }
+
 
     public function reportarPregunta()
     {
@@ -293,13 +297,13 @@ class GameController
     {
         $preguntasVistas = $_SESSION["preguntas_vistas"] ?? [];
         $usuarioId = isset($_SESSION["usuario"]) ? $_SESSION["usuario"]["id"] : null;
+        $categoria = $_SESSION['categoria_seleccionada'] ?? null;  // Pasar categoría si existe
 
-        $nuevaPartida = $this->model->getPreguntaAleatoria($preguntasVistas, $usuarioId);
+        $nuevaPartida = $this->model->getPreguntaAleatoria($preguntasVistas, $usuarioId, $categoria);
 
         if (empty($nuevaPartida)) {
             $this->finalizarPartida();
         }
-
         $this->guardarPreguntaEnSesion($nuevaPartida);
     }
 
@@ -336,7 +340,7 @@ class GameController
         $_SESSION["partida_iniciada"] = true;
         $_SESSION["partida_desafio"] = false;
         unset($_SESSION["pregunta_actual"]);
-        $this->redirectTo("jugarPartida");
+        $this->redirectTo("ruleta");
     }
 
     private function procesarPartida()
@@ -344,7 +348,8 @@ class GameController
         $idRespuesta = $_POST["idRespuesta"] ?? null;
 
         if ($this->preguntaYaFueRespondida()) {
-            $this->redirectTo("jugarPartida");
+            $this->redirectTo("ruleta");
+            return;
         }
 
         if ($this->tiempoExpirado()) {
@@ -361,6 +366,7 @@ class GameController
         } else {
             $this->procesarRespuestaIncorrecta();
         }
+        $this->redirectTo("ruleta");
     }
 
     private function calcularTiempoRespuesta()
@@ -400,16 +406,20 @@ class GameController
 
     private function preguntaYaFueRespondida()
     {
-        return isset($_SESSION["pregunta_respondida"]) &&
-            $_SESSION["pregunta_respondida"] === true;
+         if(isset($_SESSION["pregunta_respondida"]) && $_SESSION["pregunta_respondida"] === true) {
+             $this->redirectTo("ruleta");
+             return true;
+         }
+         return false;
     }
 
     private function procesarRespuestaCorrecta()
     {
         $_SESSION["puntaje"]++;
         $_SESSION["pregunta_respondida"] = true;
+        $_SESSION['mensaje'] = 'Respuesta correcta';
         $this->generarNuevaPregunta();
-        $this->redirectTo("jugarPartida");
+        $this->redirectTo("ruleta");
     }
 
     private function procesarRespuestaIncorrecta()
@@ -471,5 +481,21 @@ class GameController
             exit();
         }
         return $tiempoRestante;
+    }
+
+    public function ruleta()
+    {
+        $this->redirectNotAuthenticated();
+        $categorias = $this->model->getCategorias();
+
+        $data = ["categorias" => $categorias];
+        $data['mensaje'] = $_SESSION['mensaje'] ?? '';
+        unset($_SESSION['mensaje']);
+
+        if (isset($_SESSION['usuario'])){
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        }
+
+        $this->renderer->render("ruleta", $data);
     }
 }

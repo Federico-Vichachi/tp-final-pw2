@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const codigoInput = document.getElementById('codigo');
 
+    if (!codigoInput) return;
+
     codigoInput.addEventListener('input', function(e) {
         this.value = this.value.replace(/[^0-9]/g, '');
     });

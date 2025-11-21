@@ -64,15 +64,15 @@ class GameModel
         $this->actualizarEstadisticasPregunta($preguntaId, $fallada);
     }
 
-    public function getPreguntaAleatoria($preguntasVistas, $usuarioId)
+    public function getPreguntaAleatoria($preguntasVistas, $usuarioId, $categoria = null)
     {
         $usuario = $this->getUsuarioById($usuarioId);
         $nivelUsuario = $usuario['nivel'] ?? 1;
 
-        $pregunta = $this->obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario);
+        $pregunta = $this->obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario, $categoria);
 
         if(empty($pregunta)) {
-            $pregunta = $this->obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario);
+            $pregunta = $this->obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario, 2 , $categoria);
         }
 
         if(empty($pregunta)) {
@@ -218,7 +218,7 @@ class GameModel
         }
     }
 
-    private function obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario)
+    private function obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario, $categoria = null)
     {
         $sql = "SELECT p.id AS pregunta_id, 
                    p.texto AS pregunta, 
@@ -231,6 +231,10 @@ class GameModel
             WHERE p.esta_activa = 1 
               AND p.nivel_pregunta = $nivelUsuario";
 
+        if($categoria){
+            $sql .= " AND c.nombre = '$categoria'";
+        }
+
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
             $sql .= " AND p.id NOT IN ($idsExcluidos)";
@@ -242,7 +246,7 @@ class GameModel
         return $this->getSingleRow($resultado);
     }
 
-    private function obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario, $rango = 2)
+    private function obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario, $rango = 2, $categoria = null)
     {
         $nivelMin = max(1, $nivelUsuario - $rango);
         $nivelMax = min(10, $nivelUsuario + $rango);
@@ -257,6 +261,10 @@ class GameModel
             JOIN categorias c ON p.categoria_id = c.id
             WHERE p.esta_activa = 1 
               AND p.nivel_pregunta BETWEEN $nivelMin AND $nivelMax";
+
+        if ($categoria) {
+            $sql .= " AND c.nombre = '$categoria'";
+        }
 
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
@@ -419,7 +427,7 @@ class GameModel
 
     public function getCategorias()
     {
-        $sql = "SELECT id, nombre FROM categorias ORDER BY nombre ASC";
+        $sql = "SELECT id, nombre, color, imagen FROM categorias ORDER BY nombre ASC";
         return $this->conexion->query($sql);
     }
 
