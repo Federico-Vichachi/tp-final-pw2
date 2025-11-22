@@ -1,0 +1,17 @@
+{
+    "name": "user/tp-final-pw2",
+    "autoload": {
+        "psr-4": {
+            "User\\TpFinalPw2\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mauri1120",
+            "email": "mauricioarganaraz2020@gmail.com"
+        }
+    ],
+    "require": {
+        "endroid/qr-code": "^6.0"
+    }
+}
