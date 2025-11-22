@@ -212,10 +212,24 @@ class UserController
     public function perfil()
     {
         $this->redirectNotAuthenticated();
-        $usuario = $this->model->getUsuarioById($_SESSION['usuario']['id']);
-        $this->renderer->render("perfil",[
-            'usuario' => $usuario
-        ]);
+        $usuarioId = $_SESSION['usuario']['id'];
+        $usuario = $this->model->getUsuarioById($usuarioId);
+
+        $baseUrl = 'http://' . $_SERVER['HTTP_HOST'];
+        $qrUrl = $baseUrl . '/game/jugador?id=' . $usuarioId;
+
+        require_once 'modelos/QrModel.php';
+        $qrModel = new QrModel();
+        $filePath = __DIR__ . '/../public/uploads/qr/qr_' . $usuarioId . '.png';
+        $qrModel->generateQr($qrUrl, $filePath);
+
+        $qrPublicPath = '/public/uploads/qr/qr_' . $usuarioId . '.png';
+        $data = [
+            'usuario' => $usuario,
+            'qr_path' => $qrPublicPath
+        ];
+        $this->renderer->render("perfil", $data);
+
     }
 
     private function aceptarInvitacion()
