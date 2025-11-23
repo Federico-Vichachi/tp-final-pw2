@@ -61,19 +61,13 @@ class UserController
             $this->salir();
         }
 
-        $rol = $_SESSION['usuario']['rol'] ?? 'usuario';
-
-        if ($rol === 'administrador') {
-            header('Location: /admin/panel');
-            exit();
-        }
-        if ($rol === 'editor') {
+        if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'editor') {
             header('Location: /editor/index');
             exit();
         }
-
+        $usuario = $this->model->getUsuarioById($_SESSION['usuario']['id']);
         $this->renderer->render("lobby",[
-            'usuario' => $_SESSION['usuario']
+            'usuario' => $usuario
         ]);
     }
 
@@ -81,9 +75,7 @@ class UserController
     {
         $this->redirectNotAuthenticated();
 
-        $categorias = $this->model->getCategorias();
-
-        $data = ['categorias' => $categorias];
+        $data = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarSugerenciaPregunta();
@@ -114,16 +106,14 @@ class UserController
         }
         $_SESSION['usuario'] = $usuario;
 
-        if ($usuario['rol'] === 'administrador') {
-            header('Location: /admin/panel');
-        }
-        else if ($usuario['rol'] === 'editor') {
+        if ($usuario['rol'] === 'editor') {
             header('Location: /editor/index');
-        }
-        else {
+        } else {
             header('Location: /user/lobby');
         }
         exit();
+
+        $this->redirectTo('lobby');
     }
 
     private function procesarRegistro()
@@ -299,17 +289,12 @@ class UserController
     private function redirectAuthenticated()
     {
         if ($this->isAuthenticated()) {
-            $rol = $_SESSION['usuario']['rol'] ?? 'usuario';
-
-            if ($rol === 'administrador') {
-                header('Location: /admin/panel');
-            }
-            else if ($rol === 'editor') {
+            if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'editor') {
                 header('Location: /editor/index');
+                exit();
             }
-            else {
-                header('Location: /user/lobby');
-            }
+
+            header('Location: /user/lobby');
             exit();
         }
     }

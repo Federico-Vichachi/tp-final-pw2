@@ -1,70 +1,392 @@
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg border-0 rounded-3">
-                <div class="card-header bg-primary text-white p-4">
-                    <h3 class="mb-0 fw-bold">
-                        <i class="bi bi-plus-circle-fill me-2"></i>Crear Nueva Pregunta
-                    </h3>
+<div class="container py-4" style="max-width: 900px;">
+    <!-- Card Principal del Formulario -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header text-white text-center py-4 bg-success">
+            <h1 class="mb-0 fw-bold">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                Crear Nueva Pregunta
+            </h1>
+            <p class="lead mb-0 mt-2 opacity-75">Agrega una pregunta al banco del juego</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form action="/editor/procesarCrearPregunta" method="POST" id="crearPreguntaForm">
+
+                <!-- Texto de la Pregunta -->
+                <div class="mb-4">
+                    <label for="texto" class="form-label fw-bold">
+                        <i class="bi bi-question-circle me-2 text-primary"></i>
+                        Texto de la Pregunta
+                    </label>
+                    <textarea id="texto"
+                              name="texto"
+                              class="form-control form-control-lg"
+                              rows="3"
+                              placeholder="Escribe aquí la pregunta..."
+                              required></textarea>
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Asegúrate de que la pregunta sea clara y concisa.
+                    </small>
                 </div>
-                <div class="card-body p-4">
-                    <form action="/editor/procesarCrearPregunta" method="POST">
 
-                        <div class="mb-4">
-                            <label for="texto" class="form-label fw-bold text-dark">Texto de la Pregunta</label>
-                            <textarea class="form-control form-control-lg" id="texto" name="texto" rows="2" required placeholder="Ej: ¿Cuál es la capital de Francia?"></textarea>
+                <!-- Categoría -->
+                <div class="mb-4">
+                    <label for="categoria_id" class="form-label fw-bold">
+                        <i class="bi bi-tag-fill me-2 text-info"></i>
+                        Categoría
+                    </label>
+                    <select id="categoria_id"
+                            name="categoria_id"
+                            class="form-select form-select-lg"
+                            required>
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                        {{#categorias}}
+                            <option value="{{id}}">{{nombre}}</option>
+                        {{/categorias}}
+                    </select>
+                </div>
+
+                <!-- Separador de Respuestas -->
+                <div class="mb-3">
+                    <h5 class="fw-bold text-secondary">
+                        <i class="bi bi-list-check me-2"></i>
+                        Opciones de Respuesta
+                    </h5>
+                    <hr class="mt-2">
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="alert alert-info border-0 shadow-sm mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <div>
+                            <strong>Instrucciones:</strong> Marca el círculo de la opción que será la respuesta correcta
                         </div>
+                    </div>
+                </div>
 
-                        <div class="mb-4">
-                            <label for="categoria_id" class="form-label fw-bold text-dark">Categoria</label>
-                            <select class="form-select form-select-lg" id="categoria_id" name="categoria_id" required>
-                                <option value="" selected disabled>Selecciona una categoria...</option>
-                                {{#categorias}}
-                                    <option value="{{id}}">{{nombre}}</option>
-                                {{/categorias}}
-                            </select>
-                            <div class="form-text">
-                                ¿No encontras la categoraa? <a href="/editor/crearCategoriaForm">Crea una nueva aca</a>.
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <!-- Respuesta Correcta -->
-                        <div class="mb-3">
-                            <label for="respuesta_correcta" class="form-label fw-bold text-success">
-                                <i class="bi bi-check-circle-fill me-1"></i>Respuesta Correcta
-                            </label>
-                            <input type="text" class="form-control border-success" id="respuesta_correcta" name="respuesta_correcta" required placeholder="Ej: París">
-                        </div>
-
-                        <!-- Respuestas Incorrectas -->
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="respuesta_incorrecta1" class="form-label fw-bold text-danger">Incorrecta 1</label>
-                                    <input type="text" class="form-control border-danger" id="respuesta_incorrecta1" name="respuesta_incorrecta1" required placeholder="Ej: Londres">
+                <!-- Opción 1 -->
+                <div class="card option-card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input correct-answer"
+                                           type="radio"
+                                           name="respuesta_correcta_index"
+                                           value="0"
+                                           required
+                                           id="opcion1_radio">
+                                    <label class="form-check-label" for="opcion1_radio"></label>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="respuesta_incorrecta2" class="form-label fw-bold text-danger">Incorrecta 2</label>
-                                    <input type="text" class="form-control border-danger" id="respuesta_incorrecta2" name="respuesta_incorrecta2" required placeholder="Ej: Berlín">
-                                </div>
+                            <div class="col">
+                                <input type="text"
+                                       class="form-control border-0 option-input"
+                                       name="opcion1"
+                                       placeholder="Escribe la primera opción..."
+                                       required>
                             </div>
                         </div>
-
-                        <!-- Botones de Acción -->
-                        <div class="d-grid gap-2 mt-4 d-md-flex justify-content-md-end">
-                            <a href="/editor/index" class="btn btn-outline-secondary me-md-2">Cancelar</a>
-                            <button type="submit" class="btn btn-success px-5">
-                                <i class="bi bi-save me-2"></i>Guardar Pregunta
-                            </button>
-                        </div>
-
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Opción 2 -->
+                <div class="card option-card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input correct-answer"
+                                           type="radio"
+                                           name="respuesta_correcta_index"
+                                           value="1"
+                                           required
+                                           id="opcion2_radio">
+                                    <label class="form-check-label" for="opcion2_radio"></label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="text"
+                                       class="form-control border-0 option-input"
+                                       name="opcion2"
+                                       placeholder="Escribe la segunda opción..."
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opción 3 -->
+                <div class="card option-card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input correct-answer"
+                                           type="radio"
+                                           name="respuesta_correcta_index"
+                                           value="2"
+                                           required
+                                           id="opcion3_radio">
+                                    <label class="form-check-label" for="opcion3_radio"></label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="text"
+                                       class="form-control border-0 option-input"
+                                       name="opcion3"
+                                       placeholder="Escribe la tercera opción..."
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opción 4 -->
+                <div class="card option-card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input correct-answer"
+                                           type="radio"
+                                           name="respuesta_correcta_index"
+                                           value="3"
+                                           required
+                                           id="opcion4_radio">
+                                    <label class="form-check-label" for="opcion4_radio"></label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="text"
+                                       class="form-control border-0 option-input"
+                                       name="opcion4"
+                                       placeholder="Escribe la cuarta opción..."
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos ocultos para mantener compatibilidad con el backend -->
+                <input type="hidden" name="respuesta_correcta" id="respuesta_correcta_hidden">
+                <input type="hidden" name="respuesta_incorrecta1" id="respuesta_incorrecta1_hidden">
+                <input type="hidden" name="respuesta_incorrecta2" id="respuesta_incorrecta2_hidden">
+
+                <!-- Botones de Acción -->
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">
+                        <i class="bi bi-save-fill me-2"></i>
+                        Guardar Pregunta
+                    </button>
+                    <a href="/editor/index" class="btn btn-outline-secondary btn-lg px-5">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Estilos CSS adicionales -->
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28c628 0%, #198754 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 198, 40, 0.4);
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-1px);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #28c628 0%, #198754 100%);
+    }
+
+    /* Estilos para las opciones de respuesta */
+    .option-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .option-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        cursor: pointer;
+    }
+
+    .option-card.selected {
+        border-color: #198754;
+        background-color: rgba(25, 135, 84, 0.05);
+    }
+
+    .correct-answer {
+        width: 1.2em;
+        height: 1.2em;
+        cursor: pointer;
+    }
+
+    .correct-answer:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    .option-input {
+        background: transparent;
+        font-weight: 500;
+    }
+
+    .option-input:focus {
+        background: white;
+        box-shadow: none !important;
+        transform: none;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .btn-lg {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .option-card .card-body {
+            padding: 1rem !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('crearPreguntaForm');
+        const optionCards = document.querySelectorAll('.option-card');
+        const correctAnswerRadios = document.querySelectorAll('.correct-answer');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        // Efectos para las opciones de respuesta
+        correctAnswerRadios.forEach((radio, index) => {
+            radio.addEventListener('change', function() {
+                // Remover selección de todas las cards
+                optionCards.forEach(card => {
+                    card.classList.remove('selected');
+                });
+
+                // Agregar selección a la card actual
+                if (this.checked) {
+                    optionCards[index].classList.add('selected');
+                }
+            });
+        });
+
+        // Efecto click en las cards para seleccionar la opción
+        optionCards.forEach((card, index) => {
+            card.addEventListener('click', function(e) {
+                // Si el click no fue directamente en el input de texto o radio button
+                if (e.target.type !== 'radio' && e.target.type !== 'text') {
+                    const radio = this.querySelector('.correct-answer');
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        // Validación y procesamiento del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let isValid = true;
+            const errorMessages = [];
+
+            // Validar que se haya seleccionado una respuesta correcta
+            const selectedAnswer = document.querySelector('input[name="respuesta_correcta_index"]:checked');
+            if (!selectedAnswer) {
+                isValid = false;
+                errorMessages.push('Debes seleccionar la respuesta correcta');
+            }
+
+            // Validar que las opciones no estén vacías
+            const options = document.querySelectorAll('.option-input');
+            options.forEach((input, index) => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    errorMessages.push(`La opción ${index + 1} no puede estar vacía`);
+                }
+            });
+
+            // Validar que no haya opciones duplicadas
+            const optionValues = Array.from(options).map(input => input.value.trim().toLowerCase());
+            const uniqueOptions = new Set(optionValues);
+            if (uniqueOptions.size !== optionValues.length) {
+                isValid = false;
+                errorMessages.push('No puede haber opciones duplicadas');
+            }
+
+            if (!isValid) {
+                const errorMessage = errorMessages.join('\n');
+                alert(`Por favor corrige los siguientes errores:\n\n${errorMessage}`);
+                return;
+            }
+
+            // Procesar las respuestas para enviarlas en el formato esperado por el backend
+            const correctIndex = parseInt(selectedAnswer.value);
+            const allOptions = Array.from(options).map(input => input.value.trim());
+
+            // Asignar la respuesta correcta
+            document.getElementById('respuesta_correcta_hidden').value = allOptions[correctIndex];
+
+            // Asignar las respuestas incorrectas (las primeras 2 que no sean la correcta)
+            const incorrectAnswers = allOptions.filter((_, index) => index !== correctIndex);
+            document.getElementById('respuesta_incorrecta1_hidden').value = incorrectAnswers[0] || '';
+            document.getElementById('respuesta_incorrecta2_hidden').value = incorrectAnswers[1] || '';
+
+            // Efecto de carga
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Guardando pregunta...
+            `;
+
+            // Enviar el formulario
+            form.submit();
+        });
+
+        // Efectos de interacción para los campos
+        const formElements = form.querySelectorAll('input, select, textarea');
+        formElements.forEach(element => {
+            element.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-1px)';
+            });
+
+            element.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>

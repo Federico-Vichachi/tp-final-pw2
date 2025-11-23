@@ -1,19 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../libs/dompdf/autoload.inc.php';
-
 include_once("helpers/MyConexion.php");
 include_once("helpers/NewRouter.php");
 
 include_once("controladores/UserController.php");
 include_once("controladores/GameController.php");
 include_once("controladores/EditorController.php");
-include_once("controladores/AdminController.php");
 
 include_once("modelos/UserModel.php");
 include_once("modelos/GameModel.php");
-include_once("modelos/AdminModel.php");
-include_once("modelos/EditorModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 include_once ("helpers/MustacheRenderer.php");
@@ -43,10 +38,8 @@ class ConfigFactory
         $this->objetos["router"] = new NewRouter($this, "UserController", "base");
         $this->objetos["UserController"] = new UserController(new UserModel($this->conexion), $this->renderer);
         $this->objetos["GameController"] = new GameController(new GameModel($this->conexion), $this->renderer);
-        $this->objetos["EditorController"] = new EditorController(new EditorModel($this->conexion), $this->renderer);
-        $this->objetos["AdminController"] = new AdminController(new AdminModel($this->conexion), $this->renderer);
+        $this->objetos["EditorController"] = new EditorController(new GameModel($this->conexion), $this->renderer);
     }
-
 
     public function get($objectName)
     {

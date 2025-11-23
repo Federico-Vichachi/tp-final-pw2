@@ -1,95 +1,38 @@
-<div class="container py-5" style="max-width: 1000px;">
+<div class="w3-container">
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
-        <h2 class="fw-bold text-dark mb-0">
-            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-            Reportes Pendientes
-        </h2>
+    <h1>Reportes de Preguntas Pendientes</h1>
 
-        <div class="btn-group">
-            <a href="/editor/historialReportes" class="btn btn-outline-primary">
-                <i class="bi bi-clock-history me-1"></i> Ver Historial Revisados
-            </a>
-            <a href="/editor/index" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i> Volver al Panel
-            </a>
+    {{#reportes}}
+        <div class="w3-card-4 w3-margin-bottom w3-padding">
+            <h4>Pregunta ID: {{pregunta_id}} - Reportada por: {{reportado_por}}</h4>
+            <p><b>Pregunta:</b> {{pregunta_texto}}</p>
+
+            <h5>Respuestas Registradas:</h5>
+            <ul class="w3-ul w3-border">
+                {{#respuestas}}
+                    <li class="{{#es_correcta}}w3-pale-green{{/es_correcta}}{{^es_correcta}}w3-pale-red{{/es_correcta}}">
+                        {{texto}} {{#es_correcta}}<b>(Correcta)</b>{{/es_correcta}}
+                    </li>
+                {{/respuestas}}
+            </ul>
+
+            <p><b>Motivo del Reporte:</b> {{motivo}}</p>
+            <p class="w3-small">Fecha: {{fecha_reporte}}</p>
+
+            <div class="w3-margin-top">
+                <a href="/editor/eliminarPregunta?id={{pregunta_id}}" class="w3-button w3-red w3-round">Eliminar Pregunta</a>
+                <a href="/editor/marcarReporteRevisado?id={{id}}" class="w3-button w3-blue w3-round">Marcar como Revisado</a>
+            </div>
         </div>
-    </div>
+    {{/reportes}}
 
-    <div class="row">
-        {{#reportes}}
-            <div class="col-12 mb-4">
-                <div class="card shadow-sm border-0 h-100">
+    {{^reportes}}
+        <p>No hay reportes pendientes.</p>
+    {{/reportes}}
 
-                    <!-- Cabecera de la Tarjeta -->
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                        <span class="badge bg-danger">ID Pregunta: {{pregunta_id}}</span>
-                        <div class="text-muted small">
-                            Reportado por: <strong>{{reportado_por}}</strong> |
-                            <i class="bi bi-calendar me-1"></i> {{fecha_reporte}}
-                        </div>
-                    </div>
+    <hr>
+    <a href="/editor/historialReportes">Ver historial de reportes revisados</a>
+    <br>
+    <a href="/editor/index">Volver al Panel Principal</a>
 
-                    <div class="card-body p-4">
-                        <div class="row">
-                            <div class="col-md-7 border-end">
-                                <h5 class="text-muted small text-uppercase fw-bold">Pregunta:</h5>
-                                <p class="fs-5 fw-bold mb-3">{{pregunta_texto}}</p>
-
-                                <h5 class="text-muted small text-uppercase fw-bold mt-3">Respuestas:</h5>
-                                <ul class="list-group list-group-flush">
-                                    {{#respuestas}}
-                                        <li class="list-group-item px-0 py-1 border-0 d-flex align-items-center">
-                                            {{#es_correcta}}
-                                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                                <span class="fw-bold text-success">{{texto}} (Correcta)</span>
-                                            {{/es_correcta}}
-                                            {{^es_correcta}}
-                                                <i class="bi bi-circle text-muted me-2"></i>
-                                                <span class="text-secondary">{{texto}}</span>
-                                            {{/es_correcta}}
-                                        </li>
-                                    {{/respuestas}}
-                                </ul>
-                            </div>
-
-                            <div class="col-md-5 ps-md-4 d-flex flex-column justify-content-between">
-                                <div>
-                                    <h5 class="text-danger small text-uppercase fw-bold">
-                                        <i class="bi bi-chat-quote-fill me-1"></i>Motivo del Reporte:
-                                    </h5>
-                                    <div class="alert alert-danger bg-opacity-10 border-danger text-dark">
-                                        "{{motivo}}"
-                                    </div>
-                                </div>
-
-                                <div class="d-grid gap-2 mt-3">
-                                    <a href="/editor/eliminarPregunta?id={{pregunta_id}}"
-                                    class="btn btn-danger"
-                                    onclick="return confirm('¿Estás seguro de eliminar esta pregunta?');">
-                                    <i class="bi bi-trash-fill me-2"></i>Eliminar Pregunta
-                                    </a>
-
-                                    <a href="/editor/marcarReporteRevisado?id={{id}}" class="btn btn-primary">
-                                    <i class="bi bi-check-lg me-2"></i>Marcar como Revisado
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {{/reportes}}
-
-        {{^reportes}}
-            <div class="col-12 text-center py-5">
-                <div class="text-muted opacity-50 mb-3">
-                    <i class="bi bi-clipboard-check" style="font-size: 4rem;"></i>
-                </div>
-                <h3>No hay reportes pendientes</h3>
-                <p class="text-muted">No hay nada wachin.</p>
-                <a href="/editor/index" class="btn btn-primary mt-3">Volver al Inicio</a>
-            </div>
-        {{/reportes}}
-    </div>
 </div>
