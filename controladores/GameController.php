@@ -55,6 +55,24 @@ class GameController
         $this->redirectToLobby();
     }
 
+    public function reportarPreguntas()
+    {
+        $this->redirectNotAuthenticated();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['motivos'])) {
+            $usuarioId = $_SESSION['usuario']['id'];
+            $reportes = $_POST['motivos'];
+
+            foreach ($reportes as $preguntaId => $motivo) {
+                if (!empty(trim($motivo))) {
+                    $this->model->guardarReporte($preguntaId, $usuarioId, $motivo);
+                }
+            }
+        }
+
+        $this->redirectToLobby();
+    }
+
     private function verificarRolJugador()
     {
         if (isset($_SESSION['usuario'])) {
@@ -98,6 +116,9 @@ class GameController
 
     public function jugador()
     {
+
+        $this->redirectNotAuthenticated();
+
         if (!isset($_GET["id"])) {
             $this->redirectTo('ranking');
         }

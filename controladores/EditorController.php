@@ -4,9 +4,9 @@ class EditorController
     private $renderer;
     private $model;
 
-    public function __construct($GameModel, $renderer)
+    public function __construct($editorModel, $renderer)
     {
-        $this->model = $GameModel;
+        $this->model = $editorModel;
         $this->renderer = $renderer;
     }
 
@@ -146,4 +146,34 @@ class EditorController
         header('Location: /editor/index');
         exit();
     }
+
+    public function verSugerencias()
+    {
+        $this->verificarRolEditor();
+        $sugerencias = $this->model->getSugerenciasPendientes();
+        $this->renderer->render("sugerenciasPendientes", ["sugerencias" => $sugerencias]);
+    }
+
+    public function aprobarSugerencia()
+    {
+        $this->verificarRolEditor();
+        $sugerenciaId = $_GET['id'] ?? null;
+        if ($sugerenciaId) {
+            $this->model->aprobarSugerencia($sugerenciaId);
+        }
+        header('Location: /editor/verSugerencias');
+        exit();
+    }
+
+    public function rechazarSugerencia()
+    {
+        $this->verificarRolEditor();
+        $sugerenciaId = $_GET['id'] ?? null;
+        if ($sugerenciaId) {
+            $this->model->rechazarSugerencia($sugerenciaId);
+        }
+        header('Location: /editor/verSugerencias');
+        exit();
+    }
+
 }

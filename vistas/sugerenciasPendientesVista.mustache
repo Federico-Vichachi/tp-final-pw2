@@ -1,0 +1,113 @@
+<div class="container py-5" style="max-width: 1000px;">
+
+    <!-- Encabezado -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <h2 class="fw-bold text-dark mb-0">
+            <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+            Sugerencias de Usuarios
+        </h2>
+        <a href="/editor/index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+        </a>
+    </div>
+
+    <div class="row">
+        {{#sugerencias}}
+            <div class="col-12 mb-4">
+                <div class="card shadow border-0">
+
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <small class="text-muted d-block" style="line-height: 1;">Sugerido por:</small>
+                                <span class="fw-bold">{{sugerido_por}}</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-calendar3 me-1"></i> {{fecha_sugerencia}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Categoría y Pregunta -->
+                        <div class="mb-4 text-center">
+                            <span class="badge bg-info text-dark mb-2 px-3 py-2 rounded-pill">
+                                {{categoria_nombre}}
+                            </span>
+                            <h3 class="fw-bold text-dark mt-2">"{{texto_pregunta}}"</h3>
+                        </div>
+
+                        <!-- Respuestas -->
+                        <div class="row g-3">
+                            <!-- Respuesta Correcta ) -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-success bg-success bg-opacity-10">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <small class="text-success fw-bold text-uppercase mb-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Respuesta Correcta
+                                        </small>
+                                        <p class="mb-0 fs-5 fw-bold text-success">{{respuesta_correcta}}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Respuestas Incorrectas -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-light bg-light">
+                                    <div class="card-body">
+                                        <small class="text-muted fw-bold text-uppercase mb-2 d-block">Incorrectas </small>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-2 text-danger">
+                                                <i class="bi bi-x-circle me-2"></i>{{respuesta_incorrecta1}}
+                                            </li>
+                                            <li class="mb-2 text-danger">
+                                                <i class="bi bi-x-circle me-2"></i>{{respuesta_incorrecta2}}
+                                            </li>
+                                            {{#respuesta_incorrecta3}}
+                                                <li class="text-danger">
+                                                    <i class="bi bi-x-circle me-2"></i>{{.}}
+                                                </li>
+                                            {{/respuesta_incorrecta3}}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light p-3">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <a href="/editor/rechazarSugerencia?id={{id}}"
+                                class="btn btn-outline-danger w-100"
+                                onclick="return confirm('¿Estás seguro de rechazar esta sugerencia? Desaparecerá de la lista.');">
+                                <i class="bi bi-x-lg me-2"></i>Rechazar
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/editor/aprobarSugerencia?id={{id}}"
+                                class="btn btn-success w-100 fw-bold">
+                                <i class="bi bi-check-lg me-2"></i>Aprobar y Publicar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        {{/sugerencias}}
+
+        {{^sugerencias}}
+            <div class="col-12 text-center py-5">
+                <div class="mb-3 text-muted opacity-25">
+                    <i class="bi bi-mailbox" style="font-size: 5rem;"></i>
+                </div>
+                <h3 class="fw-bold text-secondary">Sin sugerencias pendientes</h3>
+                <p class="text-muted">Los usuarios no han enviado nuevas preguntas recientemente.</p>
+                <a href="/editor/index" class="btn btn-primary mt-3 px-4">Volver al Panel</a>
+            </div>
+        {{/sugerencias}}
+    </div>
+</div>

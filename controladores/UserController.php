@@ -61,13 +61,19 @@ class UserController
             $this->salir();
         }
 
-        if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'editor') {
+        $rol = $_SESSION['usuario']['rol'] ?? 'usuario';
+
+        if ($rol === 'administrador') {
+            header('Location: /admin/panel');
+            exit();
+        }
+        if ($rol === 'editor') {
             header('Location: /editor/index');
             exit();
         }
-        $usuario = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+
         $this->renderer->render("lobby",[
-            'usuario' => $usuario
+            'usuario' => $_SESSION['usuario']
         ]);
     }
 
@@ -75,7 +81,9 @@ class UserController
     {
         $this->redirectNotAuthenticated();
 
-        $data = [];
+        $categorias = $this->model->getCategorias();
+
+        $data = ['categorias' => $categorias];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarSugerenciaPregunta();
@@ -106,14 +114,16 @@ class UserController
         }
         $_SESSION['usuario'] = $usuario;
 
-        if ($usuario['rol'] === 'editor') {
+        if ($usuario['rol'] === 'administrador') {
+            header('Location: /admin/panel');
+        }
+        else if ($usuario['rol'] === 'editor') {
             header('Location: /editor/index');
-        } else {
+        }
+        else {
             header('Location: /user/lobby');
         }
         exit();
-
-        $this->redirectTo('lobby');
     }
 
     private function procesarRegistro()
@@ -289,12 +299,17 @@ class UserController
     private function redirectAuthenticated()
     {
         if ($this->isAuthenticated()) {
-            if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'editor') {
-                header('Location: /editor/index');
-                exit();
-            }
+            $rol = $_SESSION['usuario']['rol'] ?? 'usuario';
 
-            header('Location: /user/lobby');
+            if ($rol === 'administrador') {
+                header('Location: /admin/panel');
+            }
+            else if ($rol === 'editor') {
+                header('Location: /editor/index');
+            }
+            else {
+                header('Location: /user/lobby');
+            }
             exit();
         }
     }
