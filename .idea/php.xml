@@ -27,7 +27,9 @@
       <path value="$PROJECT_DIR$/vendor/mustache/bin" />
     </include_path>
   </component>
-  <component name="PhpProjectSharedConfiguration" php_language_level="7.3" />
+  <component name="PhpProjectSharedConfiguration" php_language_level="8.0">
+    <option name="suggestChangeDefaultLanguageLevel" value="false" />
+  </component>
   <component name="PhpStan">
     <PhpStan_settings>
       <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="b6222e6d-5850-45b9-af97-e8be15fc5b95" timeout="60000" />

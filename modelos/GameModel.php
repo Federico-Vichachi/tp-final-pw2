@@ -232,7 +232,7 @@ class GameModel
               AND p.nivel_pregunta = $nivelUsuario";
 
         if($categoria){
-            $sql .= " AND c.nombre = '$categoria'";
+            $sql .= "  teAND c.nombre = '$categoria'";
         }
 
         if(!empty($preguntasVistas)){
@@ -522,5 +522,16 @@ class GameModel
             WHERE usuario_id = $usuarioId";
         $resultado = $this->conexion->query($sql);
         return $resultado[0]['mejor_puntaje'] ?? 0;
+    }
+    public function crearCategoria($data)
+    {
+        $nombre = $data['nombre'];
+        $color = $data['color'];
+        $imagen = $data['imagen'];
+
+        $sql = "INSERT INTO categorias (nombre, color, imagen) VALUES ('$nombre', '$color', '$imagen')";
+        $this->conexion->query($sql);
+        return true;
+
     }
 }

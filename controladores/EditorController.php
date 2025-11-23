@@ -124,4 +124,26 @@ class EditorController
         $data = ['reportes' => $reportes];
         $this->renderer->render("historialReportes", $data);
     }
+
+    public function crearCategoriaForm()
+    {
+        $this->verificarRolEditor();
+        $this->renderer->render("crearCategoria");
+    }
+
+    public function procesarCrearCategoria()
+    {
+        $this->verificarRolEditor();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $categoriaData =[
+                'nombre' => $_POST['nombre'] ?? '',
+                'color' => $_POST['color'] ?? '',
+                'imagen' => $_POST['imagen'] ?? ''
+            ];
+
+            $this->model->crearCategoria($categoriaData);
+        }
+        header('Location: /editor/index');
+        exit();
+    }
 }

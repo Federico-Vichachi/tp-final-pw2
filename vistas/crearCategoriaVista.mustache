@@ -1,0 +1,173 @@
+<div class="container py-4" style="max-width: 900px;">
+    <!-- Card Principal del Formulario -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header text-white text-center py-4 bg-primary">
+            <h1 class="mb-0 fw-bold">
+                <i class="bi bi-tags-fill me-2"></i>
+                Crear Nueva Categoría
+            </h1>
+            <p class="lead mb-0 mt-2 opacity-75">Agrega una categoría para las preguntas del juego</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form action="/editor/procesarCrearCategoria" method="POST" id="crearCategoriaForm">
+
+                <!-- Nombre de la Categoría -->
+                <div class="mb-4">
+                    <label for="nombre" class="form-label fw-bold">
+                        <i class="bi bi-tag-fill me-2 text-primary"></i>
+                        Nombre de la Categoría
+                    </label>
+                    <input type="text" id="nombre" name="nombre" class="form-control form-control-lg" placeholder="Escribe el nombre de la categoría..." required>
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        El nombre debe ser único y descriptivo.
+                    </small>
+                </div>
+
+                <!-- Color de la Categoría -->
+                <div class="mb-4">
+                    <label for="color" class="form-label fw-bold">
+                        <i class="bi bi-palette-fill me-2 text-info"></i>
+                        Color Representativo
+                    </label>
+                    <input type="color" id="color" name="color" class="form-control form-control-lg" value="#007bff">
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Selecciona un color para identificar la categoría.
+                    </small>
+                </div>
+
+                <!-- Imagen de la Categoría -->
+                <div class="mb-4">
+                    <label for="imagen" class="form-label fw-bold">
+                        <i class="bi bi-image-fill me-2 text-success"></i>
+                        Imagen (URL)
+                    </label>
+                    <input type="text" id="imagen" name="imagen" class="form-control form-control-lg" placeholder="https://ejemplo.com/imagen.jpg">
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Opcional: Ingresa la URL de una imagen representativa.
+                    </small>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+                        <i class="bi bi-save-fill me-2"></i>
+                        Guardar Categoría
+                    </button>
+                    <a href="/editor/index" class="btn btn-outline-secondary btn-lg px-5">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-1px);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .btn-lg {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('crearCategoriaForm');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        // Validación y procesamiento del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let isValid = true;
+            const errorMessages = [];
+
+            // Validar que el nombre no esté vacío
+            const nombre = document.getElementById('nombre').value.trim();
+            if (!nombre) {
+                isValid = false;
+                errorMessages.push('El nombre de la categoría no puede estar vacío');
+            }
+
+            // Validar que el color sea un valor válido (opcional, pero si se proporciona)
+            const color = document.getElementById('color').value;
+            if (color && !/^#[0-9A-F]{6}$/i.test(color)) {
+                isValid = false;
+                errorMessages.push('El color debe ser un código hexadecimal válido (ej. #FF0000)');
+            }
+
+            if (!isValid) {
+                const errorMessage = errorMessages.join('\n');
+                alert(`Por favor corrige los siguientes errores:\n\n${errorMessage}`);
+                return;
+            }
+
+            // Efecto de carga
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Guardando categoría...
+            `;
+
+            // Enviar el formulario
+            form.submit();
+        });
+
+        // Efectos de interacción para los campos
+        const formElements = form.querySelectorAll('input');
+        formElements.forEach(element => {
+            element.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-1px)';
+            });
+
+            element.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
