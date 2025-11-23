@@ -98,8 +98,6 @@ class GameController
 
     public function jugador()
     {
-        $this->redirectNotAuthenticated();
-
         if (!isset($_GET["id"])) {
             $this->redirectTo('ranking');
         }

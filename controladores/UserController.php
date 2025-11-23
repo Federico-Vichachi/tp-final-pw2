@@ -215,21 +215,49 @@ class UserController
         $usuarioId = $_SESSION['usuario']['id'];
         $usuario = $this->model->getUsuarioById($usuarioId);
 
-        $baseUrl = 'http://' . $_SERVER['HTTP_HOST'];
+        // Usar URL base dinámica
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $baseUrl = $protocol . '://' . $_SERVER['HTTP_HOST'];
         $qrUrl = $baseUrl . '/game/jugador?id=' . $usuarioId;
 
         require_once 'modelos/QrModel.php';
         $qrModel = new QrModel();
-        $filePath = __DIR__ . '/../public/uploads/qr/qr_' . $usuarioId . '.png';
-        $qrModel->generateQr($qrUrl, $filePath);
 
-        $qrPublicPath = '/public/uploads/qr/qr_' . $usuarioId . '.png';
+        // Definir rutas
+        $qrDir = __DIR__ . '/../public/uploads/qr/';
+        $filePath = $qrDir . 'qr_' . $usuarioId . '.png';
+
+        // Crear directorio si no existe
+        if (!is_dir($qrDir)) {
+            mkdir($qrDir, 0755, true);
+        }
+
+        // Verificar permisos de escritura
+        if (!is_writable($qrDir)) {
+            error_log("Directorio QR no tiene permisos de escritura: " . $qrDir);
+            // Usar una ruta alternativa o mostrar error
+            $qrPublicPath = '/public/imagenes/qr-error.png';
+        } else {
+            try {
+                $qrModel->generateQr($qrUrl, $filePath);
+                $qrPublicPath = '/public/uploads/qr/qr_' . $usuarioId . '.png';
+
+                // Verificar que el archivo se creó
+                if (!file_exists($filePath)) {
+                    error_log("Archivo QR no se generó: " . $filePath);
+                    $qrPublicPath = '/public/imagenes/qr-error.png';
+                }
+            } catch (Exception $e) {
+                error_log("Error generando QR: " . $e->getMessage());
+                $qrPublicPath = '/public/imagenes/qr-error.png';
+            }
+        }
+
         $data = [
             'usuario' => $usuario,
             'qr_path' => $qrPublicPath
         ];
         $this->renderer->render("perfil", $data);
-
     }
 
     private function aceptarInvitacion()
