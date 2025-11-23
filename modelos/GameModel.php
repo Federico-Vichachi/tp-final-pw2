@@ -231,13 +231,15 @@ class GameModel
             WHERE p.esta_activa = 1 
               AND p.nivel_pregunta = $nivelUsuario";
 
-        if($categoria){
-            $sql .= "  teAND c.nombre = '$categoria'";
+        if($categoria && !empty($categoria)){
+            $sql .= " AND c.nombre = '$categoria'";
         }
 
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
-            $sql .= " AND p.id NOT IN ($idsExcluidos)";
+            if (!empty($idsExcluidos)) {
+                $sql .= " AND p.id NOT IN ($idsExcluidos)";
+            }
         }
 
         $sql .= " ORDER BY RAND() LIMIT 1";
@@ -268,7 +270,9 @@ class GameModel
 
         if(!empty($preguntasVistas)){
             $idsExcluidos = implode(",", $preguntasVistas);
-            $sql .= " AND p.id NOT IN ($idsExcluidos)";
+            if (!empty($idsExcluidos)) {
+                $sql .= " AND p.id NOT IN ($idsExcluidos)";
+            }
         }
 
         $sql .= " ORDER BY ABS(p.nivel_pregunta - $nivelUsuario), RAND() LIMIT 1";
