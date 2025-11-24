@@ -1,0 +1,63 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h3 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Editar Pregunta</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/editor/procesarModificarPregunta" method="POST">
+                        <input type="hidden" name="id" value="{{pregunta.id}}">
+
+                        <!-- Texto de la Pregunta -->
+                        <div class="mb-4">
+                            <label for="texto" class="form-label fw-bold">Pregunta</label>
+                            <input type="text" class="form-control form-control-lg" id="texto" name="texto"
+                                   value="{{pregunta.texto}}" required>
+                        </div>
+
+                        <!-- Categoria -->
+                        <div class="mb-4">
+                            <label for="categoria" class="form-label fw-bold">Categoría</label>
+                            <select class="form-select" id="categoria" name="categoria_id" required>
+                                {{#categorias}}
+                                    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{nombre}}</option>
+                                {{/categorias}}
+                            </select>
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="mb-3 text-muted">Respuestas</h5>
+
+                        <!-- Respuesta Correcta -->
+                        <div class="mb-3">
+                            <label class="form-label text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>Respuesta Correcta</label>
+                            <input type="text" class="form-control border-success" name="respuesta_correcta"
+                                   value="{{pregunta.respuesta_correcta}}" required>
+                        </div>
+
+                        <!-- Respuestas Incorrectas -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 1</label>
+                                <input type="text" class="form-control border-danger" name="respuesta_incorrecta1"
+                                       value="{{pregunta.respuesta_incorrecta1}}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 2</label>
+                                <input type="text" class="form-control border-danger" name="respuesta_incorrecta2"
+                                       value="{{pregunta.respuesta_incorrecta2}}" required>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-5">
+                            <a href="/editor/index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-warning fw-bold px-4">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -176,4 +176,56 @@ class EditorController
         exit();
     }
 
+    public function modificarPreguntaForm()
+    {
+        $this->verificarRolEditor();
+        $id = $_GET['id'] ?? null;
+
+        if (!$id) {
+            header('Location: /editor/index');
+            exit();
+        }
+
+        $pregunta = $this->model->getPreguntaPorId($id);
+
+        if (!$pregunta) {
+            header('Location: /editor/index');
+            exit();
+        }
+
+        $categorias = $this->model->getCategorias();
+
+        foreach ($categorias as $key => $cat) {
+            if ($cat['id'] == $pregunta['categoria_id']) {
+                $categorias[$key]['selected'] = true;
+            }
+        }
+
+        $this->renderer->render("modificarPregunta", [
+            "pregunta" => $pregunta,
+            "categorias" => $categorias
+        ]);
+    }
+
+    public function procesarModificarPregunta()
+    {
+        $this->verificarRolEditor();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'id' => $_POST['id'],
+                'texto' => $_POST['texto'] ?? '',
+                'categoria_id' => $_POST['categoria_id'] ?? 0,
+                'respuesta_correcta' => $_POST['respuesta_correcta'] ?? '',
+                'respuesta_incorrecta1' => $_POST['respuesta_incorrecta1'] ?? '',
+                'respuesta_incorrecta2' => $_POST['respuesta_incorrecta2'] ?? ''
+            ];
+
+            $this->model->actualizarPregunta($data);
+        }
+
+        header('Location: /editor/index');
+        exit();
+    }
+
 }

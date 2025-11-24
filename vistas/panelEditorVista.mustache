@@ -10,7 +10,7 @@
         </div>
 
         <div class="card-body p-4">
-            <!-- Botones de Acción Principal -->
+            <!-- Botones de Accion Principal -->
             <div class="row mb-4 g-3">
                 <!-- Card Ver Reportes -->
                 <div class="col-12 col-md-6">
@@ -30,7 +30,7 @@
                 <div class="col-12 col-md-6">
                     <a href="/editor/verSugerencias" class="text-decoration-none">
                         <div class="card shadow-sm h-100 hover-card border-0 text-white"
-                             style="background-color: #fd7e14; transition: transform 0.2s, box-shadow 0.2s;"> <!-- Color Naranja similar al original -->
+                             style="background-color: #fd7e14; transition: transform 0.2s, box-shadow 0.2s;">
                             <div class="card-body p-4 d-flex flex-column justify-content-center align-items-center text-center">
                                 <i class="bi bi-lightbulb-fill mb-3" style="font-size: 3rem;"></i>
                                 <h4 class="fw-bold mb-2">Ver Sugerencias</h4>
@@ -95,23 +95,35 @@
                             <tbody>
                             {{#preguntas}}
                                 <tr>
-                                    <td class="text-center fw-bold">{{id}}</td>
-                                    <td>{{texto}}</td>
-                                    <td class="text-center">
+                                    <td class="text-center fw-bold align-middle">{{id}}</td>
+                                    <td class="align-middle">{{texto}}</td>
+                                    <td class="text-center align-middle">
                                         <span class="badge text-white shadow-sm" style="background-color: {{categoria_color}};">
                                             {{categoria}}
                                         </span>
                                     </td>
-                                    <td class="text-center">
-                                        <button onclick="toggleAnswers({{id}})"
-                                                class="btn btn-sm btn-primary me-1 mb-1">
-                                            <i class="bi bi-eye-fill me-1"></i>Ver Respuestas
-                                        </button>
-                                        <a href="/editor/eliminarPregunta?id={{id}}"
-                                        onclick="return confirm('¿Estás seguro de que quieres eliminar esta pregunta?');"
-                                        class="btn btn-sm btn-danger mb-1">
-                                        <i class="bi bi-trash-fill me-1"></i>Eliminar
-                                        </a>
+                                    <td class="text-center align-middle">
+                                        <div class="d-flex justify-content-center gap-1 flex-wrap">
+
+                                            <button onclick="toggleAnswers({{id}})"
+                                                    class="btn btn-sm btn-primary"
+                                                    title="Ver Respuestas">
+                                                <i class="bi bi-eye-fill"></i> Ver
+                                            </button>
+
+                                            <!-- Boton Editar -->
+                                            <a href="/editor/modificarPreguntaForm?id={{id}}"
+                                            class="btn btn-sm btn-warning text-dark">
+                                            <i class="bi bi-pencil-fill"></i> Editar
+                                            </a>
+
+                                            <!-- Boton Eliminar -->
+                                            <a href="/editor/eliminarPregunta?id={{id}}"
+                                            onclick="return confirm('¿Estás seguro de que quieres eliminar esta pregunta?');"
+                                            class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash-fill"></i> Eliminar
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr id="answers-{{id}}" style="display:none;">

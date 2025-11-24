@@ -195,4 +195,52 @@ class EditorModel
         return true;
 
     }
+
+    public function getPreguntaPorId($id)
+    {
+        $sql = "SELECT * FROM preguntas WHERE id = " . (int)$id;
+        $pregunta = $this->getSingleRow($this->conexion->query($sql));
+
+        if (empty($pregunta)) return null;
+
+        $respuestas = $this->getRespuestas($id);
+
+        foreach ($respuestas as $resp) {
+            if ($resp['es_correcta'] == 1) {
+                $pregunta['respuesta_correcta'] = $resp['texto'];
+            } else {
+                if (!isset($pregunta['respuesta_incorrecta1'])) {
+                    $pregunta['respuesta_incorrecta1'] = $resp['texto'];
+                } else {
+                    $pregunta['respuesta_incorrecta2'] = $resp['texto'];
+                }
+            }
+        }
+
+        return $pregunta;
+    }
+
+    public function actualizarPregunta($data)
+    {
+        $id = (int)$data['id'];
+        $texto = $data['texto'];
+        $categoria_id = (int)$data['categoria_id'];
+
+        $sqlPregunta = "UPDATE preguntas SET texto = '$texto', categoria_id = $categoria_id WHERE id = $id";
+        $this->conexion->query($sqlPregunta);
+
+
+        $this->conexion->query("DELETE FROM respuestas WHERE pregunta_id = $id");
+
+        $resp_correcta = $data['respuesta_correcta'];
+        $resp_incorrecta1 = $data['respuesta_incorrecta1'];
+        $resp_incorrecta2 = $data['respuesta_incorrecta2'];
+
+        $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_correcta', 1)");
+        $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_incorrecta1', 0)");
+        $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_incorrecta2', 0)");
+
+        return true;
+    }
+
 }
