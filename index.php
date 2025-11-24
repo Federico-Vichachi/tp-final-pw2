@@ -3,7 +3,7 @@ session_start();
 
 include("helpers/ConfigFactory.php");
 require_once 'vendor/autoload.php';
-
+require_once 'libs/dompdf/vendor/autoload.php';
 
 $configFactory = new ConfigFactory();
 $router = $configFactory->get("router");

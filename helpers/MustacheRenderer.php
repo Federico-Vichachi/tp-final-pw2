@@ -21,15 +21,15 @@ class MustacheRenderer{
     public function generateHtml($contentFile, $data = [], $includeLayout = true) {
         $contentAsString = "";
         if ($includeLayout) {
-            $contentAsString .= file_get_contents($this->viewsFolder . '/partials/header.mustache');
+            $header = file_get_contents($this->viewsFolder . '/partials/header.mustache');
+            $contentAsString .= $this->mustache->render($header, $data);
         }
-
         $template = file_get_contents($contentFile);
-
         $contentAsString .= $this->mustache->render($template, $data);
 
         if ($includeLayout) {
-            $contentAsString .= file_get_contents($this->viewsFolder . '/partials/footer.mustache');
+            $footer = file_get_contents($this->viewsFolder . '/partials/footer.mustache');
+            $contentAsString .= $this->mustache->render($footer, $data);
         }
 
         return $contentAsString;

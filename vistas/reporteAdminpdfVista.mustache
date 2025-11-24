@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Estadísticas - Preguntados</title>
+    <style>
+        /* Estilos mejorados para PDF */
+        body {
+            font-family: 'DejaVu Sans', 'Helvetica', Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0 0 5px 0;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 18px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 25px;
+        }
+
+        h3 {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .metrics-grid {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .metric-card {
+            flex: 1;
+            min-width: 30%;
+            margin: 0 10px 15px 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-container {
+            text-align: center;
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+
+        .chart-container img {
+            max-width: 90%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .page-break {
+            page-break-before: always;
+            margin-top: 30px;
+        }
+
+        .section-break {
+            margin-top: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ecf0f1;
+            color: #95a5a6;
+            font-size: 10px;
+        }
+
+        .summary-section {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .summary-text {
+            font-size: 13px;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 11px;
+        }
+
+        .data-table th {
+            background: #34495e;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .timestamp {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .full-page-section {
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chart-description {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 15px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- PÁGINA 1: ENCABEZADO Y MÉTRICAS PRINCIPALES -->
+<div class="logo">
+    <div class="logo-text">🎮 Preguntados - Sistema de Juegos</div>
+</div>
+
+<div class="header">
+    <h1>Reporte de Estadísticas Generales</h1>
+    <div class="subtitle">Análisis completo de la plataforma</div>
+</div>
+
+<div class="timestamp">
+    Generado el: <strong>{{fechaGeneracion}}</strong>
+</div>
+
+<!-- Resumen Ejecutivo -->
+<div class="summary-section">
+    <p class="summary-text">
+        📊 <strong>Resumen Ejecutivo:</strong> Este reporte presenta un análisis completo de la plataforma Preguntados,
+        incluyendo métricas de usuarios, preguntas, partidas y distribuciones por categorías y países.
+    </p>
+</div>
+
+<!-- Métricas Principales -->
+<h2>📈 Métricas Principales de la Plataforma</h2>
+
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Total de Usuarios</div>
+        <div class="metric-value">{{totalUsuarios}}</div>
+        <div style="color: #27ae60; font-size: 11px;">▼ Jugadores registrados</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Preguntas Activas</div>
+        <div class="metric-value">{{totalPreguntas}}</div>
+        <div style="color: #e74c3c; font-size: 11px;">▼ En base de datos</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Partidas Hoy</div>
+        <div class="metric-value">{{partidasHoy}}</div>
+        <div style="color: #3498db; font-size: 11px;">▼ Actividad del día</div>
+    </div>
+</div>
+
+<!-- SALTO DE PÁGINA PARA DISTRIBUCIÓN DE CATEGORÍAS -->
+<div class="page-break"></div>
+
+<!-- PÁGINA 2: DISTRIBUCIÓN DE PREGUNTAS POR CATEGORÍA -->
+<div class="full-page-section">
+    <h2>📚 Distribución de Preguntas por Categoría</h2>
+    <div class="chart-container">
+        <div class="chart-title">Porcentaje de preguntas en cada categoría</div>
+        <img src="{{urlGraficoCategorias}}" alt="Distribución de Preguntas por Categoría">
+        <div class="chart-description">
+            Este gráfico muestra cómo se distribuyen las preguntas activas entre las diferentes categorías disponibles en la plataforma.
+            Permite identificar las categorías con mayor y menor cantidad de contenido.
+        </div>
+    </div>
+</div>
+
+<!-- SALTO DE PÁGINA PARA TOP PAÍSES -->
+<div class="page-break"></div>
+
+<!-- PÁGINA 3: TOP 10 PAÍSES -->
+<div class="full-page-section">
+    <h2>🌍 Top 10 Países con Más Usuarios</h2>
+    <div class="chart-container">
+        <div class="chart-title">Distribución geográfica de usuarios registrados</div>
+        <img src="{{urlGraficoPaises}}" alt="Top 10 Países con Más Usuarios">
+        <div class="chart-description">
+            Representación de los 10 países con mayor número de usuarios registrados en la plataforma.
+            Muestra la diversidad geográfica de nuestra base de usuarios.
+        </div>
+    </div>
+</div>
+
+<!-- SALTO DE PÁGINA PARA TENDENCIAS -->
+<div class="page-break"></div>
+
+<!-- PÁGINA 4: TENDENCIAS DE REGISTRO -->
+<div class="full-page-section">
+    <h2>📅 Tendencias de Nuevos Registros</h2>
+    <div class="chart-container">
+        <div class="chart-title">Evolución de nuevos usuarios (últimos 7 días)</div>
+        <img src="{{urlGraficoRegistros}}" alt="Tendencias de Nuevos Registros">
+        <div class="chart-description">
+            Análisis temporal del crecimiento de usuarios en los últimos 7 días.
+            Permite identificar patrones de registro y tendencias de crecimiento.
+        </div>
+    </div>
+</div>
+
+<!-- SALTO DE PÁGINA PARA INFORMACIÓN ADICIONAL -->
+<div class="page-break"></div>
+
+<!-- PÁGINA 5: INFORMACIÓN ADICIONAL -->
+<h2>ℹ️ Información del Sistema</h2>
+
+<table class="data-table">
+    <tr>
+        <th>Parámetro</th>
+        <th>Valor</th>
+        <th>Descripción</th>
+    </tr>
+    <tr>
+        <td><strong>Fecha de Generación</strong></td>
+        <td>{{fechaGeneracion}}</td>
+        <td>Momento exacto de creación del reporte</td>
+    </tr>
+    <tr>
+        <td><strong>Total Métricas</strong></td>
+        <td>6 indicadores</td>
+        <td>Principales KPI de la plataforma</td>
+    </tr>
+    <tr>
+        <td><strong>Gráficos Incluidos</strong></td>
+        <td>3 visualizaciones</td>
+        <td>Análisis visual de datos</td>
+    </tr>
+    <tr>
+        <td><strong>Período Analizado</strong></td>
+        <td>Histórico completo</td>
+        <td>Datos acumulados hasta la fecha</td>
+    </tr>
+    <tr>
+        <td><strong>Total Usuarios</strong></td>
+        <td>{{totalUsuarios}}</td>
+        <td>Usuarios registrados en el sistema</td>
+    </tr>
+    <tr>
+        <td><strong>Preguntas Activas</strong></td>
+        <td>{{totalPreguntas}}</td>
+        <td>Preguntas disponibles para juego</td>
+    </tr>
+    <tr>
+        <td><strong>Partidas del Día</strong></td>
+        <td>{{partidasHoy}}</td>
+        <td>Actividad de juego en la fecha actual</td>
+    </tr>
+</table>
+
+<!-- Footer -->
+<div class="footer">
+    <p>
+        Reporte generado automáticamente por el Sistema Preguntados<br>
+        © 2024 Preguntados - Todos los derechos reservados<br>
+        Página <span class="page-number"></span>
+    </p>
+</div>
+
+</body>
+</html>

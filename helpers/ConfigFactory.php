@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../libs/dompdf/autoload.inc.php';
-
 include_once("helpers/MyConexion.php");
 include_once("helpers/NewRouter.php");
 
