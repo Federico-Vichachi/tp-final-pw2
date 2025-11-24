@@ -26,6 +26,7 @@ class EditorModel
         $resp_correcta = $data['respuesta_correcta'];
         $resp_incorrecta1 = $data['respuesta_incorrecta1'];
         $resp_incorrecta2 = $data['respuesta_incorrecta2'];
+        $resp_incorrecta3 = $data['respuesta_incorrecta3'];
 
         $sqlPregunta = "INSERT INTO preguntas (texto, categoria_id) VALUES ('$texto', $categoria_id)";
         $this->conexion->query($sqlPregunta);
@@ -42,6 +43,9 @@ class EditorModel
 
         $sqlResp3 = "INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($preguntaId, '$resp_incorrecta2', 0)";
         $this->conexion->query($sqlResp3);
+
+        $sqlResp4 = "INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($preguntaId, '$resp_incorrecta3', 0)";
+        $this->conexion->query($sqlResp4);
 
         return true;
     }
@@ -211,8 +215,10 @@ class EditorModel
             } else {
                 if (!isset($pregunta['respuesta_incorrecta1'])) {
                     $pregunta['respuesta_incorrecta1'] = $resp['texto'];
-                } else {
+                } elseif (!isset($pregunta['respuesta_incorrecta2'])) {
                     $pregunta['respuesta_incorrecta2'] = $resp['texto'];
+                } else {
+                    $pregunta['respuesta_incorrecta3'] = $resp['texto'];
                 }
             }
         }
@@ -235,10 +241,12 @@ class EditorModel
         $resp_correcta = $data['respuesta_correcta'];
         $resp_incorrecta1 = $data['respuesta_incorrecta1'];
         $resp_incorrecta2 = $data['respuesta_incorrecta2'];
+        $resp_incorrecta3 = $data['respuesta_incorrecta3'];
 
         $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_correcta', 1)");
         $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_incorrecta1', 0)");
         $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_incorrecta2', 0)");
+        $this->conexion->query("INSERT INTO respuestas (pregunta_id, texto, es_correcta) VALUES ($id, '$resp_incorrecta3', 0)");
 
         return true;
     }

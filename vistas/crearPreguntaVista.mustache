@@ -40,26 +40,28 @@
 
                         <!-- Respuestas Incorrectas -->
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="respuesta_incorrecta1" class="form-label fw-bold text-danger">Incorrecta 1</label>
-                                    <input type="text" class="form-control border-danger" id="respuesta_incorrecta1" name="respuesta_incorrecta1" required placeholder="Ej: Londres">
-                                </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 1</label>
+                                <input type="text" class="form-control border-danger" name="respuesta_incorrecta1"
+                                       value="{{pregunta.respuesta_incorrecta1}}" required>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="respuesta_incorrecta2" class="form-label fw-bold text-danger">Incorrecta 2</label>
-                                    <input type="text" class="form-control border-danger" id="respuesta_incorrecta2" name="respuesta_incorrecta2" required placeholder="Ej: Berlín">
-                                </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 2</label>
+                                <input type="text" class="form-control border-danger" name="respuesta_incorrecta2"
+                                       value="{{pregunta.respuesta_incorrecta2}}" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 3</label>
+                                <input type="text" class="form-control border-danger" name="respuesta_incorrecta3"
+                                       value="{{pregunta.respuesta_incorrecta3}}" required>
                             </div>
                         </div>
 
-                        <!-- Botones de Acción -->
-                        <div class="d-grid gap-2 mt-4 d-md-flex justify-content-md-end">
-                            <a href="/editor/index" class="btn btn-outline-secondary me-md-2">Cancelar</a>
-                            <button type="submit" class="btn btn-success px-5">
-                                <i class="bi bi-save me-2"></i>Guardar Pregunta
-                            </button>
+
+                        <div class="d-flex justify-content-between mt-5">
+                            <a href="/editor/index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success fw-bold px-4">Crear Pregunta</button>
                         </div>
 
                     </form>

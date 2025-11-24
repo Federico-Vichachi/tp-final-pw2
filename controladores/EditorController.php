@@ -73,7 +73,8 @@ class EditorController
                 'categoria_id' => $_POST['categoria_id'] ?? 0,
                 'respuesta_correcta' => $_POST['respuesta_correcta'] ?? '',
                 'respuesta_incorrecta1' => $_POST['respuesta_incorrecta1'] ?? '',
-                'respuesta_incorrecta2' => $_POST['respuesta_incorrecta2'] ?? ''
+                'respuesta_incorrecta2' => $_POST['respuesta_incorrecta2'] ?? '',
+                'respuesta_incorrecta3' => $_POST['respuesta_incorrecta3'] ?? ''
             ];
 
             $this->model->crearPreguntaCompleta($preguntaData);
@@ -218,7 +219,8 @@ class EditorController
                 'categoria_id' => $_POST['categoria_id'] ?? 0,
                 'respuesta_correcta' => $_POST['respuesta_correcta'] ?? '',
                 'respuesta_incorrecta1' => $_POST['respuesta_incorrecta1'] ?? '',
-                'respuesta_incorrecta2' => $_POST['respuesta_incorrecta2'] ?? ''
+                'respuesta_incorrecta2' => $_POST['respuesta_incorrecta2'] ?? '',
+                'respuesta_incorrecta3' => $_POST['respuesta_incorrecta3'] ?? ''
             ];
 
             $this->model->actualizarPregunta($data);

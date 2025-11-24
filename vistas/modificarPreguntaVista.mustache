@@ -16,7 +16,7 @@
                                    value="{{pregunta.texto}}" required>
                         </div>
 
-                        <!-- Categoria -->
+                        <!-- Categoría -->
                         <div class="mb-4">
                             <label for="categoria" class="form-label fw-bold">Categoría</label>
                             <select class="form-select" id="categoria" name="categoria_id" required>
@@ -38,15 +38,20 @@
 
                         <!-- Respuestas Incorrectas -->
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 1</label>
                                 <input type="text" class="form-control border-danger" name="respuesta_incorrecta1"
                                        value="{{pregunta.respuesta_incorrecta1}}" required>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 2</label>
                                 <input type="text" class="form-control border-danger" name="respuesta_incorrecta2"
                                        value="{{pregunta.respuesta_incorrecta2}}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Incorrecta 3</label>
+                                <input type="text" class="form-control border-danger" name="respuesta_incorrecta3"
+                                       value="{{pregunta.respuesta_incorrecta3}}" required>
                             </div>
                         </div>
 
