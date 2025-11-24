@@ -241,45 +241,47 @@ class UserModel
         return $sql;
     }
 
-    public function guardarSugerenciaPregunta($datosSugerirPregunta)
+    public function guardarSugerenciaPregunta($datosSugerenciaPregunta)
     {
-        // Insertar la pregunta
-        $sql = "INSERT INTO preguntas (
-                   esta_activa, texto, categoria_id
-            ) VALUES (
-                      0,
-                      '{$datosSugerirPregunta['pregunta']}',
-                       {$this->obtenerIdCategoria($datosSugerirPregunta)}
-            )";
+        $usuario_id = $datosSugerenciaPregunta['usuario_id'];
+        $categoria_nombre = $datosSugerenciaPregunta['categoria'];
+        $texto_pregunta = $datosSugerenciaPregunta['pregunta'];
 
-        $resultado = $this->conexion->query($sql);
+        $opciones = [
+            $datosSugerenciaPregunta['opcion1'],
+            $datosSugerenciaPregunta['opcion2'],
+            $datosSugerenciaPregunta['opcion3'],
+            $datosSugerenciaPregunta['opcion4']
+        ];
 
-        if ($resultado === true) {
-            $preguntaId = $this->conexion->insert_id();
+        $indice_correcta = (int)$datosSugerenciaPregunta['respuesta_correcta'];
+        $respuesta_correcta = $opciones[$indice_correcta];
 
-            // Preparar array de respuestas
-            $respuestas = [
-                $datosSugerirPregunta['opcion1'],
-                $datosSugerirPregunta['opcion2'],
-                $datosSugerirPregunta['opcion3'],
-                $datosSugerirPregunta['opcion4']
-            ];
-
-            // Insertar cada respuesta
-            foreach ($respuestas as $index => $respuesta) {
-                $esCorrecta = ($index == $datosSugerirPregunta['respuesta_correcta']) ? 1 : 0;
-                $sqlRespuesta = "INSERT INTO respuestas (
-                                    texto, es_correcta, pregunta_id
-                                 ) VALUES (
-                                           '$respuesta',
-                                           $esCorrecta,
-                                           $preguntaId
-                                 )";
-                $this->conexion->query($sqlRespuesta);
+        $respuestas_incorrectas = [];
+        for ($i = 0; $i < count($opciones); $i++) {
+            if ($i !== $indice_correcta) {
+                $respuestas_incorrectas[] = $opciones[$i];
             }
         }
 
-        return $resultado;
+        $sql = "INSERT INTO preguntas_sugeridas (
+                usuario_id, 
+                categoria_nombre, 
+                texto_pregunta, 
+                respuesta_correcta, 
+                respuesta_incorrecta1, 
+                respuesta_incorrecta2, 
+                respuesta_incorrecta3
+            ) VALUES (
+                $usuario_id,
+                '$categoria_nombre',
+                '$texto_pregunta',
+                '$respuesta_correcta',
+                '{$respuestas_incorrectas[0]}',
+                '{$respuestas_incorrectas[1]}',
+                '{$respuestas_incorrectas[2]}'
+            )";
+        return $this->conexion->query($sql);
     }
 
     public function emailExiste($email)
@@ -289,5 +291,12 @@ class UserModel
 
         return(is_array($result) && count($result)>0);
     }
+
+    public function getCategorias()
+    {
+        $sql = "SELECT id, nombre FROM categorias ORDER BY nombre ASC";
+        return $this->conexion->query($sql);
+    }
+
 }
 

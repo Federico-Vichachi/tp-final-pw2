@@ -1,19 +1,68 @@
-<h1>Historial de Reportes Revisados</h1>
+<div class="container py-5" style="max-width: 1000px;">
 
-{{#reportes}}
-    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-        <p><strong>Pregunta Reportada:</strong> {{pregunta_texto}}</p>
-        <p><strong>Motivo del Reporte:</strong> {{motivo}}</p>
-        <p><strong>Reportado por:</strong> {{reportado_por}} el {{fecha_reporte}}</p>
-        <p><em>Este reporte ya ha sido gestionado.</em></p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <h2 class="fw-bold text-dark mb-0">
+            <i class="bi bi-archive-fill text-secondary me-2"></i>
+            Historial de Revisados
+        </h2>
+        <a href="/editor/verReportes" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Volver a Pendientes
+        </a>
     </div>
-{{/reportes}}
 
-{{^reportes}}
-    <p>No hay reportes en el historial.</p>
-{{/reportes}}
+    <div class="row">
+        <div class="col-12">
+            {{#reportes}}
+                <div class="card shadow-sm border-0 mb-3 border-start border-4 border-success">
+                    <div class="card-body py-3">
+                        <div class="row align-items-center">
 
-<br>
-<a href="/editor/verReportes">Volver a Reportes Pendientes</a>
-<br>
-<a href="/editor/index">Volver al Panel Principal</a>
+
+                            <!-- Información Principal -->
+                            <div class="col ps-3">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h5 class="card-title mb-0 fw-bold text-dark">
+                                        {{pregunta_texto}}
+                                    </h5>
+                                    <span class="badge bg-light text-muted border">ID: {{pregunta_id}}</span>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <p class="mb-0 small text-muted">
+                                            <i class="bi bi-person-circle me-1"></i> Reportado por:
+                                            <span class="fw-bold text-dark">{{reportado_por}}</span>
+                                        </p>
+                                        <p class="mb-0 small text-muted">
+                                            <i class="bi bi-calendar-check me-1"></i> Fecha: {{fecha_reporte}}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mt-2 mt-md-0">
+                                        <div class="bg-light rounded p-2 border border-light">
+                                            <p class="mb-0 small text-secondary fst-italic">
+                                                <i class="bi bi-chat-quote-fill me-1"></i>
+                                                "{{motivo}}"
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            {{/reportes}}
+        </div>
+
+        {{^reportes}}
+            <div class="col-12 text-center py-5">
+                <div class="text-muted opacity-25 mb-3">
+                    <i class="bi bi-clock-history" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-muted">El historial está vacío</h3>
+                <p class="text-muted">Aún no has marcado ningún reporte como revisado.</p>
+                <a href="/editor/verReportes" class="btn btn-primary mt-3">Ir a Revisar Reportes</a>
+            </div>
+        {{/reportes}}
+    </div>
+</div>

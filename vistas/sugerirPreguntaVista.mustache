@@ -1,502 +1,117 @@
-<div class="container py-4" style="max-width: 800px;">
-    <!-- Card Principal de Sugerencia -->
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white text-center py-4">
-            <h2 class="mb-0 fw-bold">
-                <i class="bi bi-lightbulb me-2"></i>
-                Sugerir Nueva Pregunta
-            </h2>
-            <p class="lead mb-0 mt-2 opacity-75">Ayúdanos a mejorar el juego con tus preguntas</p>
-        </div>
 
-        <div class="card-body p-4">
-            <!-- Alertas -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <!-- Título -->
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-primary">Sugerir Nueva Pregunta</h2>
+                <p class="text-muted">Ayúdanos a mejorar el juego sugiriendo nuevas preguntas</p>
+            </div>
+
+            <!-- Mensajes -->
             {{#error}}
-                <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                        <div>
-                            <strong class="fw-bold">Error:</strong> {{error}}
-                        </div>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Error:</strong> {{error}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {{/error}}
 
             <!-- Formulario -->
-            <form method="POST" action="/user/sugerirNuevaPregunta" id="suggestionForm">
-                <!-- Categoría -->
-                <div class="mb-4">
-                    <label for="categoria" class="form-label fw-bold text-dark mb-3">
-                        <i class="bi bi-tag-fill me-2 text-primary"></i>
-                        Categoría
-                    </label>
-                    <select class="form-select form-select-lg" id="categoria" name="categoria" required>
-                        <option value="">Selecciona una categoría</option>
-                        <option value="Historia">Historia</option>
-                        <option value="Deporte">Deporte</option>
-                        <option value="Ciencia">Ciencia</option>
-                        <option value="Geografía">Geografía</option>
-                    </select>
-                    <div class="form-text">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Selecciona la categoría que mejor se adapte a tu pregunta
-                    </div>
-                </div>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="/user/sugerirNuevaPregunta">
 
-                <!-- Pregunta -->
-                <div class="mb-4">
-                    <label for="pregunta" class="form-label fw-bold text-dark mb-3">
-                        <i class="bi bi-question-circle-fill me-2 text-primary"></i>
-                        Pregunta
-                    </label>
-                    <textarea
-                            class="form-control"
-                            id="pregunta"
-                            name="pregunta"
-                            rows="3"
-                            placeholder="Escribe tu pregunta aquí..."
-                            required
-                            style="min-height: 100px; resize: vertical;"
-                    >{{#datos}}{{pregunta}}{{/datos}}</textarea>
-                    <div class="form-text text-end">
-                        <span id="preguntaCounter">0</span>/500 caracteres
-                    </div>
-                </div>
-
-                <!-- Opciones de Respuesta -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark mb-3">
-                        <i class="bi bi-list-check me-2 text-primary"></i>
-                        Opciones de Respuesta
-                    </label>
-
-                    <div class="alert alert-info border-0 shadow-sm mb-3">
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <div>
-                                <strong>Instrucciones:</strong> Marca el círculo de la opción correcta
-                            </div>
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label fw-bold">Categoría</label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="" selected disabled>Selecciona una categoría</option>
+                                {{#categorias}}
+                                    <option value="{{nombre}}">{{nombre}}</option>
+                                {{/categorias}}
+                            </select>
                         </div>
-                    </div>
 
-                    <!-- Opción 1 -->
-                    <div class="card option-card mb-3 border-0 shadow-sm">
-                        <div class="card-body p-3">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input correct-answer"
-                                               type="radio"
-                                               name="respuesta_correcta"
-                                               value="0"
-                                               required
-                                               id="opcion1_radio">
-                                        <label class="form-check-label" for="opcion1_radio"></label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <input type="text"
-                                           class="form-control border-0 option-input"
-                                           name="opcion1"
-                                           placeholder="Escribe la primera opción..."
-                                           value="{{#datos}}{{opcion1}}{{/datos}}"
-                                           required>
-                                </div>
-                            </div>
+                        <!-- Pregunta -->
+                        <div class="mb-3">
+                            <label for="pregunta" class="form-label fw-bold">
+                                <i class="bi bi-question-circle-fill text-primary me-1"></i>
+                                Pregunta
+                            </label>
+                            <textarea
+                                    class="form-control"
+                                    id="pregunta"
+                                    name="pregunta"
+                                    rows="3"
+                                    placeholder="Escribe tu pregunta aquí..."
+                                    required
+                            >{{#datos}}{{pregunta}}{{/datos}}</textarea>
                         </div>
-                    </div>
 
-                    <!-- Opción 2 -->
-                    <div class="card option-card mb-3 border-0 shadow-sm">
-                        <div class="card-body p-3">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input correct-answer"
-                                               type="radio"
-                                               name="respuesta_correcta"
-                                               value="1"
-                                               required
-                                               id="opcion2_radio">
-                                        <label class="form-check-label" for="opcion2_radio"></label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <input type="text"
-                                           class="form-control border-0 option-input"
-                                           name="opcion2"
-                                           placeholder="Escribe la segunda opción..."
-                                           value="{{#datos}}{{opcion2}}{{/datos}}"
-                                           required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <!-- Opciones de Respuesta -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-list-check text-primary me-1"></i>
+                                Opciones de Respuesta
+                            </label>
 
-                    <!-- Opción 3 -->
-                    <div class="card option-card mb-3 border-0 shadow-sm">
-                        <div class="card-body p-3">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input correct-answer"
-                                               type="radio"
-                                               name="respuesta_correcta"
-                                               value="2"
-                                               required
-                                               id="opcion3_radio">
-                                        <label class="form-check-label" for="opcion3_radio"></label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <input type="text"
-                                           class="form-control border-0 option-input"
-                                           name="opcion3"
-                                           placeholder="Escribe la tercera opción..."
-                                           value="{{#datos}}{{opcion3}}{{/datos}}"
-                                           required>
-                                </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="0" required aria-label="Opción 1 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion1" placeholder="Opción 1" value="{{#datos}}{{opcion1}}{{/datos}}" required>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Opción 4 -->
-                    <div class="card option-card mb-3 border-0 shadow-sm">
-                        <div class="card-body p-3">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input correct-answer"
-                                               type="radio"
-                                               name="respuesta_correcta"
-                                               value="3"
-                                               required
-                                               id="opcion4_radio">
-                                        <label class="form-check-label" for="opcion4_radio"></label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <input type="text"
-                                           class="form-control border-0 option-input"
-                                           name="opcion4"
-                                           placeholder="Escribe la cuarta opción..."
-                                           value="{{#datos}}{{opcion4}}{{/datos}}"
-                                           required>
-                                </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="1" required aria-label="Opción 2 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion2" placeholder="Opción 2" value="{{#datos}}{{opcion2}}{{/datos}}" required>
                             </div>
+
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="2" required aria-label="Opción 3 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion3" placeholder="Opción 3" value="{{#datos}}{{opcion3}}{{/datos}}" required>
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">
+                                    <input type="radio" name="respuesta_correcta" value="3" required aria-label="Opción 4 correcta">
+                                </span>
+                                <input type="text" class="form-control" name="opcion4" placeholder="Opción 4" value="{{#datos}}{{opcion4}}{{/datos}}" required>
+                            </div>
+
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Marca el círculo de la opción que sea la respuesta correcta
+                            </small>
                         </div>
-                    </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send-fill me-2"></i>
+                                Enviar Sugerencia
+                            </button>
+                            <a href="/user/lobby" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Volver al Lobby
+                            </a>
+                        </div>
+                    </form>
                 </div>
+            </div>
 
-                <!-- Botones de Acción -->
-                <div class="d-grid gap-3 mb-3">
-                    <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold shadow-sm">
-                        <i class="bi bi-send-fill me-2"></i>
-                        Enviar Sugerencia
-                    </button>
-                    <a href="/user/lobby" class="btn btn-outline-secondary btn-lg py-2">
-                        <i class="bi bi-arrow-left me-2"></i>
-                        Volver al Lobby
-                    </a>
-                </div>
-            </form>
-
-            <!-- Nota Informativa -->
-            <div class="alert alert-info border-0 shadow-sm mt-4" role="alert">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-lightbulb-fill me-2 fs-5"></i>
-                    <div>
-                        <strong class="fw-bold">Nota:</strong> Tu sugerencia será revisada por nuestros editores antes de ser incluida en el juego.
-                        Recibirás puntos de experiencia si tu pregunta es aceptada.
-                    </div>
-                </div>
+            <!-- Nota informativa -->
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="bi bi-lightbulb-fill me-2"></i>
+                <strong>Nota:</strong> Tu sugerencia será revisada por los editores antes de ser incluida en el juego.
             </div>
         </div>
     </div>
 </div>
 
-<!-- Estilos CSS adicionales para mantener consistencia -->
-<style>
-    .card {
-        border-radius: 12px;
-    }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        border: none;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,123,255,0.4) !important;
-    }
-
-    .btn-outline-secondary {
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-secondary:hover {
-        transform: translateY(-1px);
-    }
-
-    .form-control, .form-select {
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        transform: translateY(-1px);
-    }
-
-    .alert {
-        border-radius: 10px;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Estilos para las opciones de respuesta */
-    .option-card {
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-
-    .option-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    }
-
-    .option-card.selected {
-        border-color: #007bff;
-        background-color: rgba(0,123,255,0.05);
-    }
-
-    .correct-answer {
-        width: 1.2em;
-        height: 1.2em;
-        cursor: pointer;
-    }
-
-    .correct-answer:checked {
-        background-color: #198754;
-        border-color: #198754;
-    }
-
-    .option-input {
-        background: transparent;
-        font-weight: 500;
-    }
-
-    .option-input:focus {
-        background: white;
-        box-shadow: none !important;
-        transform: none;
-    }
-
-    /* Contador de caracteres */
-    #preguntaCounter {
-        font-weight: 600;
-    }
-
-    #preguntaCounter.warning {
-        color: #ffc107;
-    }
-
-    #preguntaCounter.danger {
-        color: #dc3545;
-    }
-
-    @media (max-width: 768px) {
-        .container {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        .card-body {
-            padding: 2rem 1.5rem !important;
-        }
-
-        .option-card .card-body {
-            padding: 1rem !important;
-        }
-    }
-
-    /* Efectos de validación */
-    .is-valid {
-        border-color: #198754 !important;
-    }
-
-    .is-invalid {
-        border-color: #dc3545 !important;
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const suggestionForm = document.getElementById('suggestionForm');
-        const preguntaTextarea = document.getElementById('pregunta');
-        const preguntaCounter = document.getElementById('preguntaCounter');
-        const optionCards = document.querySelectorAll('.option-card');
-        const correctAnswerRadios = document.querySelectorAll('.correct-answer');
-        const submitButton = suggestionForm.querySelector('button[type="submit"]');
-
-        // Contador de caracteres para la pregunta
-        function updateCounter() {
-            const length = preguntaTextarea.value.length;
-            preguntaCounter.textContent = length;
-
-            if (length > 450) {
-                preguntaCounter.classList.add('danger');
-                preguntaCounter.classList.remove('warning');
-            } else if (length > 400) {
-                preguntaCounter.classList.add('warning');
-                preguntaCounter.classList.remove('danger');
-            } else {
-                preguntaCounter.classList.remove('warning', 'danger');
-            }
-        }
-
-        preguntaTextarea.addEventListener('input', updateCounter);
-        updateCounter(); // Inicializar contador
-
-        // Efectos para las opciones de respuesta
-        correctAnswerRadios.forEach((radio, index) => {
-            radio.addEventListener('change', function() {
-                // Remover selección de todas las cards
-                optionCards.forEach(card => {
-                    card.classList.remove('selected');
-                });
-
-                // Agregar selección a la card actual
-                if (this.checked) {
-                    optionCards[index].classList.add('selected');
-                }
-            });
-        });
-
-        // Efecto hover para las cards de opciones
-        optionCards.forEach((card, index) => {
-            card.addEventListener('click', function(e) {
-                // Si el click no fue directamente en el radio button
-                if (e.target.type !== 'radio') {
-                    const radio = this.querySelector('.correct-answer');
-                    radio.checked = true;
-                    radio.dispatchEvent(new Event('change'));
-                }
-            });
-        });
-
-        // Validación del formulario
-        suggestionForm.addEventListener('submit', function(e) {
-            let isValid = true;
-            const errorMessages = [];
-
-            // Validar que se haya seleccionado una respuesta correcta
-            const selectedAnswer = document.querySelector('input[name="respuesta_correcta"]:checked');
-            if (!selectedAnswer) {
-                isValid = false;
-                errorMessages.push('Debes seleccionar la respuesta correcta');
-            }
-
-            // Validar que las opciones no estén vacías
-            const options = document.querySelectorAll('.option-input');
-            options.forEach((input, index) => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    errorMessages.push(`La opción ${index + 1} no puede estar vacía`);
-                }
-            });
-
-            // Validar que no haya opciones duplicadas
-            const optionValues = Array.from(options).map(input => input.value.trim().toLowerCase());
-            const uniqueOptions = new Set(optionValues);
-            if (uniqueOptions.size !== optionValues.length) {
-                isValid = false;
-                errorMessages.push('No puede haber opciones duplicadas');
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-                const errorMessage = errorMessages.join('\n');
-                alert(`Por favor corrige los siguientes errores:\n\n${errorMessage}`);
-                return;
-            }
-
-            // Efecto de carga
-            submitButton.disabled = true;
-            submitButton.innerHTML = `
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Enviando sugerencia...
-            `;
-        });
-
-        // Efectos de interacción para los campos
-        const formElements = suggestionForm.querySelectorAll('input, select, textarea');
-        formElements.forEach(element => {
-            element.addEventListener('focus', function() {
-                this.style.transform = 'translateY(-1px)';
-            });
-
-            element.addEventListener('blur', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Auto-guardado en localStorage (opcional)
-        const formDataKey = 'suggestionFormData';
-
-        function saveFormData() {
-            const formData = new FormData(suggestionForm);
-            const data = {};
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-            localStorage.setItem(formDataKey, JSON.stringify(data));
-        }
-
-        function loadFormData() {
-            const savedData = localStorage.getItem(formDataKey);
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                Object.keys(data).forEach(key => {
-                    const element = suggestionForm.querySelector(`[name="${key}"]`);
-                    if (element) {
-                        element.value = data[key];
-                        if (element.type === 'radio' && element.value === data[key]) {
-                            element.checked = true;
-                            element.dispatchEvent(new Event('change'));
-                        }
-                    }
-                });
-                updateCounter();
-            }
-        }
-
-        // Guardar datos cada 2 segundos
-        let saveTimeout;
-        suggestionForm.addEventListener('input', function() {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveFormData, 2000);
-        });
-
-        // Cargar datos guardados al iniciar
-        loadFormData();
-
-        // Limpiar datos guardados al enviar el formulario
-        suggestionForm.addEventListener('submit', function() {
-            localStorage.removeItem(formDataKey);
-        });
-    });
-</script>

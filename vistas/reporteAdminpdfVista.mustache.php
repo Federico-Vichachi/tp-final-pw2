@@ -94,58 +94,58 @@
                             </thead>
                             <tbody>
                             {{#preguntas}}
-                                <tr>
-                                    <td class="text-center fw-bold">{{id}}</td>
-                                    <td>{{texto}}</td>
-                                    <td class="text-center">
+                            <tr>
+                                <td class="text-center fw-bold">{{id}}</td>
+                                <td>{{texto}}</td>
+                                <td class="text-center">
                                         <span class="badge text-white shadow-sm" style="background-color: {{categoria_color}};">
                                             {{categoria}}
                                         </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <button onclick="toggleAnswers({{id}})"
-                                                class="btn btn-sm btn-primary me-1 mb-1">
-                                            <i class="bi bi-eye-fill me-1"></i>Ver Respuestas
-                                        </button>
-                                        <a href="/editor/eliminarPregunta?id={{id}}"
-                                        onclick="return confirm('¿Estás seguro de que quieres eliminar esta pregunta?');"
-                                        class="btn btn-sm btn-danger mb-1">
+                                </td>
+                                <td class="text-center">
+                                    <button onclick="toggleAnswers({{id}})"
+                                            class="btn btn-sm btn-primary me-1 mb-1">
+                                        <i class="bi bi-eye-fill me-1"></i>Ver Respuestas
+                                    </button>
+                                    <a href="/editor/eliminarPregunta?id={{id}}"
+                                       onclick="return confirm('¿Estás seguro de que quieres eliminar esta pregunta?');"
+                                       class="btn btn-sm btn-danger mb-1">
                                         <i class="bi bi-trash-fill me-1"></i>Eliminar
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr id="answers-{{id}}" style="display:none;">
-                                    <td colspan="4" class="p-0">
-                                        <div class="alert alert-info mb-0 rounded-0" style="border-left: 4px solid #0dcaf0;">
-                                            <div class="p-3">
-                                                <h6 class="fw-bold mb-3">
-                                                    <i class="bi bi-check2-circle me-2"></i>Respuestas:
-                                                </h6>
-                                                <ul class="list-group list-group-flush">
-                                                    {{#respuestas}}
-                                                        <li class="list-group-item {{#es_correcta}}list-group-item-success{{/es_correcta}}{{^es_correcta}}list-group-item-danger{{/es_correcta}} d-flex align-items-center">
-                                                            {{#es_correcta}}
-                                                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                                            {{/es_correcta}}
-                                                            {{^es_correcta}}
-                                                                <i class="bi bi-x-circle-fill text-danger me-2"></i>
-                                                            {{/es_correcta}}
-                                                            {{texto}}
-                                                        </li>
-                                                    {{/respuestas}}
-                                                </ul>
-                                            </div>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr id="answers-{{id}}" style="display:none;">
+                                <td colspan="4" class="p-0">
+                                    <div class="alert alert-info mb-0 rounded-0" style="border-left: 4px solid #0dcaf0;">
+                                        <div class="p-3">
+                                            <h6 class="fw-bold mb-3">
+                                                <i class="bi bi-check2-circle me-2"></i>Respuestas:
+                                            </h6>
+                                            <ul class="list-group list-group-flush">
+                                                {{#respuestas}}
+                                                <li class="list-group-item {{#es_correcta}}list-group-item-success{{/es_correcta}}{{^es_correcta}}list-group-item-danger{{/es_correcta}} d-flex align-items-center">
+                                                    {{#es_correcta}}
+                                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                                    {{/es_correcta}}
+                                                    {{^es_correcta}}
+                                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                                    {{/es_correcta}}
+                                                    {{texto}}
+                                                </li>
+                                                {{/respuestas}}
+                                            </ul>
                                         </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </td>
+                            </tr>
                             {{/preguntas}}
                             {{^preguntas}}
-                                <tr>
-                                    <td colspan="4" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox" style="font-size: 3rem;"></i>
-                                        <p class="mt-3 mb-0">No hay preguntas para mostrar.</p>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                    <p class="mt-3 mb-0">No hay preguntas para mostrar.</p>
+                                </td>
+                            </tr>
                             {{/preguntas}}
                             </tbody>
                         </table>

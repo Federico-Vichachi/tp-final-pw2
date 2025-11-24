@@ -152,6 +152,20 @@ CREATE TABLE reportes (
                           FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
+CREATE TABLE preguntas_sugeridas (
+                                     id INT AUTO_INCREMENT PRIMARY KEY,
+                                     usuario_id INT NOT NULL,
+                                     categoria_nombre VARCHAR(100) NOT NULL,
+                                     texto_pregunta VARCHAR(255) NOT NULL,
+                                     respuesta_correcta VARCHAR(255) NOT NULL,
+                                     respuesta_incorrecta1 VARCHAR(255) NOT NULL,
+                                     respuesta_incorrecta2 VARCHAR(255) NOT NULL,
+                                     respuesta_incorrecta3 VARCHAR(255),
+                                     estado ENUM('pendiente', 'aprobada', 'rechazada') DEFAULT 'pendiente',
+                                     fecha_sugerencia TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
 -- INSERT PREGUNTAS --
 INSERT INTO preguntas (texto, categoria_id) VALUES
 -- HISTORIA (id_categoria = 1)
