@@ -5,7 +5,6 @@ class GameController
     private $renderer;
     private $model;
 
-
     public function __construct($GameModel,$renderer)
     {
         $this->model = $GameModel;
@@ -22,21 +21,38 @@ class GameController
         $this->verificarRolJugador();
         $this->redirectNotAuthenticated();
 
-        if (isset($_GET['categoria'])) {
-            $_SESSION['categoria_seleccionada'] = $_GET['categoria'];
-            unset($_SESSION["pregunta_actual"]);
+        // Si no hay partida iniciada, iniciar una nueva
+        if (!$this->partidaEstaIniciada()) {
+            $this->iniciarNuevaPartida();
+            return;
+        }
+
+        // Si no hay pregunta actual, redirigir a ruleta para preparar una
+        if (!isset($_SESSION['pregunta_actual']) || empty($_SESSION['pregunta_actual'])) {
+            $this->redirectTo('ruleta');
+            return;
+        }
+
+        // Iniciar el tiempo SOLO cuando se muestra la pregunta por primera vez
+        if (!isset($_SESSION["tiempo_inicio_pregunta"])) {
+            $_SESSION["tiempo_inicio_pregunta"] = time();
+            $_SESSION["tiempo_limite"] = 10; // 10 segundos por pregunta
+        }
+
+        // Verificar si el tiempo expiró antes de procesar POST
+        if ($this->tiempoExpirado()) {
+            $this->procesarTiempoExpirado();
+            return;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->procesarPartida();
+            return;
         }
-        if (!$this->partidaEstaIniciada()) {
-            $this->iniciarNuevaPartida();
-        }
+
         $partida = $this->obtenerPreguntaActual();
         $this->mostrarVistaPartida($partida);
     }
-
 
     public function reportarPregunta()
     {
@@ -49,24 +65,6 @@ class GameController
 
             if ($preguntaId && !empty($motivo)) {
                 $this->model->guardarReporte($preguntaId, $usuarioId, $motivo);
-            }
-        }
-
-        $this->redirectToLobby();
-    }
-
-    public function reportarPreguntas()
-    {
-        $this->redirectNotAuthenticated();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['motivos'])) {
-            $usuarioId = $_SESSION['usuario']['id'];
-            $reportes = $_POST['motivos'];
-
-            foreach ($reportes as $preguntaId => $motivo) {
-                if (!empty(trim($motivo))) {
-                    $this->model->guardarReporte($preguntaId, $usuarioId, $motivo);
-                }
             }
         }
 
@@ -111,14 +109,14 @@ class GameController
         }
 
         $this->limpiarPartidaActual();
+        unset($_SESSION['categoria_seleccionada']);
+        unset($_SESSION['categoria_imagen']);
+        unset($_SESSION['categoria_color']);
         $this->renderer->render("resumenPartida", $data);
     }
 
     public function jugador()
     {
-
-        $this->redirectNotAuthenticated();
-
         if (!isset($_GET["id"])) {
             $this->redirectTo('ranking');
         }
@@ -161,6 +159,148 @@ class GameController
         }
 
         $this->renderer->render("ranking", $data);
+    }
+
+    public function ruleta()
+    {
+        $this->redirectNotAuthenticated();
+
+        // Si ya hay pregunta preparada y no respondida, redirigir directamente a jugar
+        if (isset($_SESSION['pregunta_actual']) && !empty($_SESSION['pregunta_actual']) &&
+            !isset($_SESSION['pregunta_respondida'])) {
+            $this->redirectTo('jugarPartida');
+            return;
+        }
+
+        // Si no hay pregunta actual, generar una nueva
+        if (!isset($_SESSION['pregunta_actual']) || empty($_SESSION['pregunta_actual'])) {
+            $this->generarNuevaPregunta();
+        }
+
+        $categorias = $this->model->getCategorias();
+        $rondaActual = ($_SESSION["puntaje"] ?? 0) + 1;
+
+        $data = [
+            "categorias" => $categorias,
+            'mensaje' => $_SESSION['mensaje'] ?? '',
+            'categoria_seleccionada' => $_SESSION['categoria_seleccionada'] ?? '',
+            'categoria_imagen' => $_SESSION['categoria_imagen'] ?? '',
+            'categoria_color' => $_SESSION['categoria_color'] ?? '',
+            'ronda_actual' => $rondaActual
+        ];
+
+        unset($_SESSION['mensaje']);
+
+        if (isset($_SESSION['usuario'])) {
+            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+        }
+
+        $this->renderer->render("ruleta", $data);
+    }
+
+    private function procesarPartida()
+    {
+        // Verificar si ya fue respondida o tiempo expirado
+        if ($this->preguntaYaFueRespondida() || $this->tiempoExpirado()) {
+            $this->redirectTo("ruleta");
+            return;
+        }
+
+        $idRespuesta = $_POST["idRespuesta"] ?? null;
+        $tiempoRespuesta = $this->calcularTiempoRespuesta();
+
+        $respuestaCorrecta = $this->model->verificarRespuesta($idRespuesta);
+        $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
+
+        $this->registrarRespuestaEnHistorial(!$respuestaCorrecta, $tiempoRespuesta, $nivelPregunta);
+
+        if ($respuestaCorrecta) {
+            $this->procesarRespuestaCorrecta();
+        } else {
+            $this->procesarRespuestaIncorrecta();
+        }
+    }
+
+    private function procesarRespuestaCorrecta()
+    {
+        $_SESSION["puntaje"]++;
+        $_SESSION["pregunta_respondida"] = true;
+        $_SESSION['mensaje'] = '¡Respuesta correcta!';
+
+        // Limpiar para nueva pregunta
+        unset($_SESSION['pregunta_actual']);
+        unset($_SESSION['categoria_seleccionada']);
+        unset($_SESSION['categoria_imagen']);
+        unset($_SESSION['categoria_color']);
+        unset($_SESSION["tiempo_inicio_pregunta"]);
+
+        $this->redirectTo("ruleta");
+    }
+
+    private function procesarRespuestaIncorrecta()
+    {
+        $_SESSION['mensaje'] = 'Respuesta incorrecta - Fin de la partida';
+        $this->redirectTo("resumenPartida");
+    }
+
+    private function tiempoExpirado()
+    {
+        if (!isset($_SESSION["tiempo_inicio_pregunta"]) || !isset($_SESSION["tiempo_limite"])) {
+            return false;
+        }
+
+        $tiempoTranscurrido = time() - $_SESSION["tiempo_inicio_pregunta"];
+        return $tiempoTranscurrido > $_SESSION["tiempo_limite"];
+    }
+
+    private function procesarTiempoExpirado()
+    {
+        if (isset($_SESSION["pregunta_actual"])) {
+            $tiempoRespuesta = $this->calcularTiempoRespuesta();
+            $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
+            $this->registrarRespuestaEnHistorial(true, $tiempoRespuesta, $nivelPregunta);
+        }
+
+        $_SESSION["pregunta_respondida"] = true;
+        $_SESSION['mensaje'] = '¡Tiempo agotado! - Fin de la partida';
+        $this->redirectTo("resumenPartida");
+    }
+
+    private function generarNuevaPregunta()
+    {
+        $preguntasVistas = $_SESSION["preguntas_vistas"] ?? [];
+        $usuarioId = isset($_SESSION["usuario"]) ? $_SESSION["usuario"]["id"] : null;
+
+        // Seleccionar categoría aleatoria antes de obtener la pregunta
+        $categorias = $this->model->getCategorias();
+        if (!empty($categorias)) {
+            $categoriaAleatoria = $categorias[array_rand($categorias)];
+
+            // Guardar toda la información de la categoría
+            $_SESSION['categoria_seleccionada'] = $categoriaAleatoria['nombre'];
+            $_SESSION['categoria_imagen'] = $categoriaAleatoria['imagen'] ?? '';
+            $_SESSION['categoria_color'] = $categoriaAleatoria['color'] ?? '';
+        }
+
+        $categoria = $_SESSION['categoria_seleccionada'] ?? null;
+
+        // Obtener pregunta de esa categoría específica
+        $nuevaPartida = $this->model->getPreguntaAleatoria($preguntasVistas, $usuarioId, $categoria);
+
+        if (empty($nuevaPartida)) {
+            $this->finalizarPartida();
+            return;
+        }
+
+        $this->guardarPreguntaEnSesion($nuevaPartida);
+    }
+
+    private function guardarPreguntaEnSesion($partida)
+    {
+        $_SESSION["pregunta_actual"] = $partida;
+        $_SESSION["preguntas_vistas"][] = $partida["pregunta"]["pregunta_id"];
+        $_SESSION["pregunta_respondida"] = false;
+        $_SESSION["historial_partida"][] = $partida["pregunta"];
     }
 
     private function calcularResultadoPartida()
@@ -261,7 +401,8 @@ class GameController
             "tiempo_inicio_pregunta",
             "partida_id",
             "partida_codigo" ,
-            "historial_partida"
+            "historial_partida",
+            "tiempo_limite"
         ];
 
         foreach ($variablesPartida as $variable) {
@@ -287,7 +428,9 @@ class GameController
             "puntaje" => $_SESSION["puntaje"] ?? 0,
             "nivel_usuario" => $_SESSION["nivel_usuario"] ?? 1,
             "tiempo_limite" => $this->validarTiempoRestante(),
-            "codigo_partida" => $_SESSION["partida_codigo"] ?? 'N/A'
+            "codigo_partida" => $_SESSION["partida_codigo"] ?? 'N/A',
+            "categoria_color" => $_SESSION['categoria_color'] ?? '',
+            "categoria_imagen" => $_SESSION['categoria_imagen'] ?? ''
         ];
 
         if (isset($_SESSION['usuario'])) {
@@ -303,6 +446,7 @@ class GameController
             return $_SESSION["pregunta_actual"];
         }
 
+        // Si no hay pregunta actual, generar una nueva
         $this->generarNuevaPregunta();
 
         if (!isset($_SESSION["pregunta_actual"])) {
@@ -312,33 +456,10 @@ class GameController
         return $_SESSION["pregunta_actual"];
     }
 
-    private function generarNuevaPregunta()
-    {
-        $preguntasVistas = $_SESSION["preguntas_vistas"] ?? [];
-        $usuarioId = isset($_SESSION["usuario"]) ? $_SESSION["usuario"]["id"] : null;
-        $categoria = $_SESSION['categoria_seleccionada'] ?? null;  // Pasar categoría si existe
-
-        $nuevaPartida = $this->model->getPreguntaAleatoria($preguntasVistas, $usuarioId, $categoria);
-
-        if (empty($nuevaPartida)) {
-            $this->finalizarPartida();
-        }
-        $this->guardarPreguntaEnSesion($nuevaPartida);
-    }
-
     private function finalizarPartida()
     {
         unset($_SESSION["partida_iniciada"]);
         $this->redirectTo('resumenPartida');
-    }
-
-    private function guardarPreguntaEnSesion($partida)
-    {
-        $_SESSION["pregunta_actual"] = $partida;
-        $_SESSION["preguntas_vistas"][] = $partida["pregunta"]["pregunta_id"];
-        $_SESSION["pregunta_respondida"] = false;
-        $_SESSION["tiempo_inicio_pregunta"] = time();
-        $_SESSION["historial_partida"][] = $partida["pregunta"];
     }
 
     private function iniciarNuevaPartida()
@@ -358,33 +479,14 @@ class GameController
         $_SESSION["historial_partida"] = [];
         $_SESSION["partida_iniciada"] = true;
         $_SESSION["partida_desafio"] = false;
+
+        // Limpiar pregunta y categoría
         unset($_SESSION["pregunta_actual"]);
-        $this->redirectTo("ruleta");
-    }
+        unset($_SESSION['categoria_seleccionada']);
+        unset($_SESSION['categoria_imagen']);
+        unset($_SESSION['categoria_color']);
+        unset($_SESSION["tiempo_inicio_pregunta"]);
 
-    private function procesarPartida()
-    {
-        $idRespuesta = $_POST["idRespuesta"] ?? null;
-
-        if ($this->preguntaYaFueRespondida()) {
-            $this->redirectTo("ruleta");
-            return;
-        }
-
-        if ($this->tiempoExpirado()) {
-            $this->procesarTiempoExpirado();
-        }
-
-        $tiempoRespuesta = $this->calcularTiempoRespuesta();
-        $respuestaCorrecta = $this->model->verificarRespuesta($idRespuesta);
-        $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
-        $this->registrarRespuestaEnHistorial(!$respuestaCorrecta, $tiempoRespuesta, $nivelPregunta);
-
-        if ($respuestaCorrecta) {
-            $this->procesarRespuestaCorrecta();
-        } else {
-            $this->procesarRespuestaIncorrecta();
-        }
         $this->redirectTo("ruleta");
     }
 
@@ -404,25 +506,6 @@ class GameController
         }
     }
 
-    private function tiempoExpirado()
-    {
-        if (!isset($_SESSION["tiempo_inicio_pregunta"])) {
-            return true;
-        }
-
-        $tiempoTranscurrido = time() - $_SESSION["tiempo_inicio_pregunta"];
-        return $tiempoTranscurrido > 10;
-    }
-
-    private function procesarTiempoExpirado()
-    {
-        $tiempoRespuesta = $this->calcularTiempoRespuesta();
-        $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
-        $this->registrarRespuestaEnHistorial(true, $tiempoRespuesta, $nivelPregunta);
-        $_SESSION["pregunta_respondida"] = true;
-        $this->redirectTo("resumenPartida");
-    }
-
     private function preguntaYaFueRespondida()
     {
         if(isset($_SESSION["pregunta_respondida"]) && $_SESSION["pregunta_respondida"] === true) {
@@ -430,20 +513,6 @@ class GameController
             return true;
         }
         return false;
-    }
-
-    private function procesarRespuestaCorrecta()
-    {
-        $_SESSION["puntaje"]++;
-        $_SESSION["pregunta_respondida"] = true;
-        $_SESSION['mensaje'] = 'Respuesta correcta';
-        $this->generarNuevaPregunta();
-        $this->redirectTo("ruleta");
-    }
-
-    private function procesarRespuestaIncorrecta()
-    {
-        $this->redirectTo("resumenPartida");
     }
 
     private function partidaEsValida($partida)
@@ -486,7 +555,7 @@ class GameController
 
     private function validarTiempoRestante()
     {
-        $tiempoLimite = 10;
+        $tiempoLimite = $_SESSION["tiempo_limite"] ?? 10;
 
         if (!isset($_SESSION["tiempo_inicio_pregunta"])) {
             $_SESSION["tiempo_inicio_pregunta"] = time();
@@ -500,21 +569,5 @@ class GameController
             exit();
         }
         return $tiempoRestante;
-    }
-
-    public function ruleta()
-    {
-        $this->redirectNotAuthenticated();
-        $categorias = $this->model->getCategorias();
-
-        $data = ["categorias" => $categorias];
-        $data['mensaje'] = $_SESSION['mensaje'] ?? '';
-        unset($_SESSION['mensaje']);
-
-        if (isset($_SESSION['usuario'])){
-            $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
-        }
-
-        $this->renderer->render("ruleta", $data);
     }
 }

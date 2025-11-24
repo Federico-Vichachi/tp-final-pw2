@@ -4,77 +4,88 @@ const ctx = canvas.getContext("2d");
 const numSegments = categorias.length;
 const segmentAngle = 2 * Math.PI / numSegments;
 const radius = canvas.width / 2;
-const btnGirar = document.getElementById("btnGirar");
 
-let rotation = 0;  // Ángulo de rotación inicial
+let rotation = 0;
 
 // Función para dibujar la ruleta
 function drawRuleta() {
-    // Dibujar cada segmento de la ruleta
+    // Fondo blanco para mejor contraste
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     for (let i = 0; i < numSegments; i++) {
         const angleStart = i * segmentAngle + rotation;
         const angleEnd = (i + 1) * segmentAngle + rotation;
 
-        // Configurar color y texto del segmento
         ctx.fillStyle = categorias[i].color;
         ctx.beginPath();
-        ctx.arc(radius, radius, radius, angleStart, angleEnd);
+        ctx.arc(radius, radius, radius - 10, angleStart, angleEnd);
         ctx.lineTo(radius, radius);
         ctx.closePath();
         ctx.fill();
 
-        // Dibujar el texto (nombre de la categoría)
+        // Borde blanco entre segmentos
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
         ctx.fillStyle = "#fff";
-        ctx.font = "20px Arial";
+        ctx.font = "bold 14px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.save();
         ctx.translate(radius, radius);
         ctx.rotate((angleStart + angleEnd) / 2);
-        ctx.fillText(categorias[i].nombre, radius - 50, 0);
+        ctx.fillText(categorias[i].nombre, radius - 60, 0);
         ctx.restore();
     }
+
+    // Centro de la ruleta
+    ctx.fillStyle = '#f8f9fa';
+    ctx.beginPath();
+    ctx.arc(radius, radius, 15, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#dee2e6';
+    ctx.lineWidth = 3;
+    ctx.stroke();
 }
 
-// Función para girar la ruleta
-function spinRuleta() {
-    const spins = Math.floor(Math.random() * 5) + 5;  // Número de giros aleatorios
-    const targetRotation = Math.random() * Math.PI * 2;  // Ángulo de destino aleatorio
-    const rotationIncrement = (Math.PI * 2 * spins + targetRotation - rotation) / 100; // Incremento en cada paso
+// Función para girar la ruleta automáticamente
+function girarRuletaAutomaticamente() {
+    const spins = 5;
+    const targetRotation = Math.random() * Math.PI * 2;
+    const rotationIncrement = (Math.PI * 2 * spins + targetRotation - rotation) / 100;
     let currentRotation = rotation;
     let count = 0;
-    // Animación de giro
+
+    // Mostrar spinner de carga
+    document.getElementById('cargando').style.display = 'block';
+
     const animation = setInterval(() => {
         count++;
         currentRotation += rotationIncrement;
-        rotation = currentRotation % (Math.PI * 2);  // Mantener la rotación entre 0 y 2π
+        rotation = currentRotation % (Math.PI * 2);
         drawRuleta();
+
         if (count >= 100) {
             clearInterval(animation);
-            // Determinar la categoría ganadora
-            const finalAngle = (rotation % (2 * Math.PI)) / segmentAngle;
-            const winningSegment = Math.floor(finalAngle);
-            const categoriaGanadora = categorias[winningSegment];
 
-            // Mostrar mensaje en la página
-            document.getElementById('mensajeCategoria').innerText = "¡Categoría ganadora: " + categoriaGanadora.nombre + "!";
+            // Ocultar spinner
+            document.getElementById('cargando').style.display = 'none';
+
+            // Usar la categoría seleccionada que viene de PHP
+            document.getElementById('mensajeCategoria').innerHTML =
+                "¡Categoría seleccionada: <strong>" + categoriaSeleccionada + "</strong>!";
             document.getElementById('mensajeCategoria').style.display = 'block';
 
-            // Ocultar botón Girar y mostrar Proceder
-            document.getElementById('btnGirar').style.display = 'none';
-            document.getElementById('btnProceder').style.display = 'block';
-
-            // Configurar el botón Proceder para redirigir
-            document.getElementById('btnProceder').onclick = function() {
-                window.location.href = '/game/jugarPartida?categoria=' + encodeURIComponent(categoriaGanadora.nombre);
-            };
+            // Redirigir automáticamente después de 1.5 segundos
+            setTimeout(() => {
+                window.location.href = '/game/jugarPartida';
+            }, 1500);
         }
-    }, 20);  // Actualizar cada 20ms
+    }, 20);
 }
 
-
-// Inicializar la ruleta
+// Inicializar y girar automáticamente después de un pequeño delay
 drawRuleta();
-
-// Agregar el evento de clic al botón de "Girar"
-btnGirar.addEventListener("click", spinRuleta);
+setTimeout(girarRuletaAutomaticamente, 1000);
