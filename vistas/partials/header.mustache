@@ -17,7 +17,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow py-2 header-footer-min-height">
         <div class="container">
             <!-- Logo y Nombre -->
-            <a class="navbar-brand d-flex align-items-center fw-bold" href="/user/lobby" style="font-size: 1.6rem;">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="{{#usuario}}{{#es_admin}}/admin/panel{{/es_admin}}{{#es_editor}}/editor/index{{/es_editor}}{{^es_admin}}{{^es_editor}}/user/lobby{{/es_editor}}{{/es_admin}}{{/usuario}}{{^usuario}}/user/lobby{{/usuario}}" style="font-size: 1.6rem;">
                 <i class="bi bi-joystick me-2"></i>
                 Juego del Saber
             </a>
@@ -31,24 +31,65 @@
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     {{#usuario}}
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center" href="/user/lobby">
-                                <i class="bi bi-house me-1"></i>
-                                Inicio
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center" href="/game/ranking?ranking=partidas">
-                                <i class="bi bi-trophy me-1"></i>
-                                Ranking
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center" href="/game/jugador?id={{id}}">
-                            <i class="bi bi-person me-1"></i>
-                            Mi Perfil Público
-                            </a>
-                        </li>
+                        <!-- Menú para Administradores -->
+                        {{#es_admin}}
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/admin/panel">
+                                    <i class="bi bi-speedometer2 me-1"></i>
+                                    Panel Admin
+                                </a>
+                            </li>
+                        {{/es_admin}}
+
+                        <!-- Menú para Editores -->
+                        {{#es_editor}}
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/editor/index">
+                                    <i class="bi bi-speedometer2 me-1"></i>
+                                    Panel Editor
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/editor/verReportes">
+                                    <i class="bi bi-flag me-1"></i>
+                                    Reportes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/editor/verSugerencias">
+                                    <i class="bi bi-lightbulb me-1"></i>
+                                    Sugerencias
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/editor/crearPreguntaForm">
+                                    <i class="bi bi-plus-circle me-1"></i>
+                                    Crear Pregunta
+                                </a>
+                            </li>
+                        {{/es_editor}}
+
+                        <!-- Menú para Usuarios Normales -->
+                        {{^es_admin}}{{^es_editor}}
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/user/lobby">
+                                    <i class="bi bi-house me-1"></i>
+                                    Inicio
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/game/ranking?ranking=partidas">
+                                    <i class="bi bi-trophy me-1"></i>
+                                    Ranking
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="/game/jugador?id={{id}}">
+                                <i class="bi bi-person me-1"></i>
+                                Mi Perfil Público
+                                </a>
+                            </li>
+                        {{/es_editor}}{{/es_admin}}
                     {{/usuario}}
                 </ul>
 
@@ -62,20 +103,43 @@
                                      class="rounded-circle me-2"
                                      style="width: 28px; height: 28px; object-fit: cover;">
                                 <span class="fw-medium">{{username}}</span>
+                                {{#es_admin}}
+                                    <span class="badge bg-danger text-white ms-2">Admin</span>
+                                {{/es_admin}}
+                                {{#es_editor}}
+                                    <span class="badge bg-warning text-dark ms-2">Editor</span>
+                                {{/es_editor}}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                {{^es_admin}}{{^es_editor}}
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center" href="/user/perfil">
                                         <i class="bi bi-person me-2"></i>
                                         Mi Perfil
                                     </a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="/user/sugerirNuevaPregunta">
-                                        <i class="bi bi-lightbulb me-2"></i>
-                                        Sugerir Pregunta
-                                    </a>
-                                </li>
+                                {{/es_editor}}{{/es_admin}}
+
+                                <!-- Mostrar "Panel de Admin" solo para administradores -->
+                                {{#es_admin}}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="/admin/panel">
+                                            <i class="bi bi-speedometer2 me-2"></i>
+                                            Panel de Admin
+                                        </a>
+                                    </li>
+                                {{/es_admin}}
+
+                                <!-- Mostrar "Panel de Editor" solo para editores -->
+                                {{#es_editor}}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="/editor/index">
+                                            <i class="bi bi-speedometer2 me-2"></i>
+                                            Panel de Editor
+                                        </a>
+                                    </li>
+                                {{/es_editor}}
+
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center text-danger" href="/user/lobby?action=salir">

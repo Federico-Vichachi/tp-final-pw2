@@ -73,7 +73,8 @@ class UserController
         }
 
         $this->renderer->render("lobby",[
-            'usuario' => $_SESSION['usuario']
+            'usuario' => $_SESSION['usuario'],
+            'es_editor' => false
         ]);
     }
 

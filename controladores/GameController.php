@@ -106,6 +106,7 @@ class GameController
 
         if (isset($_SESSION['usuario'])) {
             $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+            $data['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
         }
 
         $this->limpiarPartidaActual();
@@ -132,6 +133,7 @@ class GameController
 
         if (isset($_SESSION['usuario'])) {
             $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+            $data['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
         }
 
         $this->renderer->render("jugador", $data);
@@ -156,6 +158,7 @@ class GameController
 
         if (isset($_SESSION['usuario'])) {
             $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+            $data['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
         }
 
         $this->renderer->render("ranking", $data);
@@ -193,6 +196,7 @@ class GameController
 
         if (isset($_SESSION['usuario'])) {
             $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+            $data['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
         }
 
         $this->renderer->render("ruleta", $data);
@@ -385,7 +389,8 @@ class GameController
             "puntosGanados" => $puntosGanados,
             "mensaje" => $mensaje,
             "codigoPartida" => $_SESSION["partida_codigo"] ?? 'N/A',
-            "usuario" => $usuarioActualizado
+            "usuario" => $usuarioActualizado,
+            "es_editor" => ($_SESSION['usuario']['rol'] === 'editor')
         ]);
     }
 
@@ -435,6 +440,7 @@ class GameController
 
         if (isset($_SESSION['usuario'])) {
             $data['usuario'] = $this->model->getUsuarioById($_SESSION['usuario']['id']);
+            $data['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
         }
 
         $this->renderer->render("partida", $data);

@@ -29,7 +29,11 @@ class EditorController
             }
         }
 
-        $this->renderer->render("panelEditor", ["preguntas" => $preguntas]);
+        $this->renderer->render("panelEditor", [
+            "preguntas" => $preguntas,
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
+        ]);
     }
 
     public function verReportes()
@@ -52,7 +56,11 @@ class EditorController
             }
         }
 
-        $data = ['reportes' => $reportes];
+        $data = [
+            'reportes' => $reportes,
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
+        ];
         $this->renderer->render("reportes", $data);
     }
 
@@ -61,7 +69,11 @@ class EditorController
     {
         $this->verificarRolEditor();
         $categorias = $this->model->getCategorias();
-        $this->renderer->render("crearPregunta", ["categorias" => $categorias]);
+        $this->renderer->render("crearPregunta", [
+            "categorias" => $categorias,
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
+        ]);
     }
 
     public function procesarCrearPregunta()
@@ -122,14 +134,21 @@ class EditorController
     {
         $this->verificarRolEditor();
         $reportes = $this->model->getReportesRevisados();
-        $data = ['reportes' => $reportes];
+        $data = [
+            'reportes' => $reportes,
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
+        ];
         $this->renderer->render("historialReportes", $data);
     }
 
     public function crearCategoriaForm()
     {
         $this->verificarRolEditor();
-        $this->renderer->render("crearCategoria");
+        $this->renderer->render("crearCategoria", [
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
+        ]);
     }
 
     public function procesarCrearCategoria()
@@ -152,7 +171,11 @@ class EditorController
     {
         $this->verificarRolEditor();
         $sugerencias = $this->model->getSugerenciasPendientes();
-        $this->renderer->render("sugerenciasPendientes", ["sugerencias" => $sugerencias]);
+        $this->renderer->render("sugerenciasPendientes", [
+            "sugerencias" => $sugerencias,
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
+        ]);
     }
 
     public function aprobarSugerencia()
@@ -204,7 +227,9 @@ class EditorController
 
         $this->renderer->render("modificarPregunta", [
             "pregunta" => $pregunta,
-            "categorias" => $categorias
+            "categorias" => $categorias,
+            "usuario" => $_SESSION['usuario'],
+            "es_editor" => true
         ]);
     }
 

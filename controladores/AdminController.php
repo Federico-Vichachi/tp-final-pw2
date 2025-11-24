@@ -14,7 +14,6 @@ class AdminController
         $this->renderer = $renderer;
     }
 
-
     public function panel()
     {
         $this->verificarRolAdmin();
@@ -38,13 +37,21 @@ class AdminController
             $datosParaGraficoRegistros[] = [date('d/m', strtotime($item['fecha'])), (int)$item['cantidad']];
         }
 
-        $datos['jsonDataCategorias'] = json_encode($datosParaGraficoCategorias);
-        $datos['jsonDataPaises'] = json_encode($datosParaGraficoPaises);
-        $datos['jsonDataRegistros'] = json_encode($datosParaGraficoRegistros);
+        $datos = [
+            'jsonDataCategorias' => json_encode($datosParaGraficoCategorias),
+            'jsonDataPaises' => json_encode($datosParaGraficoPaises),
+            'jsonDataRegistros' => json_encode($datosParaGraficoRegistros),
+            'totalUsuarios' => $this->model->getConteoTotalUsuarios(),
+            'totalPreguntas' => $this->model->getConteoTotalPreguntas(),
+            'partidasHoy' => $this->model->getPartidasJugadasHoy()
+        ];
 
-        $datos['totalUsuarios'] = $this->model->getConteoTotalUsuarios();
-        $datos['totalPreguntas'] = $this->model->getConteoTotalPreguntas();
-        $datos['partidasHoy'] = $this->model->getPartidasJugadasHoy();
+        // Agregar datos del usuario y rol para el header
+        if (isset($_SESSION['usuario'])) {
+            $datos['usuario'] = $_SESSION['usuario'];
+            $datos['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
+            $datos['es_admin'] = true;
+        }
 
         $this->renderer->render("panelAdmin", $datos);
     }
@@ -57,15 +64,23 @@ class AdminController
         }
     }
 
-
     public function generarReportePDF()
     {
         $this->verificarRolAdmin();
 
-        $datos['totalUsuarios'] = $this->model->getConteoTotalUsuarios();
-        $datos['totalPreguntas'] = $this->model->getConteoTotalPreguntas();
-        $datos['partidasHoy'] = $this->model->getPartidasJugadasHoy();
-        $datos['fechaGeneracion'] = date("d/m/Y H:i");
+        $datos = [
+            'totalUsuarios' => $this->model->getConteoTotalUsuarios(),
+            'totalPreguntas' => $this->model->getConteoTotalPreguntas(),
+            'partidasHoy' => $this->model->getPartidasJugadasHoy(),
+            'fechaGeneracion' => date("d/m/Y H:i")
+        ];
+
+        // Agregar datos del usuario y rol para el header
+        if (isset($_SESSION['usuario'])) {
+            $datos['usuario'] = $_SESSION['usuario'];
+            $datos['es_editor'] = ($_SESSION['usuario']['rol'] === 'editor');
+            $datos['es_admin'] = true;
+        }
 
         $preguntasPorCategoria = $this->model->getPreguntasPorCategoria();
         $usuariosPorPais = $this->model->getUsuariosPorPais();
@@ -98,7 +113,6 @@ class AdminController
         $dompdf->stream("reporte-preguntados-{$fecha}.pdf", ["Attachment" => true]);
         exit();
     }
-
 
     private function generarUrlGraficoDona($data)
     {
