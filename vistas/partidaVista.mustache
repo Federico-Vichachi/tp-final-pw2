@@ -101,10 +101,12 @@
                                                        font-size: 14px;
                                                        transition: all 0.3s ease;
                                                        box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-                                            <span class="badge me-3 d-flex align-items-center justify-content-center"
-                                                  style="font-size: 12px; width: 32px; height: 32px;
-                                                          background: linear-gradient(135deg, {{pregunta.color_categoria}} 0%, {{#darkenColor}}{{pregunta.color_categoria}}{{/darkenColor}} 100%);
-                                                          color: white;">
+                                            <span class="badge me-3 d-flex align-items-center justify-content-center position-relative"
+                                                  style="font-size: 14px; width: 36px; height: 36px;
+                                                          background: {{pregunta.color_categoria}};
+                                                          color: white;
+                                                          font-weight: bold;
+                                                          z-index: 1;">
                                                 {{posicion}}
                                             </span>
                                             <span class="flex-grow-1 fw-medium text-dark text-truncate">{{texto}}</span>
