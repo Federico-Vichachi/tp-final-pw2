@@ -12,13 +12,13 @@ class GameModel
     public function iniciarPartida($usuarioId)
     {
         $usuario = $this->getUsuarioById($usuarioId);
-        $nivelUsuario = $usuario['nivel'] ?? 1;
+        $dificultadUsuario = $this->calcularDificultadUsuario($usuarioId);
 
         $codigoPartida = uniqid('partida_', true);
         $fechaInicio = date('Y-m-d H:i:s');
 
         $sql = "INSERT INTO partidas (codigo_partida, usuario_id, estado, fecha_inicio, nivel_usuario) 
-                VALUES ('$codigoPartida', $usuarioId, 'en_curso', '$fechaInicio', $nivelUsuario)";
+                VALUES ('$codigoPartida', $usuarioId, 'en_curso', '$fechaInicio', {$usuario['nivel']})";
 
         $this->conexion->query($sql);
 
@@ -51,14 +51,14 @@ class GameModel
         $this->actualizarNivelUsuario($usuarioId);
     }
 
-    public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0, $nivelPregunta = 1)
+    public function registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta = 0, $dificultadPregunta = 'intermedia')
     {
         $fallada = $preguntaFallada ? 1 : 0;
         $fechaRespuesta = date('Y-m-d H:i:s');
 
         $sql = "INSERT INTO historial_preguntas 
-                (partida_id, pregunta_id, pregunta_fallada, fecha_respuesta, tiempo_respuesta, nivel_pregunta_partida) 
-                VALUES ($partidaId, $preguntaId, $fallada, '$fechaRespuesta', $tiempoRespuesta, $nivelPregunta)";
+                (partida_id, pregunta_id, pregunta_fallada, fecha_respuesta, tiempo_respuesta, dificultad_pregunta_partida) 
+                VALUES ($partidaId, $preguntaId, $fallada, '$fechaRespuesta', $tiempoRespuesta, '$dificultadPregunta')";
 
         $this->conexion->query($sql);
         $this->actualizarEstadisticasPregunta($preguntaId, $fallada);
@@ -67,12 +67,26 @@ class GameModel
     public function getPreguntaAleatoria($preguntasVistas, $usuarioId, $categoria = null)
     {
         $usuario = $this->getUsuarioById($usuarioId);
-        $nivelUsuario = $usuario['nivel'] ?? 1;
+        $dificultadUsuario = $this->calcularDificultadUsuario($usuarioId);
 
-        $pregunta = $this->obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario, $categoria);
+        // Obtener las últimas 10 preguntas acertadas
+        $preguntasExcluidas = $this->getUltimasPreguntasAcertadas($usuarioId);
+        $preguntasVistas = array_merge($preguntasVistas, $preguntasExcluidas);
 
+        // Buscar pregunta de la misma dificultad
+        $pregunta = $this->obtenerPreguntaPorDificultad($preguntasVistas, $dificultadUsuario, $categoria);
+
+        // Si no encuentra, buscar en dificultad superior
         if(empty($pregunta)) {
-            $pregunta = $this->obtenerPreguntaPorRangoNivel($preguntasVistas, $nivelUsuario, 2 , $categoria);
+            $dificultadSuperior = $this->getDificultadSuperior($dificultadUsuario);
+            if ($dificultadSuperior) {
+                $pregunta = $this->obtenerPreguntaPorDificultad($preguntasVistas, $dificultadSuperior, $categoria);
+            }
+        }
+
+        // Si aún no encuentra, buscar cualquier pregunta activa
+        if(empty($pregunta)) {
+            $pregunta = $this->obtenerPreguntaCualquiera($preguntasVistas, $categoria);
         }
 
         if(empty($pregunta)) {
@@ -195,7 +209,7 @@ class GameModel
 
     private function calcularRatioDificultad($preguntaId)
     {
-        $sql = "SELECT veces_acertada, veces_fallada 
+        $sql = "SELECT veces_acertada, veces_fallada, ratio_dificultad
                 FROM preguntas 
                 WHERE id = $preguntaId";
         $resultado = $this->conexion->query($sql);
@@ -210,12 +224,146 @@ class GameModel
         if ($total > 0) {
             $ratio = $acertadas / $total;
 
-            $nivel = max(1, min(10, ceil((1 - $ratio) * 10)));
+            // Aplicar suavizado (promedio ponderado)
+            $ratioAnterior = $fila['ratio_dificultad'];
+            $pesoAnterior = 0.3; // 30% del valor anterior
+            $pesoActual = 0.7;   // 70% del nuevo valor
+
+            $ratioSuavizado = ($ratioAnterior * $pesoAnterior) + ($ratio * $pesoActual);
+
+            // Clasificar dificultad según el ratio suavizado
+            $dificultad = $this->clasificarDificultad($ratioSuavizado);
+
             $sql = "UPDATE preguntas 
-                    SET ratio_dificultad = $ratio, nivel_pregunta = $nivel 
+                    SET ratio_dificultad = $ratioSuavizado, 
+                        dificultad = '$dificultad' 
                     WHERE id = $preguntaId";
             $this->conexion->query($sql);
         }
+    }
+
+    private function clasificarDificultad($ratio)
+    {
+        if ($ratio >= 0.7 && $ratio <= 1.0) {
+            return 'facil';
+        } elseif ($ratio > 0.3 && $ratio < 0.7) {
+            return 'intermedia';
+        } else {
+            return 'dificil';
+        }
+    }
+
+    private function calcularDificultadUsuario($usuarioId)
+    {
+        // Obtener estadísticas del usuario de los últimos 30 días
+        $sql = "SELECT 
+                   COUNT(*) as total_preguntas,
+                   SUM(CASE WHEN hp.pregunta_fallada = 0 THEN 1 ELSE 0 END) as correctas
+                FROM historial_preguntas hp
+                JOIN partidas p ON hp.partida_id = p.id
+                WHERE p.usuario_id = $usuarioId
+                AND hp.fecha_respuesta >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+
+        $resultado = $this->conexion->query($sql);
+        $estadisticas = $this->getSingleRow($resultado);
+
+        if (empty($estadisticas) || $estadisticas['total_preguntas'] == 0) {
+            return 'intermedia';
+        }
+
+        $ratio = $estadisticas['correctas'] / $estadisticas['total_preguntas'];
+
+        // Aplicar suavizado (promedio ponderado con valor inicial 0.5)
+        $ratioSuavizado = ($ratio * 0.7) + (0.5 * 0.3);
+
+        return $this->clasificarDificultad($ratioSuavizado);
+    }
+
+    private function getDificultadSuperior($dificultadActual)
+    {
+        switch ($dificultadActual) {
+            case 'facil': return 'intermedia';
+            case 'intermedia': return 'dificil';
+            case 'dificil': return null;
+            default: return 'intermedia';
+        }
+    }
+
+    private function obtenerPreguntaPorDificultad($preguntasVistas, $dificultad, $categoria = null)
+    {
+        $sql = "SELECT p.id AS pregunta_id, 
+                   p.texto AS pregunta, 
+                   p.dificultad AS dificultad,
+                   p.ratio_dificultad AS ratio,
+                   c.nombre AS categoria,
+                   c.color AS color_categoria,
+                   c.imagen AS imagen_categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.esta_activa = 1 
+              AND p.dificultad = '$dificultad'";
+
+        if($categoria && !empty($categoria)){
+            $sql .= " AND c.nombre = '$categoria'";
+        }
+
+        if(!empty($preguntasVistas)){
+            $idsExcluidos = implode(",", $preguntasVistas);
+            if (!empty($idsExcluidos)) {
+                $sql .= " AND p.id NOT IN ($idsExcluidos)";
+            }
+        }
+
+        $sql .= " ORDER BY RAND() LIMIT 1";
+
+        $resultado = $this->conexion->query($sql);
+        return $this->getSingleRow($resultado);
+    }
+
+    private function obtenerPreguntaCualquiera($preguntasVistas, $categoria = null)
+    {
+        $sql = "SELECT p.id AS pregunta_id, 
+                   p.texto AS pregunta, 
+                   p.dificultad AS dificultad,
+                   p.ratio_dificultad AS ratio,
+                   c.nombre AS categoria,
+                   c.color AS color_categoria,
+                   c.imagen AS imagen_categoria
+            FROM preguntas p
+            JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.esta_activa = 1";
+
+        if($categoria && !empty($categoria)){
+            $sql .= " AND c.nombre = '$categoria'";
+        }
+
+        if(!empty($preguntasVistas)){
+            $idsExcluidos = implode(",", $preguntasVistas);
+            if (!empty($idsExcluidos)) {
+                $sql .= " AND p.id NOT IN ($idsExcluidos)";
+            }
+        }
+
+        $sql .= " ORDER BY RAND() LIMIT 1";
+
+        $resultado = $this->conexion->query($sql);
+        return $this->getSingleRow($resultado);
+    }
+
+    private function getUltimasPreguntasAcertadas($usuarioId)
+    {
+        $sql = "SELECT hp.pregunta_id
+                FROM historial_preguntas hp
+                JOIN partidas p ON hp.partida_id = p.id
+                WHERE p.usuario_id = $usuarioId
+                AND hp.pregunta_fallada = 0
+                ORDER BY hp.fecha_respuesta DESC
+                LIMIT 10";
+
+        $resultado = $this->conexion->query($sql);
+        $preguntas = $this->getArrayResult($resultado);
+
+        return array_column($preguntas, 'pregunta_id');
     }
 
     private function obtenerPreguntaPorNivel($preguntasVistas, $nivelUsuario, $categoria = null)

@@ -102,7 +102,7 @@ CREATE TABLE preguntas (
                            esta_activa BOOLEAN DEFAULT TRUE,
                            texto VARCHAR(255) NOT NULL,
                            categoria_id INT,
-                           nivel_pregunta INT DEFAULT 1,
+                           dificultad ENUM('facil', 'intermedia', 'dificil') DEFAULT 'intermedia',
                            veces_acertada INT DEFAULT 0,
                            veces_fallada INT DEFAULT 0,
                            ratio_dificultad DECIMAL(5,4) DEFAULT 0.5,
@@ -136,7 +136,7 @@ CREATE TABLE historial_preguntas (
                                      pregunta_fallada BOOLEAN DEFAULT FALSE,
                                      fecha_respuesta DATETIME NULL,
                                      tiempo_respuesta INT DEFAULT 0,
-                                     nivel_pregunta_partida INT DEFAULT 1,
+                                     dificultad_pregunta_partida ENUM('facil', 'intermedia', 'dificil') DEFAULT 'intermedia',
                                      FOREIGN KEY (partida_id) REFERENCES partidas(id),
                                      FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
 );

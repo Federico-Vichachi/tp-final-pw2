@@ -17,14 +17,10 @@
                         </div>
 
                         <!-- Nombre de Categoría -->
-                        <h2 class="fw-bold mb-3 text-shadow fs-3">{{pregunta.categoria}}</h2>
+                        <h1 class="fw-bold mb-3 text-shadow fs-3">{{pregunta.categoria}}</h1>
 
-                        <!-- Información de Nivel y Tiempo -->
+                        <!-- Información de Dificultad y Tiempo -->
                         <div class="d-flex flex-column gap-2 align-items-center mb-3">
-                            <span class="badge bg-light text-dark fs-7 py-2 px-3 shadow-sm">
-                                <i class="bi bi-star-fill text-warning me-2"></i>
-                                Nivel {{pregunta.nivel}}
-                            </span>
                             <span class="badge bg-light text-dark fs-7 py-2 px-3 shadow-sm" id="badge-tiempo">
                                 <i class="bi bi-clock me-2"></i>
                                 <span id="tiempo">{{tiempo_limite}}</span> segundos
@@ -34,16 +30,18 @@
                         <!-- Información del Jugador (Desktop) -->
                         <div class="d-none d-md-block mt-3">
                             <div class="row g-2 text-center">
-                                <div class="col-12 mb-2">
-                                    <div class="p-2 bg-white bg-opacity-20 rounded text-black shadow-sm">
-                                        <small class="opacity-75">Puntaje Actual</small>
-                                        <h5 class="fw-bold mb-0 text-dark">{{puntaje}}</h5>
-                                    </div>
-                                </div>
                                 <div class="col-12">
                                     <div class="p-2 bg-white bg-opacity-20 rounded text-black shadow-sm">
-                                        <small class="opacity-75">Tu Nivel</small>
-                                        <h5 class="fw-bold mb-0 text-dark">{{nivel_usuario}}</h5>
+                                        <small class="opacity-75">Dificultad Pregunta</small>
+                                        <h6 class="fw-bold mb-0 text-dark">{{#pregunta.dificultad.facil}}Fácil{{/pregunta.dificultad.facil}}
+                                            {{#pregunta.dificultad.intermedia}}Intermedia{{/pregunta.dificultad.intermedia}}
+                                            {{#pregunta.dificultad.dificil}}Difícil{{/pregunta.dificultad.dificil}}</h6>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-2">
+                                    <div class="p-2 bg-white bg-opacity-20 rounded text-black shadow-sm">
+                                        <small class="opacity-75">Respuestas Correctas</small>
+                                        <h6 class="fw-bold mb-0 text-dark">{{puntaje}}</h6>
                                     </div>
                                 </div>
                             </div>

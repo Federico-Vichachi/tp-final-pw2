@@ -214,9 +214,9 @@ class GameController
         $tiempoRespuesta = $this->calcularTiempoRespuesta();
 
         $respuestaCorrecta = $this->model->verificarRespuesta($idRespuesta);
-        $nivelPregunta = $_SESSION["pregunta_actual"]["pregunta"]["nivel"] ?? 1;
+        $dificultadPregunta = $_SESSION["pregunta_actual"]["pregunta"]["dificultad"] ?? 'intermedia';
 
-        $this->registrarRespuestaEnHistorial(!$respuestaCorrecta, $tiempoRespuesta, $nivelPregunta);
+        $this->registrarRespuestaEnHistorial(!$respuestaCorrecta, $tiempoRespuesta, $dificultadPregunta);
 
         if ($respuestaCorrecta) {
             $this->procesarRespuestaCorrecta();
@@ -332,7 +332,7 @@ class GameController
             (isset($_SESSION["puntaje"]) && $_SESSION["puntaje"] > 0);
     }
 
-    private function registrarRespuestaEnHistorial($preguntaFallada, $tiempoRespuesta, $nivelPregunta)
+    private function registrarRespuestaEnHistorial($preguntaFallada, $tiempoRespuesta, $dificultadPregunta)
     {
         if (!isset($_SESSION["usuario"]) || !isset($_SESSION["pregunta_actual"]) || !isset($_SESSION["partida_id"])) {
             return;
@@ -341,7 +341,7 @@ class GameController
         $partidaId = $_SESSION["partida_id"];
         $preguntaId = $_SESSION["pregunta_actual"]["pregunta"]["pregunta_id"];
 
-        $this->model->registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta, $nivelPregunta);
+        $this->model->registrarRespuesta($partidaId, $preguntaId, $preguntaFallada, $tiempoRespuesta, $dificultadPregunta);
     }
 
     private function agregarPosiciones($array)
@@ -426,6 +426,16 @@ class GameController
 
         if (isset($partida['respuestas'])) {
             $partida['respuestas'] = $this->agregarLetras($partida['respuestas']);
+        }
+
+        // Preparar datos de dificultad para la vista
+        if (isset($partida['pregunta']['dificultad'])) {
+            $dificultad = $partida['pregunta']['dificultad'];
+            $partida['pregunta']['dificultad'] = [
+                'facil' => $dificultad === 'facil',
+                'intermedia' => $dificultad === 'intermedia',
+                'dificil' => $dificultad === 'dificil'
+            ];
         }
 
         $data = [

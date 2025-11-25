@@ -17,7 +17,8 @@
                         <p class="lead mb-3">
                             La respuesta correcta a la pregunta
                             <strong>"{{pregunta}}"</strong> de la categoría
-                            <span class="badge bg-info text-dark">{{categoria}}</span> era:
+                            <span class="badge bg-info text-dark">{{categoria}}</span>
+                            era:
                         </p>
                         <div class="alert alert-success fs-5 fw-bold">
                             <i class="bi bi-check-circle-fill me-2"></i>
@@ -108,13 +109,22 @@
             </div>
 
             <div class="card-body p-0">
-                <form action="/game/reportarPreguntas" method="POST">
+                <form action="/game/reportarPregunta" method="POST">
                     <div class="list-group list-group-flush">
                         {{#historial_partida}}
                             <div class="list-group-item">
                                 <div class="row align-items-center">
                                     <div class="col-md-3">
                                         <span class="badge bg-info text-dark mb-2 mb-md-0">{{categoria}}</span>
+                                        <span class="badge
+                                            {{#dificultad.facil}}bg-success{{/dificultad.facil}}
+                                            {{#dificultad.intermedia}}bg-warning{{/dificultad.intermedia}}
+                                            {{#dificultad.dificil}}bg-danger{{/dificultad.dificil}}
+                                        ">
+                                            {{#dificultad.facil}}Fácil{{/dificultad.facil}}
+                                            {{#dificultad.intermedia}}Intermedia{{/dificultad.intermedia}}
+                                            {{#dificultad.dificil}}Difícil{{/dificultad.dificil}}
+                                        </span>
                                     </div>
                                     <div class="col-md-7">
                                         <p class="mb-0 fw-medium">{{pregunta}}</p>
@@ -134,12 +144,12 @@
 
                                 <div class="collapse mt-3" id="reportForm-{{pregunta_id}}">
                                     <div class="card card-body bg-light">
+                                        <input type="hidden" name="pregunta_id" value="{{pregunta_id}}">
                                         <div class="mb-3">
                                             <label for="motivo-{{pregunta_id}}" class="form-label fw-bold">
                                                 Motivo del reporte:
                                             </label>
-                                            <!-- name es un array: motivos[ID] -->
-                                            <textarea name="motivos[{{pregunta_id}}]"
+                                            <textarea name="motivo"
                                                       id="motivo-{{pregunta_id}}"
                                                       class="form-control"
                                                       rows="3"
@@ -148,9 +158,13 @@
                                         <div class="alert alert-info py-2 mb-0">
                                             <small>
                                                 <i class="bi bi-info-circle me-1"></i>
-                                                Escribe el motivo y al final presiona "Enviar Todos los Reportes".
+                                                Escribe el motivo y presiona "Enviar Reporte".
                                             </small>
                                         </div>
+                                        <button type="submit" class="btn btn-danger btn-sm mt-2">
+                                            <i class="bi bi-send-fill me-2"></i>
+                                            Enviar Reporte
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -163,15 +177,6 @@
                             </div>
                         {{/historial_partida}}
                     </div>
-
-                    {{#historial_partida}}
-                        <div class="card-footer text-center py-3">
-                            <button type="submit" class="btn btn-danger btn-lg">
-                                <i class="bi bi-send-fill me-2"></i>
-                                Enviar Todos los Reportes
-                            </button>
-                        </div>
-                    {{/historial_partida}}
                 </form>
             </div>
         </div>
