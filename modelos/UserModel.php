@@ -298,5 +298,55 @@ class UserModel
         return $this->conexion->query($sql);
     }
 
+    public function editarPerfil($usuarioId, $datos, $file = null)
+    {
+
+        if (empty($datos['nombre_completo']) || empty($datos['email']) || empty($datos['username'])) {
+            return [
+                'ok' => false,
+                'errores' => "Nombre completo, email y username son obligatorios."
+            ];
+        }
+
+        $sqlCheckeo = "SELECT id FROM usuario WHERE (email = '{$datos['email']}' OR username = '{$datos['username']}') AND id != $usuarioId";
+        $resultadoCheckeo = $this->conexion->query($sqlCheckeo);
+        if (is_array($resultadoCheckeo) && count($resultadoCheckeo) > 0) {
+            return [
+                'ok' => false,
+                'errores' => "El email o nombre de usuario ya están en uso por otro usuario."
+            ];
+        }
+
+        $rutaFoto = null;
+        if ($file && $file['tmp_name']) {
+            $rutaFoto = $this->procesarImagen($file);
+            if ($rutaFoto === "NULL") {
+                $rutaFoto = null; // Mantener la existente si falla
+            }
+        }
+
+        $set = [];
+        $set[] = "nombre_completo = '{$datos['nombre_completo']}'";
+        $set[] = "anio_nacimiento = '{$datos['anio_nacimiento']}'";
+        $set[] = "sexo = '{$datos['sexo']}'";
+        $set[] = "pais = '{$datos['pais']}'";
+        $set[] = "ciudad = '{$datos['ciudad']}'";
+        $set[] = "latitud = '{$datos['latitud']}'";
+        $set[] = "longitud = '{$datos['longitud']}'";
+        $set[] = "email = '{$datos['email']}'";
+        $set[] = "username = '{$datos['username']}'";
+        if ($rutaFoto) {
+            $set[] = "foto_perfil = $rutaFoto";
+        }
+        $sql = "UPDATE usuario SET " . implode(', ', $set) . " WHERE id = $usuarioId";
+        $resultado = $this->conexion->query($sql);
+        if ($resultado === true) {
+            return ['ok' => true, 'errores' => []];
+        } else {
+            return ['ok' => false, 'errores' => "Error al actualizar el perfil."];
+        }
+    }
+
+
 }
 

@@ -345,4 +345,51 @@ class UserController
         $emailExistente = $this->model->emailExiste($email);
         echo json_encode(['existe' => $emailExistente]);
     }
+
+    public function editarPerfil()
+    {
+        $this->redirectNotAuthenticated();
+        $usuarioId = $_SESSION['usuario']['id'];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $datos = [
+                'nombre_completo' => $_POST['nombre_completo'] ?? '',
+                'anio_nacimiento' => $_POST['anio_nacimiento'] ?? '',
+                'sexo' => $_POST['sexo'] ?? 'Prefiero no cargarlo',
+                'pais' => $_POST['pais'] ?? '',
+                'ciudad' => $_POST['ciudad'] ?? '',
+                'latitud' => $_POST['latitud'] ?? '',
+                'longitud' => $_POST['longitud'] ?? '',
+                'email' => $_POST['email'] ?? '',
+                'username' => $_POST['username'] ?? ''
+            ];
+            $file = $_FILES['file'] ?? null;
+            $resultado = $this->model->editarPerfil($usuarioId, $datos, $file);
+
+            if (!$resultado['ok']) {
+                $usuario = $this->model->getUsuarioById($usuarioId);
+                $this->renderer->render("editarPerfil", [
+                    'error' => $resultado['errores'],
+                    'usuario' => $usuario,
+                    'selected_masculino' => ($usuario['sexo'] == 'Masculino'),
+                    'selected_femenino' => ($usuario['sexo'] == 'Femenino'),
+                    'selected_otro' => ($usuario['sexo'] == 'Otro'),
+                    'selected_prefiero_no' => ($usuario['sexo'] == 'Prefiero no cargarlo')
+                ]);
+                exit();
+            }
+            $_SESSION['usuario'] = $this->model->getUsuarioById($usuarioId);
+            $_SESSION['mensaje_exito'] = 'Perfil actualizado exitosamente.';
+            $this->redirectTo('perfil');
+        } else {
+            $usuario = $this->model->getUsuarioById($usuarioId);
+            $this->renderer->render("editarPerfil", [
+                'usuario' => $usuario,
+                'selected_masculino' => ($usuario['sexo'] == 'Masculino'),
+                'selected_femenino' => ($usuario['sexo'] == 'Femenino'),
+                'selected_otro' => ($usuario['sexo'] == 'Otro'),
+                'selected_prefiero_no' => ($usuario['sexo'] == 'Prefiero no cargarlo')
+            ]);
+        }
+    }
 }

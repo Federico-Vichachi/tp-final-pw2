@@ -9,92 +9,97 @@
         </div>
 
         {{#usuario}}
-            <div class="card-body p-4">
-                <!-- Información del Usuario -->
-                <div class="row mb-4">
-                    <!-- Foto y Datos Principales -->
-                    <div class="col-12 text-center mb-4">
-                        <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
-                             alt="Foto de perfil"
-                             class="rounded-circle border border-3 border-primary mb-3"
-                             style="width: 120px; height: 120px; object-fit: cover;">
-                        <h3 class="fw-bold text-primary mb-1">{{nombre_completo}}</h3>
-                        <p class="text-muted fs-5">@{{username}}</p>
-                    </div>
+        <div class="card-body p-4">
+            <!-- Información del Usuario -->
+            <div class="row mb-4">
+                <!-- Foto y Datos Principales -->
+                <div class="col-12 text-center mb-4">
+                    <img src="{{#foto_perfil}}{{foto_perfil}}{{/foto_perfil}}{{^foto_perfil}}/public/imagenes/default-avatar.jpg{{/foto_perfil}}"
+                         alt="Foto de perfil"
+                         class="rounded-circle border border-3 border-primary mb-3"
+                         style="width: 120px; height: 120px; object-fit: cover;">
+                    <h3 class="fw-bold text-primary mb-1">{{nombre_completo}}</h3>
+                    <p class="text-muted fs-5">@{{username}}</p>
+                </div>
 
-                    <!-- Información Detallada -->
-                    <div class="col-12">
-                        <div class="row g-3">
-                            <!-- Columna Izquierda -->
-                            <div class="col-12 col-md-6">
-                                <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary mb-3">
-                                            <i class="bi bi-info-circle me-2"></i>
-                                            Información Personal
-                                        </h5>
-                                        <div class="list-group list-group-flush">
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">Email:</span>
-                                                <span class="fw-bold">{{email}}</span>
-                                            </div>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">País:</span>
-                                                <span class="fw-bold">{{pais}}</span>
-                                            </div>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">Ciudad:</span>
-                                                <span class="fw-bold">{{ciudad}}</span>
-                                            </div>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">Año de nacimiento:</span>
-                                                <span class="fw-bold">{{anio_nacimiento}}</span>
-                                            </div>
+                <!-- Información Detallada -->
+                <div class="col-12">
+                    <div class="row g-3">
+                        <!-- Columna Izquierda -->
+                        <div class="col-12 col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Información Personal
+                                    </h5>
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">Email:</span>
+                                            <span class="fw-bold">{{email}}</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">País:</span>
+                                            <span class="fw-bold">{{pais}}</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">Ciudad:</span>
+                                            <span class="fw-bold">{{ciudad}}</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">Año de nacimiento:</span>
+                                            <span class="fw-bold">{{anio_nacimiento}}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Columna Derecha -->
-                            <div class="col-12 col-md-6">
-                                <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary mb-3">
-                                            <i class="bi bi-person-badge me-2"></i>
-                                            Información de Cuenta
-                                        </h5>
-                                        <div class="list-group list-group-flush">
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">Sexo:</span>
-                                                <span class="fw-bold">{{sexo}}</span>
-                                            </div>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">Fecha de registro:</span>
-                                                <span class="fw-bold">{{fecha_registro}}</span>
-                                            </div>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                <span class="fw-medium text-muted">Rol:</span>
-                                                <span class="badge bg-primary fs-6">{{rol}}</span>
-                                            </div>
+                        <!-- Columna Derecha -->
+                        <div class="col-12 col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary mb-3">
+                                        <i class="bi bi-person-badge me-2"></i>
+                                        Información de Cuenta
+                                    </h5>
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">Sexo:</span>
+                                            <span class="fw-bold">{{sexo}}</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">Fecha de registro:</span>
+                                            <span class="fw-bold">{{fecha_registro}}</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="fw-medium text-muted">Rol:</span>
+                                            <span class="badge bg-primary fs-6">{{rol}}</span>
+                                        </div>
 
-                                        </div>
-                                        <div class="mt-4 text-center">
-                                            <h6 class="text-primary mb-3">
-                                                <i class="bi bi-qr-code me-2"></i>
-                                                " Codigo QR para Compartir Perfil "
-                                            </h6>
-                                            <img src="{{qr_path}}" alt="CÃ³digo QR del perfil" class="border border-2 border-primary rounded" style="width: 150px; height: 150px;">
-                                            <p class="text-muted mt-2 small">Escanea para ver mi perfil desde otro dispositivo</p>
-                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-center">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="bi bi-qr-code me-2"></i>
+                                            " Codigo QR para Compartir Perfil "
+                                        </h6>
+                                        <img src="{{qr_path}}" alt="CÃ³digo QR del perfil" class="border border-2 border-primary rounded" style="width: 150px; height: 150px;">
+                                        <p class="text-muted mt-2 small">Escanea para ver mi perfil desde otro dispositivo</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+
                 <!-- Botón de Volver -->
                 <div class="text-center mt-4">
-                    <div class="d-grid gap-2" style="max-width: 250px; margin: 0 auto;">
+                    <div class="d-grid gap-2" style="max-width: 400px; margin: 0 auto;">
+                        <a href="/user/editarPerfil" class="btn btn-primary btn-lg">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Editar Perfil
+                        </a>
                         <a href="/user/lobby" class="btn btn-outline-primary btn-lg">
                             <i class="bi bi-arrow-left-circle me-2"></i>
                             Volver al Lobby
@@ -104,42 +109,42 @@
             </div>
         {{/usuario}}
     </div>
-</div>
+    </div>
 
-<!-- Estilos CSS adicionales para mantener consistencia -->
-<style>
-    .card {
-        border-radius: 12px;
-    }
-
-    .list-group-item {
-        padding: 0.75rem 0;
-        background: transparent;
-    }
-
-    .list-group-item:not(:last-child) {
-        border-bottom: 1px solid #e9ecef !important;
-    }
-
-    .btn-outline-primary {
-        border-width: 2px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,123,255,0.2);
-    }
-
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem !important;
+    <!-- Estilos CSS adicionales para mantener consistencia -->
+    <style>
+        .card {
+            border-radius: 12px;
         }
 
-        .container {
-            padding-left: 15px;
-            padding-right: 15px;
+        .list-group-item {
+            padding: 0.75rem 0;
+            background: transparent;
         }
-    }
-</style>
+
+        .list-group-item:not(:last-child) {
+            border-bottom: 1px solid #e9ecef !important;
+        }
+
+        .btn-outline-primary {
+            border-width: 2px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem !important;
+            }
+
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+    </style>
